@@ -93,8 +93,6 @@ const FALLBACK_TYPE_MAP = {
   MobileApplication: 'SoftwareApplication', WebApplication: 'SoftwareApplication',
 };
 
-// remoteRules가 있으면 typeFallback 사용, 없으면 내장 폴백
-let _typeFallback = null;
 function getTypeFallback(remoteRules) {
   if (remoteRules?.typeFallback) return remoteRules.typeFallback;
   return FALLBACK_TYPE_MAP;
