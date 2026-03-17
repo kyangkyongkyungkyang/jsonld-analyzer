@@ -192,7 +192,8 @@ function renderJsonldTab(issues, typeResults, jsonlds, rules) {
   const errors = issues.filter(i => i.sev === 'error');
   const warns = issues.filter(i => i.sev === 'warn');
   const passes = issues.filter(i => i.sev === 'pass');
-  const multiType = jsonlds.length > 1;
+  // 2개 이상이거나 폴백 분석된 타입이 있으면 타입 태그 표시
+  const showTypes = jsonlds.length > 1 || typeResults.some(t => t.isFallback);
 
   // 타입별 tips 수집 (remote rules 우선)
   const rulesLookup = rules || SCHEMA_RULES;
@@ -216,9 +217,9 @@ function renderJsonldTab(issues, typeResults, jsonlds, rules) {
   container.innerHTML = `
     <div style="margin-bottom:.75rem">${typeHtml}</div>
     ${allGoodHtml}
-    ${errors.length > 0 ? buildCheckGroup(msg('groupError'), errors, multiType) : ''}
-    ${warns.length > 0 ? buildCheckGroup(msg('groupWarn'), warns, multiType) : ''}
-    ${(errors.length > 0 || warns.length > 0) && passes.length > 0 ? buildCheckGroup(msg('groupPass'), passes, multiType) : ''}
+    ${errors.length > 0 ? buildCheckGroup(msg('groupError'), errors, showTypes) : ''}
+    ${warns.length > 0 ? buildCheckGroup(msg('groupWarn'), warns, showTypes) : ''}
+    ${(errors.length > 0 || warns.length > 0) && passes.length > 0 ? buildCheckGroup(msg('groupPass'), passes, showTypes) : ''}
     ${uniqueTips.length > 0 ? `<div class="section-tip">${uniqueTips.map(t => sanitizeHtml(t)).join('<br><br>')}</div>` : ''}
   `;
 }

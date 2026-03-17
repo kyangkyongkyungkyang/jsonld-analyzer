@@ -108,10 +108,11 @@ function validateJsonLd(jsonlds, rules, remoteRules) {
 
   jsonlds.forEach((ld, idx) => {
     const type = getType(ld);
+    const isFallback = !rulesMap[type] && !!fallback[type];
     const r = rulesMap[type] || rulesMap[fallback[type]];
     const safeType = escHtml(type);
     const tl = escHtml(r?.label || type);
-    typeResults.push({ type: safeType, label: tl, supported: !!r });
+    typeResults.push({ type: safeType, label: tl, supported: !!r, isFallback });
 
     if (!r) {
       issues.push({ sev: 'info', text: msg('unsupportedType', safeType), desc: msg('unsupportedTypeDesc'), cat: 'jsonld', typeLabel: safeType });
