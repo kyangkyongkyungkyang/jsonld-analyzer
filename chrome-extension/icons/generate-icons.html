@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head><title>Icon Generator</title></head>
+<body>
+<p>아래 이미지들을 우클릭 → "다른 이름으로 저장"하여 icons/ 폴더에 저장하세요.</p>
+<canvas id="c16" width="16" height="16"></canvas> <span>icon16.png</span><br><br>
+<canvas id="c48" width="48" height="48"></canvas> <span>icon48.png</span><br><br>
+<canvas id="c128" width="128" height="128"></canvas> <span>icon128.png</span><br><br>
+<script>
+function drawIcon(canvas) {
+  const ctx = canvas.getContext('2d');
+  const s = canvas.width;
+  const r = s * 0.15;
+  // Background gradient
+  const grad = ctx.createLinearGradient(0, 0, s, s);
+  grad.addColorStop(0, '#00f0ff');
+  grad.addColorStop(1, '#00ff88');
+  ctx.beginPath();
+  ctx.moveTo(r, 0); ctx.lineTo(s - r, 0); ctx.quadraticCurveTo(s, 0, s, r);
+  ctx.lineTo(s, s - r); ctx.quadraticCurveTo(s, s, s - r, s);
+  ctx.lineTo(r, s); ctx.quadraticCurveTo(0, s, 0, s - r);
+  ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.fillStyle = grad; ctx.fill();
+  // Text
+  ctx.fillStyle = '#0a0e17';
+  ctx.font = `bold ${s * 0.45}px monospace`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('{}', s / 2, s / 2 + s * 0.02);
+}
+['c16','c48','c128'].forEach(id => {
+  const c = document.getElementById(id);
+  drawIcon(c);
+  // Auto-download
+  const link = document.createElement('a');
+  link.download = `icon${c.width}.png`;
+  link.href = c.toDataURL('image/png');
+  link.click();
+});
+</script>
+</body>
+</html>

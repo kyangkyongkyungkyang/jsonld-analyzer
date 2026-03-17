@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "JSON-LD Analyzer",
+  "version": "1.0.0",
+  "description": "현재 페이지의 JSON-LD 구조화 데이터를 추출하고 Google Rich Results 가이드라인 기반으로 분석합니다",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
