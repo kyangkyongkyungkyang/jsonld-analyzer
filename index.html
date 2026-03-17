@@ -3,1006 +3,566 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JSON-LD 구조화 데이터 분석기</title>
+<title>GEO Analyzer — JSON-LD + AI 검색 최적화 분석기</title>
+<meta name="description" content="웹 페이지의 JSON-LD 구조화 데이터를 추출하고 Google Rich Results + GEO 가이드라인 기반으로 분석합니다.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg-deep:#0a0e17;--bg-card:#111827;--bg-surface:#1a2235;--bg-hover:#243049;
-  --text-primary:#e8edf5;--text-secondary:#8b97b0;--text-muted:#4a5568;
-  --accent-cyan:#00f0ff;--accent-green:#00ff88;--accent-amber:#ffb800;--accent-red:#ff3d5a;--accent-purple:#a78bfa;
-  --border:#1e2d45;--border-active:#2d4a6f;
-  --glow-cyan:0 0 20px rgba(0,240,255,.15);--glow-green:0 0 20px rgba(0,255,136,.15);
-  --radius:12px;--radius-sm:8px;
-  --font-mono:'JetBrains Mono',monospace;--font-sans:'Noto Sans KR','Space Grotesk',sans-serif;
-  --transition:all .3s cubic-bezier(.4,0,.2,1);
+  --bg:#f8f9fb;--bg-white:#ffffff;--bg-card:#f1f3f7;--bg-hover:#e8ebf0;
+  --text:#1a1d23;--text2:#555b66;--text3:#999da6;
+  --primary:#3366ff;--primary-bg:#eef2ff;--primary-light:#dbe4ff;
+  --green:#00c853;--green-bg:#e6f9ee;
+  --amber:#ff9800;--amber-bg:#fff4e5;
+  --red:#f44336;--red-bg:#ffeaea;
+  --purple:#7c4dff;--purple-bg:#f3edff;
+  --border:#e2e5ea;--border-hover:#d0d5dd;
+  --radius:14px;--radius-sm:10px;
+  --mono:'IBM Plex Mono',monospace;--sans:'Noto Sans KR',-apple-system,sans-serif;
+  --shadow:0 1px 3px rgba(0,0,0,.05);
+  --shadow-md:0 4px 16px rgba(0,0,0,.07);
+  --shadow-lg:0 8px 30px rgba(0,0,0,.08);
 }
-html{font-size:15px;scroll-behavior:smooth}
-body{
-  font-family:var(--font-sans);background:var(--bg-deep);color:var(--text-primary);
-  min-height:100vh;overflow-x:hidden;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%,rgba(0,240,255,.06),transparent),
-    radial-gradient(ellipse 60% 40% at 80% 100%,rgba(0,255,136,.04),transparent);
-}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
 
-/* GRID NOISE */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h60v60H0z' fill='none'/%3E%3Cpath d='M60 0v60M0 0h60' stroke='%23ffffff' stroke-opacity='.02'/%3E%3C/svg%3E");
-}
+.container{max-width:860px;margin:0 auto;padding:2.5rem 1.5rem}
+@media(max-width:640px){.container{padding:1.5rem 1rem}}
 
-.container{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-index:1}
-
-/* HEADER */
-.header{text-align:center;margin-bottom:3rem;position:relative}
-.header::after{
-  content:'';position:absolute;bottom:-1.5rem;left:50%;transform:translateX(-50%);
-  width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--accent-cyan),transparent);
-}
-.logo{display:inline-flex;align-items:center;gap:.75rem;margin-bottom:1rem}
-.logo-icon{
-  width:48px;height:48px;border-radius:var(--radius-sm);
-  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-green));
+/* ═══ HEADER ═══ */
+.header{text-align:center;margin-bottom:2.5rem}
+.header-row{display:inline-flex;align-items:center;gap:.65rem;margin-bottom:.6rem}
+.logo{
+  width:38px;height:38px;border-radius:var(--radius-sm);background:var(--primary);
   display:flex;align-items:center;justify-content:center;
-  font-size:1.4rem;font-weight:700;color:var(--bg-deep);
-  box-shadow:var(--glow-cyan);
+  color:#fff;font-weight:700;font-size:1rem;box-shadow:var(--shadow-md);
 }
-.header h1{
-  font-family:var(--font-mono);font-size:1.8rem;font-weight:700;letter-spacing:-.02em;
-  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-green));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+.header h1{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+.header p{font-size:.82rem;color:var(--text3);margin-top:.2rem}
+.header .ext-link{
+  display:inline-flex;align-items:center;gap:.3rem;margin-top:.6rem;
+  font-size:.72rem;color:var(--primary);text-decoration:none;
+  padding:.3rem .7rem;border:1px solid var(--primary-light);border-radius:20px;
+  transition:all .15s;
 }
-.header p{color:var(--text-secondary);font-size:.85rem;margin-top:.5rem;font-weight:300}
+.header .ext-link:hover{background:var(--primary-bg)}
 
-/* TABS */
-.tab-bar{
-  display:flex;gap:.5rem;margin-bottom:1.5rem;padding:.25rem;
-  background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);
+/* ═══ INPUT SECTION ═══ */
+.input-card{
+  background:var(--bg-white);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.25rem;margin-bottom:1.5rem;box-shadow:var(--shadow);
 }
-.tab{
-  flex:1;padding:.75rem 1rem;border:none;border-radius:var(--radius-sm);
-  background:transparent;color:var(--text-secondary);cursor:pointer;
-  font-family:var(--font-mono);font-size:.8rem;font-weight:500;
-  transition:var(--transition);
+.tab-row{display:flex;gap:.35rem;margin-bottom:1rem}
+.tab-btn{
+  padding:.45rem .9rem;border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--bg);color:var(--text2);cursor:pointer;font-size:.78rem;font-weight:500;
+  transition:all .15s;
 }
-.tab:hover{color:var(--text-primary);background:var(--bg-surface)}
-.tab.active{background:var(--bg-surface);color:var(--accent-cyan);box-shadow:inset 0 0 0 1px var(--border-active)}
+.tab-btn:hover{border-color:var(--border-hover);color:var(--text)}
+.tab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 
-/* INPUT SECTION */
-.input-section{margin-bottom:2rem}
 .input-group{position:relative}
 .url-input{
-  width:100%;padding:1rem 1.25rem;padding-right:8rem;
-  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  color:var(--text-primary);font-family:var(--font-mono);font-size:.85rem;
-  transition:var(--transition);outline:none;
+  width:100%;padding:.8rem 1rem;padding-right:5.5rem;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--text);font-family:var(--mono);font-size:.82rem;outline:none;
+  transition:border-color .15s;
 }
-.url-input:focus{border-color:var(--accent-cyan);box-shadow:var(--glow-cyan)}
-.url-input::placeholder{color:var(--text-muted)}
+.url-input:focus{border-color:var(--primary)}
+.url-input::placeholder{color:var(--text3)}
 
 .paste-area{
-  width:100%;min-height:200px;padding:1.25rem;resize:vertical;
-  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  color:var(--accent-green);font-family:var(--font-mono);font-size:.8rem;line-height:1.6;
-  transition:var(--transition);outline:none;
+  width:100%;min-height:160px;padding:1rem;resize:vertical;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--text);font-family:var(--mono);font-size:.78rem;line-height:1.6;
+  outline:none;transition:border-color .15s;
 }
-.paste-area:focus{border-color:var(--accent-green);box-shadow:var(--glow-green)}
-.paste-area::placeholder{color:var(--text-muted)}
+.paste-area:focus{border-color:var(--primary)}
+.paste-area::placeholder{color:var(--text3)}
 
-.btn-analyze{
-  position:absolute;right:.5rem;top:50%;transform:translateY(-50%);
-  padding:.6rem 1.5rem;border:none;border-radius:var(--radius-sm);
-  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-green));
-  color:var(--bg-deep);font-family:var(--font-mono);font-size:.8rem;font-weight:600;
-  cursor:pointer;transition:var(--transition);
+.btn-go{
+  position:absolute;right:.4rem;top:50%;transform:translateY(-50%);
+  padding:.5rem 1.2rem;border:none;border-radius:8px;
+  background:var(--primary);color:#fff;font-size:.78rem;font-weight:600;
+  cursor:pointer;transition:all .15s;
 }
-.btn-analyze:hover{transform:translateY(-50%) scale(1.03);box-shadow:var(--glow-cyan)}
-.btn-analyze:disabled{opacity:.5;cursor:not-allowed;transform:translateY(-50%)}
-.btn-analyze-paste{
-  display:block;margin:1rem auto 0;
-  padding:.75rem 2rem;border:none;border-radius:var(--radius-sm);
-  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-green));
-  color:var(--bg-deep);font-family:var(--font-mono);font-size:.85rem;font-weight:600;
-  cursor:pointer;transition:var(--transition);
+.btn-go:hover{opacity:.9}
+.btn-go:disabled{opacity:.4;cursor:not-allowed}
+.btn-go-block{
+  display:block;margin:.75rem auto 0;padding:.6rem 2rem;border:none;border-radius:8px;
+  background:var(--primary);color:#fff;font-size:.82rem;font-weight:600;
+  cursor:pointer;transition:all .15s;
 }
-.btn-analyze-paste:hover{transform:scale(1.03);box-shadow:var(--glow-cyan)}
+.btn-go-block:hover{opacity:.9}
+
+.samples{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.6rem}
+.sample-btn{
+  padding:.3rem .6rem;border:1px solid var(--border);border-radius:16px;
+  background:var(--bg-white);color:var(--text3);cursor:pointer;font-size:.68rem;
+  transition:all .15s;
+}
+.sample-btn:hover{border-color:var(--primary);color:var(--primary)}
 
 .hidden{display:none!important}
 
-/* LOADING */
-.loading-overlay{
-  display:none;flex-direction:column;align-items:center;justify-content:center;
-  padding:3rem;gap:1.5rem;
-}
-.loading-overlay.active{display:flex}
+/* ═══ LOADING ═══ */
+.loading{display:none;text-align:center;padding:3rem}
+.loading.active{display:block}
 .spinner{
-  width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent-cyan);
-  border-radius:50%;animation:spin 1s linear infinite;
+  width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);
+  border-radius:50%;animation:spin .7s linear infinite;margin:0 auto .75rem;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{
-  font-family:var(--font-mono);font-size:.85rem;color:var(--accent-cyan);
-  overflow:hidden;white-space:nowrap;
-  border-right:2px solid var(--accent-cyan);
-  animation:typing 2s steps(30) infinite,blink .5s step-end infinite alternate;
-}
-@keyframes typing{0%,100%{width:0}50%{width:22ch}}
-@keyframes blink{50%{border-color:transparent}}
+.loading p{font-size:.82rem;color:var(--text2)}
 
-/* RESULTS */
-.results{display:none;animation:fadeUp .5s ease}
-.results.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+/* ═══ RESULTS ═══ */
+.results{display:none}
+.results.active{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-/* SCORE DASHBOARD */
-.score-dashboard{
-  display:grid;grid-template-columns:280px 1fr;gap:1.5rem;margin-bottom:2rem;
+/* ═══ SCORE CARD ═══ */
+.score-card{
+  background:var(--bg-white);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.5rem;margin-bottom:1.25rem;box-shadow:var(--shadow);
+  display:flex;gap:1.5rem;align-items:flex-start;
 }
-@media(max-width:768px){.score-dashboard{grid-template-columns:1fr}}
-
-.score-gauge{
-  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:2rem;display:flex;flex-direction:column;align-items:center;gap:1rem;
-}
-.gauge-ring{position:relative;width:180px;height:180px}
-.gauge-ring svg{transform:rotate(-90deg)}
-.gauge-ring circle{fill:none;stroke-width:8;stroke-linecap:round}
-.gauge-bg{stroke:var(--border)}
-.gauge-fill{transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)}
-.gauge-center{
+@media(max-width:640px){.score-card{flex-direction:column;align-items:center;text-align:center}}
+.score-ring{position:relative;width:100px;height:100px;flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring circle{fill:none;stroke-width:7;stroke-linecap:round}
+.ring-bg{stroke:var(--border)}
+.ring-fill{transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)}
+.ring-center{
   position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
 }
-.gauge-score{font-family:var(--font-mono);font-size:3rem;font-weight:700;line-height:1}
-.gauge-label{font-size:.75rem;color:var(--text-secondary);margin-top:.25rem}
-.gauge-grade{
-  font-family:var(--font-mono);font-size:.9rem;font-weight:600;
-  padding:.35rem 1rem;border-radius:20px;
-}
+.ring-score{font-family:var(--mono);font-size:1.8rem;font-weight:700;line-height:1}
+.ring-label{font-size:.6rem;color:var(--text3)}
+.score-info{flex:1}
+.score-info .grade{font-size:1rem;font-weight:700;margin-bottom:.15rem}
+.score-info .desc{font-size:.78rem;color:var(--text2);margin-bottom:.75rem}
+.score-bars{display:flex;flex-direction:column;gap:.45rem}
+.sbar{display:flex;align-items:center;gap:.5rem}
+.sbar-label{font-size:.72rem;color:var(--text2);min-width:65px}
+.sbar-track{flex:1;height:6px;background:var(--bg-card);border-radius:3px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:3px;transition:width 1s ease .2s}
+.sbar-val{font-family:var(--mono);font-size:.72rem;font-weight:600;min-width:28px;text-align:right}
 
-.score-breakdown{
-  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:1.5rem;display:flex;flex-direction:column;gap:1rem;
+/* ═══ DETECTED TYPES ═══ */
+.types-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1rem}
+.type-chip{
+  padding:.3rem .6rem;border-radius:14px;font-size:.7rem;font-weight:500;
+  border:1px solid var(--primary-light);color:var(--primary);background:var(--primary-bg);
 }
-.breakdown-title{font-family:var(--font-mono);font-size:.9rem;font-weight:600;color:var(--text-secondary)}
-.breakdown-item{display:flex;align-items:center;gap:1rem}
-.breakdown-label{font-size:.8rem;color:var(--text-secondary);min-width:120px}
-.breakdown-bar-track{flex:1;height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden}
-.breakdown-bar-fill{height:100%;border-radius:4px;transition:width 1s ease .3s}
-.breakdown-value{font-family:var(--font-mono);font-size:.85rem;font-weight:600;min-width:45px;text-align:right}
+.type-chip.unknown{border-color:var(--border);color:var(--text3);background:var(--bg-card)}
 
-/* DETECTED TYPES */
-.detected-types{
-  display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;
+/* ═══ AI BOX ═══ */
+.ai-box{
+  background:var(--primary-bg);border:1px solid var(--primary-light);border-radius:var(--radius);
+  padding:1.1rem;margin-bottom:1.25rem;
 }
-.type-badge{
-  padding:.4rem .8rem;border-radius:20px;font-family:var(--font-mono);font-size:.75rem;font-weight:500;
-  border:1px solid;
+.ai-header{font-size:.82rem;font-weight:600;color:var(--primary);margin-bottom:.5rem;display:flex;align-items:center;gap:.35rem}
+.ai-item{
+  font-size:.78rem;color:var(--text2);line-height:1.6;
+  padding:.35rem 0;border-bottom:1px solid rgba(51,102,255,.08);
 }
+.ai-item:last-child{border-bottom:none}
+.ai-item strong{color:var(--text);font-weight:500}
 
-/* DETAIL CARDS */
+/* ═══ TABS ═══ */
+.result-tabs{
+  display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:1rem;
+}
+.rtab{
+  padding:.55rem 1rem;border:none;background:none;cursor:pointer;
+  font-size:.78rem;font-weight:500;color:var(--text3);
+  border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;
+}
+.rtab:hover{color:var(--text2)}
+.rtab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.rtab .badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:18px;height:18px;padding:0 5px;border-radius:9px;
+  font-size:.62rem;font-weight:700;margin-left:.3rem;
+}
+.badge.b-red{background:var(--red-bg);color:var(--red)}
+.badge.b-amber{background:var(--amber-bg);color:var(--amber)}
+.badge.b-green{background:var(--green-bg);color:var(--green)}
+
+.rtab-content{display:none}
+.rtab-content.active{display:block}
+
+/* ═══ CHECK GROUP ═══ */
+.check-group{margin-bottom:1rem}
+.cg-title{
+  font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;
+  letter-spacing:.04em;padding-bottom:.35rem;margin-bottom:.35rem;border-bottom:1px solid var(--border);
+}
+.check-item{display:flex;gap:.55rem;padding:.5rem .5rem;border-radius:var(--radius-sm);transition:background .15s}
+.check-item:hover{background:var(--bg-card)}
+.ci-icon{
+  width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;font-size:.6rem;font-weight:700;
+}
+.ci-icon.pass{background:var(--green-bg);color:var(--green)}
+.ci-icon.error{background:var(--red-bg);color:var(--red)}
+.ci-icon.warn{background:var(--amber-bg);color:var(--amber)}
+.ci-icon.info{background:var(--primary-bg);color:var(--primary)}
+.ci-body{flex:1}
+.ci-title{font-size:.8rem;font-weight:500}
+.ci-desc{font-size:.7rem;color:var(--text3);margin-top:2px;line-height:1.4}
+.ci-desc code{font-family:var(--mono);font-size:.68rem;padding:1px 4px;background:var(--bg-card);border-radius:3px;color:var(--purple)}
+
+/* ═══ CARD ═══ */
 .card{
-  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  margin-bottom:1.25rem;overflow:hidden;
+  background:var(--bg-white);border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:.75rem;overflow:hidden;box-shadow:var(--shadow);
 }
-.card-header{
-  padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--border);cursor:pointer;transition:var(--transition);
+.card-hd{
+  padding:.7rem 1rem;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;font-size:.82rem;font-weight:500;transition:background .15s;
 }
-.card-header:hover{background:var(--bg-surface)}
-.card-header h3{font-family:var(--font-mono);font-size:.9rem;font-weight:600;display:flex;align-items:center;gap:.5rem}
-.card-header .chevron{
-  width:20px;height:20px;color:var(--text-muted);transition:transform .3s ease;
-}
-.card-header.open .chevron{transform:rotate(180deg)}
-.card-body{padding:1.25rem;display:none}
-.card-body.open{display:block;animation:fadeUp .3s ease}
+.card-hd:hover{background:var(--bg-card)}
+.card-hd .chev{font-size:.55rem;color:var(--text3);transition:transform .2s}
+.card-hd.open .chev{transform:rotate(180deg)}
+.card-bd{display:none;padding:.5rem 1rem 1rem;border-top:1px solid var(--border)}
+.card-bd.open{display:block}
 
-/* ISSUE LIST */
-.issue{
-  display:flex;gap:.75rem;padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.04);
+/* ═══ JSON VIEW ═══ */
+.json-view{
+  background:#1e2330;border-radius:var(--radius-sm);padding:1rem;
+  font-family:var(--mono);font-size:.72rem;line-height:1.8;color:#c9d1d9;
+  max-height:450px;overflow:auto;white-space:pre-wrap;word-break:break-all;
 }
-.issue:last-child{border-bottom:none}
-.issue-icon{
-  width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;font-size:.7rem;margin-top:2px;
-}
-.issue-icon.error{background:rgba(255,61,90,.15);color:var(--accent-red)}
-.issue-icon.warn{background:rgba(255,184,0,.15);color:var(--accent-amber)}
-.issue-icon.pass{background:rgba(0,255,136,.15);color:var(--accent-green)}
-.issue-icon.info{background:rgba(0,240,255,.15);color:var(--accent-cyan)}
-.issue-content h4{font-size:.82rem;font-weight:500;margin-bottom:.25rem}
-.issue-content p{font-size:.75rem;color:var(--text-secondary);line-height:1.5}
-.issue-content code{
-  font-family:var(--font-mono);font-size:.72rem;padding:.15rem .4rem;
-  background:var(--bg-surface);border-radius:4px;color:var(--accent-purple);
-}
+.json-view::-webkit-scrollbar{width:5px}
+.json-view::-webkit-scrollbar-thumb{background:#444;border-radius:3px}
+.jk{color:#79c0ff}.js{color:#a5d6a7}.jn{color:#ffcc80}.jb{color:#ce93d8}.jl{color:#666}.jbr{color:#666}
 
-/* JSON TREE */
-.json-tree{
-  background:var(--bg-surface);border-radius:var(--radius-sm);padding:1.25rem;
-  font-family:var(--font-mono);font-size:.78rem;line-height:1.8;
-  max-height:500px;overflow:auto;
-}
-.json-tree::-webkit-scrollbar{width:6px}
-.json-tree::-webkit-scrollbar-track{background:transparent}
-.json-tree::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-.jt-key{color:var(--accent-cyan)}
-.jt-string{color:var(--accent-green)}
-.jt-number{color:var(--accent-amber)}
-.jt-bool{color:var(--accent-purple)}
-.jt-null{color:var(--text-muted)}
-.jt-bracket{color:var(--text-muted)}
-.jt-missing{color:var(--accent-red);opacity:.6;font-style:italic}
+/* ═══ FOOTER ═══ */
+.footer{text-align:center;padding:2rem 0 1rem;font-size:.68rem;color:var(--text3)}
+.footer a{color:var(--primary);text-decoration:none}
+.footer a:hover{text-decoration:underline}
 
-/* AI RECOMMENDATIONS */
-.ai-rec{
-  background:linear-gradient(135deg,rgba(0,240,255,.05),rgba(0,255,136,.05));
-  border:1px solid rgba(0,240,255,.15);border-radius:var(--radius);padding:1.5rem;
-  margin-bottom:1.25rem;
-}
-.ai-rec-header{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem}
-.ai-rec-header span{
-  font-family:var(--font-mono);font-size:.85rem;font-weight:600;
-  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-green));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.ai-rec-item{
-  padding:.6rem 0;border-bottom:1px solid rgba(0,240,255,.08);
-  font-size:.82rem;line-height:1.6;color:var(--text-secondary);
-}
-.ai-rec-item:last-child{border-bottom:none}
-.ai-rec-item strong{color:var(--text-primary);font-weight:500}
-
-/* SAMPLE BUTTONS */
-.sample-bar{
-  display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem;
-}
-.btn-sample{
-  padding:.4rem .8rem;border:1px solid var(--border);border-radius:20px;
-  background:transparent;color:var(--text-secondary);cursor:pointer;
-  font-family:var(--font-mono);font-size:.7rem;transition:var(--transition);
-}
-.btn-sample:hover{border-color:var(--accent-cyan);color:var(--accent-cyan)}
-
-/* FOOTER */
-.footer{
-  text-align:center;padding:2rem 0 1rem;
-  font-size:.72rem;color:var(--text-muted);font-family:var(--font-mono);
-}
-
-/* ERROR */
+/* ═══ ERROR ═══ */
 .error-box{
-  background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.2);
-  border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem;
-  color:var(--accent-red);font-size:.85rem;display:none;
+  background:var(--red-bg);border:1px solid rgba(244,67,54,.2);border-radius:var(--radius);
+  padding:1rem;margin-bottom:1rem;font-size:.82rem;color:var(--red);display:none;
 }
 .error-box.active{display:block}
 </style>
 </head>
 <body>
 <div class="container">
+
   <!-- HEADER -->
   <header class="header">
-    <div class="logo">
-      <div class="logo-icon">{}</div>
+    <div class="header-row">
+      <div class="logo">{}</div>
+      <h1>GEO Analyzer</h1>
     </div>
-    <h1>JSON-LD 구조화 데이터 분석기</h1>
-    <p>Google 리치 결과 가이드라인 기반 · 실시간 검증 · AI 추천</p>
+    <p>JSON-LD 구조화 데이터 + AI 검색 최적화(GEO) 분석기</p>
+    <a class="ext-link" href="https://github.com/kyangkyongkyungkyang/jsonld-analyzer" target="_blank">
+      GitHub — Chrome 확장도 제공 ↗
+    </a>
   </header>
 
-  <!-- TABS -->
-  <div class="tab-bar">
-    <button class="tab active" data-tab="url" onclick="switchTab('url')">🌐 URL 입력</button>
-    <button class="tab" data-tab="paste" onclick="switchTab('paste')">📋 직접 붙여넣기</button>
-  </div>
-
-  <!-- URL INPUT -->
-  <div class="input-section" id="tab-url">
-    <div class="input-group">
-      <input type="url" class="url-input" id="urlInput" placeholder="https://example.com — 분석할 페이지 주소 입력">
-      <button class="btn-analyze" id="btnAnalyzeUrl" onclick="analyzeUrl()">분석 →</button>
+  <!-- INPUT -->
+  <div class="input-card">
+    <div class="tab-row">
+      <button class="tab-btn active" data-t="url" onclick="switchInput('url')">URL 입력</button>
+      <button class="tab-btn" data-t="paste" onclick="switchInput('paste')">직접 붙여넣기</button>
     </div>
-    <div class="sample-bar">
-      <span style="font-size:.7rem;color:var(--text-muted);padding:.4rem 0">샘플:</span>
-      <button class="btn-sample" onclick="loadSample('product')">Product</button>
-      <button class="btn-sample" onclick="loadSample('article')">Article</button>
-      <button class="btn-sample" onclick="loadSample('faq')">FAQPage</button>
-      <button class="btn-sample" onclick="loadSample('breadcrumb')">BreadcrumbList</button>
-      <button class="btn-sample" onclick="loadSample('org')">Organization</button>
-      <button class="btn-sample" onclick="loadSample('local')">LocalBusiness</button>
+    <div id="inputUrl">
+      <div class="input-group">
+        <input type="url" class="url-input" id="urlInput" placeholder="https://example.com">
+        <button class="btn-go" id="btnGo" onclick="analyzeUrl()">분석</button>
+      </div>
+      <div class="samples">
+        <button class="sample-btn" onclick="loadSample('product')">Product</button>
+        <button class="sample-btn" onclick="loadSample('article')">Article</button>
+        <button class="sample-btn" onclick="loadSample('faq')">FAQPage</button>
+        <button class="sample-btn" onclick="loadSample('breadcrumb')">Breadcrumb</button>
+        <button class="sample-btn" onclick="loadSample('org')">Organization</button>
+        <button class="sample-btn" onclick="loadSample('local')">LocalBusiness</button>
+      </div>
+    </div>
+    <div id="inputPaste" class="hidden">
+      <textarea class="paste-area" id="pasteInput" placeholder='HTML 소스 또는 JSON-LD를 붙여넣으세요&#10;&#10;<script type="application/ld+json">&#10;{ "@context": "https://schema.org", "@type": "Product", "name": "..." }&#10;</script>'></textarea>
+      <button class="btn-go-block" onclick="analyzePaste()">분석 시작</button>
     </div>
   </div>
 
-  <!-- PASTE INPUT -->
-  <div class="input-section hidden" id="tab-paste">
-    <textarea class="paste-area" id="pasteInput" placeholder='HTML 소스 또는 JSON-LD를 붙여넣으세요.&#10;&#10;예시:&#10;<script type="application/ld+json">&#10;{&#10;  "@context": "https://schema.org",&#10;  "@type": "Product",&#10;  "name": "상품명"&#10;}&#10;</script>'></textarea>
-    <button class="btn-analyze-paste" onclick="analyzePaste()">분석 시작 →</button>
-  </div>
-
-  <!-- ERROR -->
   <div class="error-box" id="errorBox"></div>
-
-  <!-- LOADING -->
-  <div class="loading-overlay" id="loading">
-    <div class="spinner"></div>
-    <div class="loading-text">구조화 데이터 분석 중...</div>
-  </div>
+  <div class="loading" id="loading"><div class="spinner"></div><p>페이지 분석 중...</p></div>
 
   <!-- RESULTS -->
   <div class="results" id="results">
-    <!-- Score Dashboard -->
-    <div class="score-dashboard">
-      <div class="score-gauge">
-        <div class="gauge-ring">
-          <svg viewBox="0 0 200 200">
-            <circle class="gauge-bg" cx="100" cy="100" r="85" />
-            <circle class="gauge-fill" id="gaugeFill" cx="100" cy="100" r="85"
-              stroke-dasharray="534" stroke-dashoffset="534" />
-          </svg>
-          <div class="gauge-center">
-            <div class="gauge-score" id="totalScore">0</div>
-            <div class="gauge-label">/ 100</div>
-          </div>
+    <!-- Score Card -->
+    <div class="score-card">
+      <div class="score-ring">
+        <svg viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="50" />
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="50"
+            stroke-dasharray="314" stroke-dashoffset="314" />
+        </svg>
+        <div class="ring-center">
+          <div class="ring-score" id="ringScore">0</div>
+          <div class="ring-label">/ 100</div>
         </div>
-        <div class="gauge-grade" id="gradeLabel">—</div>
       </div>
-      <div class="score-breakdown">
-        <div class="breakdown-title">📊 세부 점수</div>
-        <div id="breakdownList"></div>
+      <div class="score-info">
+        <div class="grade" id="gradeText">—</div>
+        <div class="desc" id="gradeDesc">—</div>
+        <div class="score-bars" id="scoreBars"></div>
       </div>
     </div>
 
-    <!-- Detected Types -->
-    <div class="detected-types" id="detectedTypes"></div>
+    <!-- Types -->
+    <div class="types-row" id="typesRow"></div>
 
-    <!-- AI Recommendation -->
-    <div class="ai-rec" id="aiRec"></div>
+    <!-- AI -->
+    <div class="ai-box" id="aiBox"></div>
 
-    <!-- Detail Cards -->
-    <div id="detailCards"></div>
+    <!-- Result Tabs -->
+    <div class="result-tabs">
+      <button class="rtab active" data-rt="issues" onclick="switchRtab('issues')">주요 이슈</button>
+      <button class="rtab" data-rt="jsonld" onclick="switchRtab('jsonld')">JSON-LD <span class="badge b-green" id="bjld">0</span></button>
+      <button class="rtab" data-rt="geo" onclick="switchRtab('geo')">GEO <span class="badge b-green" id="bgeo">0</span></button>
+      <button class="rtab" data-rt="raw" onclick="switchRtab('raw')">원본</button>
+    </div>
 
-    <!-- Raw JSON-LD -->
-    <div class="card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <h3>🔍 원본 JSON-LD<span style="font-size:.7rem;color:var(--text-muted);margin-left:.5rem" id="jsonCount"></span></h3>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
-      <div class="card-body">
-        <div class="json-tree" id="jsonTree"></div>
-      </div>
+    <div class="rtab-content active" id="rt-issues"><div id="issuesList"></div></div>
+    <div class="rtab-content" id="rt-jsonld"><div id="jsonldList"></div></div>
+    <div class="rtab-content" id="rt-geo"><div id="geoList"></div></div>
+    <div class="rtab-content" id="rt-raw">
+      <div class="json-view" id="jsonView">데이터 없음</div>
     </div>
   </div>
 
   <footer class="footer">
-    JSON-LD Analyzer · Google Structured Data Guidelines Reference · 2026
+    GEO Analyzer · Google Rich Results + Generative Engine Optimization<br>
+    <a href="https://github.com/kyangkyongkyungkyang/jsonld-analyzer" target="_blank">GitHub</a>
+    · <span id="rulesVer"></span>
   </footer>
 </div>
 
 <script>
 // ═══════════════════════════════════════
-// GOOGLE RICH RESULTS SCHEMA RULES (2026)
+// SCHEMA RULES (built-in)
 // ═══════════════════════════════════════
-const SCHEMA_RULES = {
-  Product: {
-    label: '상품',
-    required: ['name'],
-    recommended: ['image','description','sku','brand','offers','aggregateRating','review'],
-    offers_required: ['price','priceCurrency','availability'],
-    offers_recommended: ['url','priceValidUntil','itemCondition','seller'],
-    tips: [
-      '`offers`에 `availability` 속성은 Google 쇼핑 탭 노출의 핵심 조건입니다.',
-      '`aggregateRating` + `review`가 함께 있으면 별점 리치 결과 노출 확률이 높아집니다.',
-      '`image`는 최소 1개, 권장 3개 이상(다각도) 제공하세요.',
-      '`brand.name`이 있으면 Google 머천트 센터 매칭 정확도가 올라갑니다.',
-      '`gtin`, `mpn` 등 글로벌 식별자를 추가하면 제품 검색 정확도가 크게 향상됩니다.'
-    ]
-  },
-  Article: {
-    label: '기사/블로그',
-    required: ['headline','author','datePublished'],
-    recommended: ['image','dateModified','publisher','description','mainEntityOfPage','articleBody'],
-    author_required: ['name'],
-    author_recommended: ['url'],
-    publisher_required: ['name','logo'],
-    tips: [
-      '`dateModified`는 콘텐츠 신선도 시그널로, 구글이 크롤링 우선순위에 반영합니다.',
-      '`author.url`을 프로필 페이지로 연결하면 E-E-A-T 신호가 강화됩니다.',
-      '`image`는 1200px 이상 너비를 권장하며, 최소 696px 이상이어야 합니다.',
-      '`publisher.logo`는 60x600px 이내, 흰색/밝은 배경 권장입니다.'
-    ]
-  },
-  FAQPage: {
-    label: 'FAQ',
-    required: ['mainEntity'],
-    mainEntity_required: ['name','acceptedAnswer'],
-    acceptedAnswer_required: ['text'],
-    recommended: [],
-    tips: [
-      '각 질문(`name`)은 완전한 문장 형태의 질문이어야 합니다.',
-      '답변(`acceptedAnswer.text`)에 HTML 마크업 사용 시 `<a>`, `<b>`, `<br>` 등만 허용됩니다.',
-      'FAQ 리치 결과는 페이지당 최대 2개 질문만 SERP에 노출될 수 있습니다.',
-      '2023년 이후 자동 생성 FAQ에 대한 리치 결과 노출이 제한되었습니다 — 고유한 콘텐츠가 중요합니다.'
-    ]
-  },
-  BreadcrumbList: {
-    label: '탐색경로',
-    required: ['itemListElement'],
-    itemListElement_required: ['position','name','item'],
-    recommended: [],
-    tips: [
-      '`position`은 1부터 시작하는 연속 정수여야 합니다.',
-      '마지막 항목(현재 페이지)은 `item`(URL) 생략이 가능합니다.',
-      '모든 `item` URL은 절대 경로여야 합니다 (상대 경로 ✕).',
-      '사이트 계층 구조를 정확히 반영해야 하며, 인위적 경로는 피하세요.'
-    ]
-  },
-  Organization: {
-    label: '조직',
-    required: ['name','url'],
-    recommended: ['logo','sameAs','contactPoint','address','description','foundingDate'],
-    tips: [
-      '`sameAs`에 공식 SNS 프로필을 모두 등록하면 지식 패널 노출에 유리합니다.',
-      '`logo`는 112x112px 이상의 정사각형 또는 직사각형을 권장합니다.',
-      '`contactPoint`에 전화번호, 이메일을 구조화하면 고객 서비스 리치 결과가 가능합니다.',
-      '본사/지사별로 별도 Organization을 만들지 말고 하나로 통합하세요.'
-    ]
-  },
-  LocalBusiness: {
-    label: '지역업체',
-    required: ['name','address','url'],
-    recommended: ['telephone','openingHours','geo','image','priceRange','aggregateRating','review','servesCuisine'],
-    address_required: ['streetAddress','addressLocality','addressRegion','postalCode','addressCountry'],
-    tips: [
-      '`geo`(위도/경도)는 Google Maps 정확한 위치 표시에 필수입니다.',
-      '`openingHoursSpecification`을 사용하면 요일별 영업시간을 더 정밀하게 표현할 수 있습니다.',
-      '`address`의 각 필드를 분리해서 작성하면 구글이 더 정확하게 파싱합니다.',
-      '`priceRange`는 "$"~"$$$$" 형태로 간단히 표현하세요.'
-    ]
-  },
-  WebSite: {
-    label: '웹사이트',
-    required: ['name','url'],
-    recommended: ['potentialAction','description'],
-    tips: [
-      '`potentialAction`(SearchAction)을 추가하면 사이트 검색창 리치 결과를 받을 수 있습니다.',
-      'SearchAction의 `query-input`은 `required name=search_term_string` 형태여야 합니다.',
-      '홈페이지에만 WebSite 마크업을 넣으세요 — 모든 페이지에 넣을 필요 없습니다.'
-    ]
-  },
-  Event: {
-    label: '이벤트',
-    required: ['name','startDate','location'],
-    recommended: ['endDate','description','image','offers','performer','organizer','eventStatus','eventAttendanceMode'],
-    tips: [
-      '`eventStatus`는 예정(Scheduled), 취소(Cancelled), 연기(Postponed) 등을 명시하세요.',
-      '`eventAttendanceMode`는 온라인/오프라인/혼합 여부를 표시합니다 (2024년부터 권장).',
-      '`location`이 온라인이면 `VirtualLocation` + `url` 형태를 사용하세요.',
-      '`offers`에 가격과 판매 URL을 포함하면 이벤트 카드에 바로 구매 링크가 표시됩니다.'
-    ]
-  },
-  Recipe: {
-    label: '레시피',
-    required: ['name','image'],
-    recommended: ['author','datePublished','description','prepTime','cookTime','totalTime','recipeYield','recipeIngredient','recipeInstructions','nutrition','aggregateRating','review','recipeCategory','recipeCuisine','video'],
-    tips: [
-      '`recipeInstructions`는 HowToStep 배열로 작성하면 단계별 리치 결과가 가능합니다.',
-      '`image`는 최소 3장(1:1, 4:3, 16:9 비율)을 제공하면 다양한 SERP에 대응합니다.',
-      '`nutrition.calories`는 Google이 자주 표시하는 필드입니다.',
-      '`video`(VideoObject)를 포함하면 비디오 리치 결과와 결합 노출됩니다.'
-    ]
-  },
-  VideoObject: {
-    label: '동영상',
-    required: ['name','description','thumbnailUrl','uploadDate'],
-    recommended: ['contentUrl','embedUrl','duration','interactionStatistic','expires','hasPart'],
-    tips: [
-      '`thumbnailUrl`은 최소 160x90px, 권장 1920x1080px입니다.',
-      '`duration`은 ISO 8601 형식(예: PT1H30M)으로 작성하세요.',
-      '`hasPart`(Clip)를 추가하면 "핵심 순간" 리치 결과가 가능합니다.',
-      '`interactionStatistic`으로 조회수를 표시하면 SERP에서 신뢰도가 올라갑니다.'
-    ]
-  },
-  HowTo: {
-    label: '사용법',
-    required: ['name','step'],
-    recommended: ['image','description','totalTime','estimatedCost','supply','tool'],
-    tips: [
-      '각 `step`은 `HowToStep`으로 `name`과 `text`를 포함해야 합니다.',
-      '단계별 이미지(`image`)를 추가하면 비주얼 가이드 리치 결과가 됩니다.',
-      '`totalTime`은 ISO 8601 형식으로 작성하세요.'
-    ]
-  },
-  Review: {
-    label: '리뷰',
-    required: ['itemReviewed','author','reviewRating'],
-    recommended: ['datePublished','reviewBody','publisher'],
-    tips: [
-      '`reviewRating`에 `bestRating`, `worstRating`을 명시하면 비표준 척도도 정확히 표현됩니다.',
-      '자체 리뷰에는 Review 마크업 대신 Product + `review` 배열을 사용하세요.',
-      '`author`가 Person이면 E-E-A-T 신호가 더 강합니다.'
-    ]
-  },
-  SoftwareApplication: {
-    label: '소프트웨어',
-    required: ['name','offers'],
-    recommended: ['applicationCategory','operatingSystem','aggregateRating','review','screenshot','description'],
-    tips: [
-      '`applicationCategory`는 GameApplication, WebApplication 등 구체적으로 작성하세요.',
-      '무료 앱도 `offers.price`를 "0"으로 명시해야 합니다.',
-      '`operatingSystem`은 사용자 검색 필터에 영향을 줍니다.'
-    ]
-  },
-  Course: {
-    label: '강좌',
-    required: ['name','description','provider'],
-    recommended: ['hasCourseInstance','offers','coursePrerequisites','educationalLevel','image','aggregateRating'],
-    tips: [
-      '`hasCourseInstance`로 수강 기간, 일정을 구조화하면 리치 결과에 표시됩니다.',
-      '`provider`는 Organization 타입으로 기관명과 URL을 포함하세요.',
-      '`offers`에 수강료를 명시하면 가격 비교 리치 결과에 포함됩니다.'
-    ]
-  },
-  JobPosting: {
-    label: '채용공고',
-    required: ['title','description','datePosted','hiringOrganization','jobLocation'],
-    recommended: ['baseSalary','employmentType','validThrough','applicantLocationRequirements','jobLocationType','directApply'],
-    tips: [
-      '`baseSalary`를 포함하면 Google for Jobs에서 급여 필터에 노출됩니다.',
-      '`validThrough`(마감일)가 지나면 자동으로 리치 결과에서 제외됩니다.',
-      '`jobLocationType`을 "TELECOMMUTE"로 설정하면 재택근무 필터에 포함됩니다.',
-      '`directApply`를 true로 설정하면 "직접 지원" 배지가 표시됩니다.'
-    ]
-  }
+const SCHEMA_RULES={Product:{label:"상품",required:["name"],recommended:["image","description","sku","brand","offers","aggregateRating","review"],offers_required:["price","priceCurrency","availability"],tips:["`offers.availability`는 Google 쇼핑 탭 노출 핵심 조건입니다.","`aggregateRating` + `review`가 함께 있으면 별점 리치 결과 확률 증가.","`gtin`, `mpn` 글로벌 식별자를 추가하면 제품 검색 정확도 향상."]},Article:{label:"기사/블로그",required:["headline","author","datePublished"],recommended:["image","dateModified","publisher","description"],author_required:["name"],publisher_required:["name","logo"],tips:["`dateModified`는 콘텐츠 신선도 시그널입니다.","`author.url`을 프로필 페이지로 연결하면 E-E-A-T 강화.","`image`는 1200px 이상 너비 권장."]},FAQPage:{label:"FAQ",required:["mainEntity"],recommended:[],mainEntity_required:["name","acceptedAnswer"],acceptedAnswer_required:["text"],tips:["FAQ 리치 결과는 페이지당 최대 2개 질문만 SERP 노출.","자동 생성 FAQ에 대한 리치 결과가 제한되고 있습니다."]},BreadcrumbList:{label:"탐색경로",required:["itemListElement"],recommended:[],itemListElement_required:["position","name","item"],tips:["`position`은 1부터 시작하는 연속 정수여야 합니다.","마지막 항목은 `item`(URL) 생략 가능."]},Organization:{label:"조직",required:["name","url"],recommended:["logo","sameAs","contactPoint","address","description"],tips:["`sameAs`에 공식 SNS 등록하면 지식 패널 노출 유리.","`logo`는 112x112px 이상 권장."]},LocalBusiness:{label:"지역업체",required:["name","address","url"],recommended:["telephone","openingHours","geo","image","priceRange","aggregateRating"],address_required:["streetAddress","addressLocality","addressRegion","postalCode","addressCountry"],tips:["`geo`(위도/경도)는 Google Maps 위치 표시에 필수.","`openingHoursSpecification`으로 요일별 영업시간 표현."]},WebSite:{label:"웹사이트",required:["name","url"],recommended:["potentialAction","description"],tips:["`potentialAction`(SearchAction)으로 사이트 검색창 리치 결과 가능."]},Event:{label:"이벤트",required:["name","startDate","location"],recommended:["endDate","description","image","offers","eventStatus","eventAttendanceMode"],tips:["`eventAttendanceMode`로 온/오프라인 여부 표시."]},Recipe:{label:"레시피",required:["name","image"],recommended:["author","description","prepTime","cookTime","recipeIngredient","recipeInstructions","nutrition","aggregateRating"],tips:["`recipeInstructions`를 HowToStep 배열로 작성."]},VideoObject:{label:"동영상",required:["name","description","thumbnailUrl","uploadDate"],recommended:["contentUrl","embedUrl","duration","hasPart"],tips:["`hasPart`(Clip)로 핵심 순간 리치 결과 가능."]},HowTo:{label:"사용법",required:["name","step"],recommended:["image","description","totalTime"],tips:["각 step은 HowToStep으로 name과 text 포함."]},Review:{label:"리뷰",required:["itemReviewed","author","reviewRating"],recommended:["datePublished","reviewBody"],tips:["`author`가 Person이면 E-E-A-T 신호 강화."]},SoftwareApplication:{label:"소프트웨어",required:["name","offers"],recommended:["applicationCategory","operatingSystem","aggregateRating"],tips:["무료 앱도 `offers.price`를 '0'으로 명시."]},Course:{label:"강좌",required:["name","description","provider"],recommended:["hasCourseInstance","offers","image"],tips:["`provider`는 Organization 타입으로 기관명+URL 포함."]},JobPosting:{label:"채용공고",required:["title","description","datePosted","hiringOrganization","jobLocation"],recommended:["baseSalary","employmentType","validThrough","directApply"],tips:["`baseSalary` 포함 시 Google for Jobs 급여 필터 노출."]}};
+
+// ═══════════════════════════════════════
+// SAMPLES
+// ═══════════════════════════════════════
+const SAMPLES={
+  product:{"@context":"https://schema.org","@type":"Product","name":"프리미엄 무선 이어폰 X3","description":"액티브 노이즈 캔슬링, 36시간 배터리","image":["https://example.com/img1.jpg"],"sku":"X3-BLK-001","brand":{"@type":"Brand","name":"TechAudio"},"offers":{"@type":"Offer","price":"159000","priceCurrency":"KRW","availability":"https://schema.org/InStock","url":"https://example.com/x3"}},
+  article:{"@context":"https://schema.org","@type":"Article","headline":"2026년 SEO 트렌드 분석","author":{"@type":"Person","name":"김경환"},"datePublished":"2026-03-15","dateModified":"2026-03-17","publisher":{"@type":"Organization","name":"Tech Blog","logo":{"@type":"ImageObject","url":"https://example.com/logo.png"}},"image":"https://example.com/seo.jpg"},
+  faq:{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"JSON-LD란?","acceptedAnswer":{"@type":"Answer","text":"JSON-LD는 Linked Data를 JSON 형식으로 인코딩하는 방법입니다."}},{"@type":"Question","name":"GEO란?","acceptedAnswer":{"@type":"Answer","text":"Generative Engine Optimization — AI 검색엔진에 최적화하는 기법입니다."}}]},
+  breadcrumb:{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"홈","item":"https://example.com/"},{"@type":"ListItem","position":2,"name":"카테고리","item":"https://example.com/cat"},{"@type":"ListItem","position":3,"name":"현재 페이지"}]},
+  org:{"@context":"https://schema.org","@type":"Organization","name":"Example Corp","url":"https://example.com","logo":"https://example.com/logo.png","sameAs":["https://twitter.com/example"]},
+  local:{"@context":"https://schema.org","@type":"LocalBusiness","name":"맛있는 레스토랑","url":"https://example.com","telephone":"+82-2-1234-5678","address":{"@type":"PostalAddress","streetAddress":"강남대로 123","addressLocality":"서울","addressRegion":"서울특별시","postalCode":"06000","addressCountry":"KR"},"geo":{"@type":"GeoCoordinates","latitude":"37.4979","longitude":"127.0276"}}
 };
 
 // ═══════════════════════════════════════
-// SAMPLE DATA
+// REMOTE RULES LOADER
 // ═══════════════════════════════════════
-const SAMPLES = {
-  product: {
-    "@context":"https://schema.org","@type":"Product","name":"프리미엄 무선 이어폰 X3",
-    "description":"액티브 노이즈 캔슬링, 36시간 배터리","image":["https://example.com/img1.jpg"],
-    "sku":"X3-BLK-001","brand":{"@type":"Brand","name":"TechAudio"},
-    "offers":{"@type":"Offer","price":"159000","priceCurrency":"KRW","availability":"https://schema.org/InStock","url":"https://example.com/x3"}
-  },
-  article: {
-    "@context":"https://schema.org","@type":"Article","headline":"2026년 SEO 트렌드 분석",
-    "author":{"@type":"Person","name":"김경환"},
-    "datePublished":"2026-03-15","dateModified":"2026-03-17",
-    "publisher":{"@type":"Organization","name":"Tech Blog","logo":{"@type":"ImageObject","url":"https://example.com/logo.png"}},
-    "image":"https://example.com/seo-trends.jpg"
-  },
-  faq: {
-    "@context":"https://schema.org","@type":"FAQPage",
-    "mainEntity":[
-      {"@type":"Question","name":"JSON-LD란 무엇인가요?","acceptedAnswer":{"@type":"Answer","text":"JSON-LD는 Linked Data를 JSON 형식으로 인코딩하는 방법입니다."}},
-      {"@type":"Question","name":"구조화 데이터가 SEO에 도움이 되나요?","acceptedAnswer":{"@type":"Answer","text":"네, 리치 결과 노출을 통해 CTR을 크게 높일 수 있습니다."}}
-    ]
-  },
-  breadcrumb: {
-    "@context":"https://schema.org","@type":"BreadcrumbList",
-    "itemListElement":[
-      {"@type":"ListItem","position":1,"name":"홈","item":"https://example.com/"},
-      {"@type":"ListItem","position":2,"name":"카테고리","item":"https://example.com/category"},
-      {"@type":"ListItem","position":3,"name":"현재 페이지"}
-    ]
-  },
-  org: {
-    "@context":"https://schema.org","@type":"Organization","name":"Example Corp","url":"https://example.com",
-    "logo":"https://example.com/logo.png",
-    "sameAs":["https://twitter.com/example","https://facebook.com/example"]
-  },
-  local: {
-    "@context":"https://schema.org","@type":"LocalBusiness","name":"맛있는 레스토랑",
-    "url":"https://example.com","telephone":"+82-2-1234-5678",
-    "address":{"@type":"PostalAddress","streetAddress":"강남대로 123","addressLocality":"서울","addressRegion":"서울특별시","postalCode":"06000","addressCountry":"KR"},
-    "geo":{"@type":"GeoCoordinates","latitude":"37.4979","longitude":"127.0276"},
-    "openingHours":"Mo-Su 11:00-22:00"
-  }
-};
+let remoteRules = null;
+(async function(){
+  try {
+    const r = await fetch('rules.json', {cache:'no-cache'});
+    if(r.ok){ remoteRules = await r.json(); document.getElementById('rulesVer').textContent=`rules v${remoteRules.version} · ${remoteRules.lastUpdated||''}`; }
+  } catch{}
+})();
 
 // ═══════════════════════════════════════
 // UI LOGIC
 // ═══════════════════════════════════════
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  document.getElementById('tab-url').classList.toggle('hidden', tab !== 'url');
-  document.getElementById('tab-paste').classList.toggle('hidden', tab !== 'paste');
+function switchInput(t){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+  document.getElementById('inputUrl').classList.toggle('hidden',t!=='url');
+  document.getElementById('inputPaste').classList.toggle('hidden',t!=='paste');
 }
-
-function toggleCard(header) {
-  header.classList.toggle('open');
-  header.nextElementSibling.classList.toggle('open');
+function switchRtab(t){
+  document.querySelectorAll('.rtab').forEach(b=>b.classList.toggle('active',b.dataset.rt===t));
+  document.querySelectorAll('.rtab-content').forEach(c=>c.classList.toggle('active',c.id===`rt-${t}`));
 }
-
-function loadSample(key) {
-  switchTab('paste');
-  document.querySelector('[data-tab="paste"]').classList.add('active');
-  document.querySelector('[data-tab="url"]').classList.remove('active');
-  const json = JSON.stringify(SAMPLES[key], null, 2);
-  document.getElementById('pasteInput').value = `<script type="application/ld+json">\n${json}\n<\/script>`;
+function loadSample(k){
+  switchInput('paste');
+  document.getElementById('pasteInput').value=`<script type="application/ld+json">\n${JSON.stringify(SAMPLES[k],null,2)}\n<\/script>`;
 }
-
-function showError(msg) {
-  const box = document.getElementById('errorBox');
-  box.textContent = msg;
-  box.classList.add('active');
-  setTimeout(() => box.classList.remove('active'), 8000);
-}
-
-function showLoading(show) {
-  document.getElementById('loading').classList.toggle('active', show);
-  document.getElementById('results').classList.toggle('active', false);
-}
+function showError(msg){const b=document.getElementById('errorBox');b.textContent=msg;b.classList.add('active');setTimeout(()=>b.classList.remove('active'),8000)}
+function showLoading(s){document.getElementById('loading').classList.toggle('active',s);document.getElementById('results').classList.remove('active')}
 
 // ═══════════════════════════════════════
 // FETCH & EXTRACT
 // ═══════════════════════════════════════
-async function analyzeUrl() {
-  const url = document.getElementById('urlInput').value.trim();
-  if (!url) return showError('URL을 입력하세요.');
+async function analyzeUrl(){
+  const url=document.getElementById('urlInput').value.trim();
+  if(!url)return showError('URL을 입력하세요.');
   showLoading(true);
-  document.getElementById('errorBox').classList.remove('active');
-
-  try {
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-    const resp = await fetch(proxyUrl);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const html = await resp.text();
-    const jsonlds = extractJsonLd(html);
-    if (jsonlds.length === 0) throw new Error('JSON-LD 구조화 데이터를 찾을 수 없습니다.');
-    runAnalysis(jsonlds);
-  } catch (e) {
-    showLoading(false);
-    showError(`페이지 로딩 실패: ${e.message}. 직접 붙여넣기 탭을 사용해보세요.`);
-  }
+  try{
+    const r=await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const html=await r.text();
+    runAnalysis(html,url);
+  }catch(e){showLoading(false);showError(`페이지 로딩 실패: ${e.message}`)}
+}
+function analyzePaste(){
+  const raw=document.getElementById('pasteInput').value.trim();
+  if(!raw)return showError('내용을 붙여넣으세요.');
+  try{const p=JSON.parse(raw);runAnalysis(null,null,[Array.isArray(p)?p:[p]])}catch{runAnalysis(raw,null)}
 }
 
-function analyzePaste() {
-  const raw = document.getElementById('pasteInput').value.trim();
-  if (!raw) return showError('HTML 소스 또는 JSON-LD를 붙여넣으세요.');
-  document.getElementById('errorBox').classList.remove('active');
-
-  let jsonlds;
-  try {
-    // Try direct JSON parse first
-    const parsed = JSON.parse(raw);
-    jsonlds = Array.isArray(parsed) ? parsed : [parsed];
-  } catch {
-    // Try extracting from HTML
-    jsonlds = extractJsonLd(raw);
-  }
-
-  if (jsonlds.length === 0) return showError('유효한 JSON-LD를 찾을 수 없습니다.');
-  runAnalysis(jsonlds);
-}
-
-function extractJsonLd(html) {
-  const results = [];
-  const regex = /<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
-  let match;
-  while ((match = regex.exec(html)) !== null) {
-    try {
-      const parsed = JSON.parse(match[1].trim());
-      if (Array.isArray(parsed)) results.push(...parsed);
-      else if (parsed['@graph']) results.push(...parsed['@graph']);
-      else results.push(parsed);
-    } catch {}
-  }
+function extractJsonLd(html){
+  const results=[];
+  const rx=/<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let m;while((m=rx.exec(html))!==null){try{const p=JSON.parse(m[1].trim());if(Array.isArray(p))results.push(...p);else if(p['@graph'])results.push(...p['@graph']);else results.push(p)}catch{}}
   return results;
+}
+function extractMeta(html){
+  const g=(n)=>{const m=html.match(new RegExp(`<meta[^>]*(?:name|property)=["']${n}["'][^>]*content=["']([^"']*)["']`,'i'))||html.match(new RegExp(`content=["']([^"']*)["'][^>]*(?:name|property)=["']${n}["']`,'i'));return m?m[1]:''};
+  const canon=(html.match(/<link[^>]*rel=["']canonical["'][^>]*href=["']([^"']*)["']/i)||[])[1]||'';
+  const lang=(html.match(/<html[^>]*lang=["']([^"']*)["']/i)||[])[1]||'';
+  const viewport=g('viewport');
+  return{title:(html.match(/<title[^>]*>([^<]*)<\/title>/i)||[])[1]||'',description:g('description'),canonical:canon,robots:g('robots'),ogTitle:g('og:title'),ogDescription:g('og:description'),ogImage:g('og:image'),ogType:g('og:type'),twitterCard:g('twitter:card'),author:g('author'),datePublished:g('article:published_time')||g('datePublished'),dateModified:g('article:modified_time')||g('dateModified'),lang,viewport};
+}
+function extractHeadings(html){
+  const h={};['h1','h2','h3','h4','h5','h6'].forEach(t=>{const rx=new RegExp(`<${t}[^>]*>([^<]*)</${t}>`,'gi');const arr=[];let m;while((m=rx.exec(html))!==null)arr.push(m[1].trim());h[t]=arr});
+  let hierarchy=true,maxL=0;const all=html.match(/<h([1-6])[^>]*>/gi)||[];
+  all.forEach(tag=>{const l=parseInt(tag.match(/h([1-6])/i)[1]);if(l>maxL+1)hierarchy=false;if(l>maxL)maxL=l});
+  h.hierarchy=hierarchy;return h;
+}
+function extractContent(html){
+  const text=html.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+  const wc=text.split(/\s+/).filter(w=>w.length>0).length;
+  const imgs=(html.match(/<img\s/gi)||[]).length;
+  const alts=(html.match(/<img[^>]*alt=["'][^"']+["']/gi)||[]).length;
+  const lists=(html.match(/<(?:ul|ol)[\s>]/gi)||[]).length;
+  const tables=(html.match(/<table[\s>]/gi)||[]).length;
+  const links=(html.match(/<a\s[^>]*href=/gi)||[]).length;
+  return{wordCount:wc,imageCount:imgs,imagesWithAlt:alts,lists,tables,linkCount:links,hasFaq:/faq/i.test(html),hasHowTo:/how-?to|step/i.test(html)};
 }
 
 // ═══════════════════════════════════════
 // ANALYSIS ENGINE
 // ═══════════════════════════════════════
-function runAnalysis(jsonlds) {
+function runAnalysis(html,url,preJsonlds){
   showLoading(false);
-  const results = document.getElementById('results');
-  results.classList.add('active');
+  const jsonlds=preJsonlds?preJsonlds.flat():html?extractJsonLd(html):[];
+  const meta=html?extractMeta(html):{};
+  const headings=html?extractHeadings(html):{h1:[],h2:[],h3:[],h4:[],h5:[],h6:[],hierarchy:true};
+  const content=html?extractContent(html):{wordCount:0,imageCount:0,imagesWithAlt:0,lists:0,tables:0,linkCount:0};
 
-  const allIssues = [];
-  const typeResults = [];
+  // Supplement meta from JSON-LD
+  jsonlds.forEach(ld=>{if(!meta.datePublished&&ld.datePublished)meta.datePublished=ld.datePublished;if(!meta.dateModified&&ld.dateModified)meta.dateModified=ld.dateModified;if(!meta.author&&ld.author)meta.author=typeof ld.author==='string'?ld.author:ld.author.name||''});
 
-  jsonlds.forEach((ld, idx) => {
-    const type = getType(ld);
-    const rules = SCHEMA_RULES[type];
-
-    if (!rules) {
-      typeResults.push({ type, label: type, supported: false });
-      allIssues.push({ severity: 'info', title: `"${type}" — 전용 검증 규칙 없음`, desc: 'Google 리치 결과 지원 타입이 아니거나 아직 분석기에 등록되지 않은 타입입니다.', category: '타입 검증' });
-      return;
-    }
-
-    typeResults.push({ type, label: rules.label, supported: true });
-    const issues = validateSchema(ld, type, rules, idx);
-    allIssues.push(...issues);
+  const rules=(remoteRules?.schemaRules)||SCHEMA_RULES;
+  const jIssues=[];const typeResults=[];
+  jsonlds.forEach((ld,idx)=>{
+    const type=getType(ld);const r=rules[type];
+    typeResults.push({type,label:r?.label||type,supported:!!r});
+    if(!r){jIssues.push({sev:'info',text:`"${type}" — 지원 타입 아님`,cat:'jsonld'});return}
+    if(!ld['@context']||!String(ld['@context']).includes('schema.org'))jIssues.push({sev:'error',text:'<code>@context</code> 누락/잘못됨',cat:'jsonld'});
+    (r.required||[]).forEach(f=>{if(!has(ld,f))jIssues.push({sev:'error',text:`필수 속성 누락: <code>${f}</code>`,desc:`${r.label}에서 필수`,cat:'jsonld'});else jIssues.push({sev:'pass',text:`<code>${f}</code> 존재`,cat:'jsonld'})});
+    (r.recommended||[]).forEach(f=>{if(!has(ld,f))jIssues.push({sev:'warn',text:`권장 속성 누락: <code>${f}</code>`,cat:'jsonld'})});
+    ['offers','author','publisher','address','mainEntity','itemListElement','acceptedAnswer'].forEach(n=>{const rk=`${n}_required`;if(r[rk]&&has(ld,n)){const items=Array.isArray(ld[n])?ld[n]:[ld[n]];items.forEach(item=>{(r[rk]||[]).forEach(f=>{if(!has(item,f))jIssues.push({sev:'error',text:`<code>${n}.${f}</code> 누락`,cat:'jsonld'})})})}});
+    if(ld.image&&typeof ld.image==='string'&&!ld.image.startsWith('http'))jIssues.push({sev:'warn',text:'이미지 URL이 상대 경로',cat:'jsonld'});
   });
 
-  const scores = calculateScores(allIssues, jsonlds);
-  renderResults(scores, typeResults, allIssues, jsonlds);
-}
-
-function getType(ld) {
-  let t = ld['@type'];
-  if (Array.isArray(t)) t = t[0];
-  return t || 'Unknown';
-}
-
-function validateSchema(ld, type, rules, idx) {
-  const issues = [];
-  const prefix = idx > 0 ? `[${idx + 1}] ` : '';
-
-  // Check required fields
-  (rules.required || []).forEach(field => {
-    if (!hasField(ld, field)) {
-      issues.push({ severity: 'error', title: `${prefix}필수 속성 누락: \`${field}\``, desc: `${rules.label} 타입에서 \`${field}\`은(는) Google 리치 결과 표시에 필수입니다.`, category: '필수 속성' });
-    }
+  const gIssues=[];
+  // Meta
+  [{k:'title',l:'Title',req:1},{k:'description',l:'Meta Description',req:1},{k:'canonical',l:'Canonical URL',req:1},{k:'ogTitle',l:'og:title'},{k:'ogDescription',l:'og:description'},{k:'ogImage',l:'og:image'},{k:'twitterCard',l:'twitter:card'},{k:'viewport',l:'Viewport',req:1},{k:'lang',l:'HTML lang',req:1}].forEach(({k,l,req})=>{
+    if(meta[k])gIssues.push({sev:'pass',text:`${l} 설정됨`,cat:'meta'});
+    else gIssues.push({sev:req?'error':'warn',text:`${l} ${req?'누락':'미설정'}`,desc:req?'SEO 및 AI 검색엔진 인식에 필수':'소셜/AI 노출 개선에 권장',cat:'meta'});
   });
+  if(meta.robots&&meta.robots.includes('noindex'))gIssues.push({sev:'error',text:'<code>noindex</code> — 검색 노출 차단',cat:'meta'});
+  if(meta.description){const l=meta.description.length;if(l<50)gIssues.push({sev:'warn',text:`메타 설명 짧음 (${l}자)`,desc:'50~160자 권장',cat:'meta'});else if(l>160)gIssues.push({sev:'warn',text:`메타 설명 김 (${l}자)`,desc:'160자 초과 시 잘림',cat:'meta'})}
+  // Headings
+  if(headings.h1.length===0)gIssues.push({sev:'error',text:'H1 태그 없음',cat:'headings'});else if(headings.h1.length>1)gIssues.push({sev:'warn',text:`H1 ${headings.h1.length}개 (1개 권장)`,cat:'headings'});else gIssues.push({sev:'pass',text:'H1 1개 존재',cat:'headings'});
+  if(headings.hierarchy)gIssues.push({sev:'pass',text:'헤딩 계층 정상',cat:'headings'});else gIssues.push({sev:'warn',text:'헤딩 계층 건너뛰기',desc:'AI 파싱에 불리',cat:'headings'});
+  // E-E-A-T
+  if(meta.author)gIssues.push({sev:'pass',text:'저자 정보 존재',cat:'eeat'});else gIssues.push({sev:'warn',text:'저자(author) 없음',cat:'eeat'});
+  if(meta.datePublished)gIssues.push({sev:'pass',text:'발행일 존재',cat:'eeat'});else gIssues.push({sev:'warn',text:'발행일 없음',cat:'eeat'});
+  if(meta.dateModified)gIssues.push({sev:'pass',text:'수정일 존재',cat:'eeat'});else gIssues.push({sev:'info',text:'수정일 없음',cat:'eeat'});
+  // Content
+  if(content.wordCount<300)gIssues.push({sev:'warn',text:`콘텐츠 부족 (약 ${content.wordCount}자)`,desc:'300자 이상 권장',cat:'content'});else gIssues.push({sev:'pass',text:`콘텐츠 분량 적절 (약 ${content.wordCount}자)`,cat:'content'});
+  if(content.imageCount>0){const r=Math.round(content.imagesWithAlt/content.imageCount*100);if(r<80)gIssues.push({sev:'warn',text:`이미지 alt 부족 (${r}%)`,cat:'content'});else gIssues.push({sev:'pass',text:`이미지 alt 양호 (${r}%)`,cat:'content'})}
+  if(content.lists>0||content.tables>0)gIssues.push({sev:'pass',text:`구조화 콘텐츠: 리스트 ${content.lists}, 테이블 ${content.tables}`,cat:'content'});else gIssues.push({sev:'info',text:'리스트/테이블 없음',desc:'AI 인용 확률 높이는 구조',cat:'content'});
 
-  // Check recommended fields
-  (rules.recommended || []).forEach(field => {
-    if (!hasField(ld, field)) {
-      issues.push({ severity: 'warn', title: `${prefix}권장 속성 누락: \`${field}\``, desc: `\`${field}\`을(를) 추가하면 리치 결과 표시가 더 풍부해집니다.`, category: '권장 속성' });
-    }
-  });
-
-  // Check nested objects (offers, author, publisher, address, etc.)
-  const nestedChecks = ['offers','author','publisher','address','mainEntity','itemListElement','acceptedAnswer'];
-  nestedChecks.forEach(nested => {
-    const reqKey = `${nested}_required`;
-    const recKey = `${nested}_recommended`;
-    if (rules[reqKey] && hasField(ld, nested)) {
-      const obj = ld[nested];
-      const items = Array.isArray(obj) ? obj : [obj];
-      items.forEach((item, i) => {
-        const iPrefix = items.length > 1 ? `${nested}[${i}].` : `${nested}.`;
-        (rules[reqKey] || []).forEach(f => {
-          if (!hasField(item, f)) {
-            issues.push({ severity: 'error', title: `${prefix}중첩 필수 속성 누락: \`${iPrefix}${f}\``, desc: `\`${nested}\` 내부의 \`${f}\`은(는) 필수입니다.`, category: '필수 속성' });
-          }
-        });
-      });
-    }
-  });
-
-  // Check @context
-  if (!ld['@context'] || !String(ld['@context']).includes('schema.org')) {
-    issues.push({ severity: 'error', title: `${prefix}\`@context\` 누락 또는 잘못됨`, desc: '`@context`는 "https://schema.org"이어야 합니다.', category: '구조 검증' });
-  }
-
-  // Check for common mistakes
-  if (ld.image && typeof ld.image === 'string' && !ld.image.startsWith('http')) {
-    issues.push({ severity: 'warn', title: `${prefix}이미지 URL이 상대 경로`, desc: '`image`는 절대 URL(https://...)이어야 합니다.', category: '데이터 품질' });
-  }
-
-  if (ld.datePublished && !/^\d{4}-\d{2}-\d{2}/.test(ld.datePublished)) {
-    issues.push({ severity: 'warn', title: `${prefix}날짜 형식 확인 필요`, desc: '`datePublished`는 ISO 8601 형식(YYYY-MM-DD)을 권장합니다.', category: '데이터 품질' });
-  }
-
-  // Pass items
-  (rules.required || []).forEach(field => {
-    if (hasField(ld, field)) {
-      issues.push({ severity: 'pass', title: `${prefix}✓ \`${field}\` 존재`, desc: '', category: '통과 항목' });
-    }
-  });
-
-  return issues;
+  const allIssues=[...jIssues,...gIssues];
+  const scores=calcScores(jIssues,gIssues,jsonlds);
+  render(scores,typeResults,allIssues,jIssues,gIssues,jsonlds);
 }
 
-function hasField(obj, field) {
-  if (!obj) return false;
-  if (obj[field] !== undefined && obj[field] !== null && obj[field] !== '') return true;
-  return false;
+function getType(ld){let t=ld['@type'];if(Array.isArray(t))t=t[0];return t||'Unknown'}
+function has(o,f){return o&&o[f]!==undefined&&o[f]!==null&&o[f]!==''}
+
+function calcScores(ji,gi,jl){
+  function cs(issues){const e=issues.filter(i=>i.sev==='error').length,w=issues.filter(i=>i.sev==='warn').length,p=issues.filter(i=>i.sev==='pass').length,t=e+w+p||1;return Math.max(0,Math.min(100,Math.round(100-(e/t)*120-(w/t)*40)))}
+  const j=jl.length>0?cs(ji):0,m=cs(gi.filter(i=>i.cat==='meta')),h=cs(gi.filter(i=>i.cat==='headings')),e=cs(gi.filter(i=>i.cat==='eeat')),c=cs(gi.filter(i=>i.cat==='content'));
+  const o=Math.min(100,Math.round(j*.3+m*.2+h*.1+e*.15+c*.25));
+  return{overall:o,bars:[{label:'JSON-LD',score:j},{label:'메타태그',score:m},{label:'헤딩구조',score:h},{label:'E-E-A-T',score:e},{label:'콘텐츠',score:c}]};
 }
-
-function calculateScores(issues, jsonlds) {
-  const errors = issues.filter(i => i.severity === 'error').length;
-  const warns = issues.filter(i => i.severity === 'warn').length;
-  const passes = issues.filter(i => i.severity === 'pass').length;
-  const total = errors + warns + passes;
-
-  const requiredScore = total > 0 ? Math.max(0, Math.round(100 - (errors / total) * 150)) : 0;
-  const recommendedScore = total > 0 ? Math.max(0, Math.round(100 - (warns / total) * 100)) : 0;
-  const hasMultipleTypes = jsonlds.length > 1;
-  const coverageScore = Math.min(100, jsonlds.length * 25 + (hasMultipleTypes ? 20 : 0));
-  const qualityBonus = errors === 0 ? 15 : 0;
-
-  const overall = Math.min(100, Math.round(requiredScore * 0.45 + recommendedScore * 0.3 + coverageScore * 0.15 + qualityBonus));
-
-  return {
-    overall, requiredScore, recommendedScore, coverageScore,
-    errors, warns, passes,
-    breakdown: [
-      { label: '필수 속성', score: requiredScore, color: requiredScore >= 80 ? 'var(--accent-green)' : requiredScore >= 50 ? 'var(--accent-amber)' : 'var(--accent-red)' },
-      { label: '권장 속성', score: recommendedScore, color: recommendedScore >= 80 ? 'var(--accent-green)' : recommendedScore >= 50 ? 'var(--accent-amber)' : 'var(--accent-red)' },
-      { label: '커버리지', score: coverageScore, color: coverageScore >= 80 ? 'var(--accent-green)' : coverageScore >= 50 ? 'var(--accent-amber)' : 'var(--accent-red)' },
-      { label: '데이터 품질', score: Math.max(0, 100 - errors * 20 - warns * 5), color: errors === 0 ? 'var(--accent-green)' : 'var(--accent-amber)' }
-    ]
-  };
-}
+function sc(s){return s>=80?'var(--green)':s>=50?'var(--amber)':'var(--red)'}
+function gr(s){if(s>=90)return{g:'A+',t:'우수 — 리치 결과 최적화',c:'green'};if(s>=80)return{g:'A',t:'양호 — 소폭 개선 필요',c:'green'};if(s>=70)return{g:'B+',t:'보통 — 권장 속성 보완',c:'amber'};if(s>=60)return{g:'B',t:'미흡 — 개선 권장',c:'amber'};if(s>=50)return{g:'C',t:'부족 — 필수 항목 보완',c:'amber'};if(s>=30)return{g:'D',t:'매우 부족',c:'red'};return{g:'F',t:'심각 — 대폭 수정 필요',c:'red'}}
 
 // ═══════════════════════════════════════
 // RENDER
 // ═══════════════════════════════════════
-function renderResults(scores, typeResults, issues, jsonlds) {
-  // Score gauge
-  const circumference = 2 * Math.PI * 85;
-  const offset = circumference - (scores.overall / 100) * circumference;
-  const fill = document.getElementById('gaugeFill');
-  const scoreColor = scores.overall >= 80 ? 'var(--accent-green)' : scores.overall >= 50 ? 'var(--accent-amber)' : 'var(--accent-red)';
-  fill.style.stroke = scoreColor;
-  fill.style.strokeDashoffset = circumference;
-  requestAnimationFrame(() => { fill.style.strokeDashoffset = offset; });
+function render(scores,typeResults,all,ji,gi,jsonlds){
+  document.getElementById('results').classList.add('active');
+  // Ring
+  const circ=2*Math.PI*50,off=circ-(scores.overall/100)*circ,col=sc(scores.overall);
+  const fill=document.getElementById('ringFill');fill.style.stroke=col;
+  requestAnimationFrame(()=>{fill.style.strokeDashoffset=off});
+  const se=document.getElementById('ringScore');se.style.color=col;anim(se,scores.overall);
+  const g=gr(scores.overall);
+  document.getElementById('gradeText').textContent=`${g.g} · ${g.t}`;
+  document.getElementById('gradeText').style.color=`var(--${g.c})`;
+  document.getElementById('gradeDesc').textContent=`JSON-LD ${jsonlds.length}개 감지`;
+  // Bars
+  document.getElementById('scoreBars').innerHTML=scores.bars.map(b=>{const c=sc(b.score);return`<div class="sbar"><span class="sbar-label">${b.label}</span><div class="sbar-track"><div class="sbar-fill" style="width:${b.score}%;background:${c}"></div></div><span class="sbar-val" style="color:${c}">${b.score}</span></div>`}).join('');
+  // Types
+  document.getElementById('typesRow').innerHTML=typeResults.map(t=>`<span class="type-chip${t.supported?'':' unknown'}">${t.type} · ${t.label}</span>`).join('');
+  // AI
+  const recs=buildRecs(jsonlds,all,scores);
+  document.getElementById('aiBox').innerHTML=`<div class="ai-header">💡 AI 추천</div>${recs.map(r=>`<div class="ai-item">${r}</div>`).join('')}`;
+  // Issues
+  const errs=all.filter(i=>i.sev==='error'||i.sev==='warn').slice(0,10);
+  document.getElementById('issuesList').innerHTML=errs.length?cg('주요 개선 사항',errs):'<p style="text-align:center;color:var(--text3);padding:2rem">이슈 없음</p>';
+  // JSON-LD tab
+  const je=ji.filter(i=>i.sev==='error'),jw=ji.filter(i=>i.sev==='warn'),jp=ji.filter(i=>i.sev==='pass');
+  document.getElementById('jsonldList').innerHTML=(jsonlds.length===0?'<p style="text-align:center;color:var(--text3);padding:2rem">JSON-LD 없음</p>':(je.length?cg('오류',je):'')+(jw.length?cg('경고',jw):'')+(jp.length?cg('통과',jp):''));
+  // GEO tab
+  [{k:'meta',t:'메타태그'},{k:'headings',t:'헤딩 구조'},{k:'eeat',t:'E-E-A-T'},{k:'content',t:'콘텐츠/인용'}].forEach(c=>{const items=gi.filter(i=>i.cat===c.k);document.getElementById('geoList').innerHTML+=(items.length?cg(c.t,items):'')});
+  // Raw
+  document.getElementById('jsonView').innerHTML=jsonlds.length?jsonlds.map(ld=>sh(JSON.stringify(ld,null,2))).join('\n\n'):'// 데이터 없음';
+  // Badges
+  const jec=ji.filter(i=>i.sev==='error').length,jwc=ji.filter(i=>i.sev==='warn').length;
+  const gec=gi.filter(i=>i.sev==='error').length,gwc=gi.filter(i=>i.sev==='warn').length;
+  ub('bjld',jec+jwc||'✓',jec?'b-red':jwc?'b-amber':'b-green');
+  ub('bgeo',gec+gwc||'✓',gec?'b-red':gwc?'b-amber':'b-green');
+}
+function ci(i){const ic={pass:'✓',error:'✕',warn:'!',info:'i'};return`<div class="check-item"><div class="ci-icon ${i.sev}">${ic[i.sev]||'i'}</div><div class="ci-body"><div class="ci-title">${i.text}</div>${i.desc?`<div class="ci-desc">${i.desc}</div>`:''}</div></div>`}
+function cg(t,items){return`<div class="check-group"><div class="cg-title">${t}</div>${items.map(ci).join('')}</div>`}
+function ub(id,t,cls){const e=document.getElementById(id);if(e){e.textContent=t;e.className=`badge ${cls}`}}
+function anim(el,t){let c=0;const s=Math.max(1,Math.ceil(t/25));const iv=setInterval(()=>{c=Math.min(c+s,t);el.textContent=c;if(c>=t)clearInterval(iv)},25)}
+function sh(j){return j.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?/g,m=>/:$/.test(m)?`<span class="jk">${m}</span>`:`<span class="js">${m}</span>`).replace(/\b(true|false)\b/g,'<span class="jb">$&</span>').replace(/\bnull\b/g,'<span class="jl">$&</span>').replace(/\b\d+\.?\d*\b/g,'<span class="jn">$&</span>').replace(/[{}\[\]]/g,'<span class="jbr">$&</span>')}
 
-  const scoreEl = document.getElementById('totalScore');
-  animateNumber(scoreEl, scores.overall);
-  scoreEl.style.color = scoreColor;
-
-  const gradeLabel = document.getElementById('gradeLabel');
-  const grade = scores.overall >= 90 ? 'A+' : scores.overall >= 80 ? 'A' : scores.overall >= 70 ? 'B+' : scores.overall >= 60 ? 'B' : scores.overall >= 50 ? 'C' : scores.overall >= 30 ? 'D' : 'F';
-  const gradeText = { 'A+': '우수 — 리치 결과 최적화', A: '양호 — 소폭 개선 필요', 'B+': '보통 — 권장 속성 보완', B: '미흡 — 개선 권장', C: '부족 — 필수 속성 보완 필요', D: '매우 부족', F: '심각 — 대폭 수정 필요' };
-  gradeLabel.textContent = `${grade} · ${gradeText[grade]}`;
-  gradeLabel.style.background = scoreColor.replace(')', ',.15)').replace('var(', 'rgba(').replace('--accent-green', '0,255,136').replace('--accent-amber', '255,184,0').replace('--accent-red', '255,61,90');
-  gradeLabel.style.color = scoreColor;
-
-  // Breakdown bars
-  const breakdownList = document.getElementById('breakdownList');
-  breakdownList.innerHTML = scores.breakdown.map(b => `
-    <div class="breakdown-item">
-      <span class="breakdown-label">${b.label}</span>
-      <div class="breakdown-bar-track"><div class="breakdown-bar-fill" style="width:${b.score}%;background:${b.color}"></div></div>
-      <span class="breakdown-value" style="color:${b.color}">${b.score}</span>
-    </div>
-  `).join('');
-
-  // Detected types
-  const dtEl = document.getElementById('detectedTypes');
-  dtEl.innerHTML = typeResults.map(t => {
-    const color = t.supported ? 'var(--accent-cyan)' : 'var(--text-muted)';
-    return `<span class="type-badge" style="border-color:${color};color:${color}">${t.type}${t.label !== t.type ? ` · ${t.label}` : ''}${t.supported ? '' : ' (미지원)'}</span>`;
-  }).join('');
-
-  // AI Recommendations
-  renderAiRecommendations(jsonlds, issues, scores);
-
-  // Detail cards
-  renderDetailCards(issues);
-
-  // JSON tree
-  document.getElementById('jsonCount').textContent = `${jsonlds.length}개 감지`;
-  document.getElementById('jsonTree').innerHTML = jsonlds.map(ld => syntaxHighlight(JSON.stringify(ld, null, 2))).join('\n\n');
+function buildRecs(jl,all,scores){
+  const recs=[],types=jl.map(getType);
+  types.forEach(t=>{const r=SCHEMA_RULES[t];if(r?.tips)recs.push(r.tips[Math.floor(Math.random()*r.tips.length)])});
+  if(scores.bars[0].score<50&&jl.length>0)recs.unshift('<strong>JSON-LD 필수 속성부터 채우세요.</strong>');
+  if(scores.bars[1].score<60)recs.push('<strong>메타태그를 완성하세요.</strong> title, description, og:* 태그는 기본입니다.');
+  if(scores.bars[3].score<60)recs.push('<strong>E-E-A-T 신호를 강화하세요.</strong> 저자, 발행일, 전문성 표시.');
+  if(jl.length===0)recs.push('<strong>JSON-LD를 추가하세요.</strong> 리치 결과의 기본 조건입니다.');
+  if(!types.includes('BreadcrumbList')&&jl.length>0)recs.push('<strong>BreadcrumbList 추가 권장.</strong>');
+  recs.push('<strong>Google Rich Results Test로 최종 검증하세요.</strong>');
+  return[...new Set(recs)].slice(0,5);
 }
 
-function renderAiRecommendations(jsonlds, issues, scores) {
-  const rec = document.getElementById('aiRec');
-  const types = jsonlds.map(getType);
-  const recs = [];
-
-  // Type-specific tips
-  types.forEach(type => {
-    const rules = SCHEMA_RULES[type];
-    if (rules && rules.tips) {
-      const tip = rules.tips[Math.floor(Math.random() * rules.tips.length)];
-      recs.push(tip);
-    }
-  });
-
-  // Score-based recommendations
-  if (scores.overall < 50) {
-    recs.unshift('<strong>우선 필수 속성부터 채우세요.</strong> 필수 속성이 없으면 Google이 리치 결과를 전혀 표시하지 않습니다.');
-  }
-  if (scores.recommendedScore < 60) {
-    recs.push('<strong>권장 속성을 추가하면 CTR이 평균 20~30% 향상됩니다.</strong> 이미지, 설명, 평점 등을 우선 추가하세요.');
-  }
-  if (jsonlds.length === 1 && !types.includes('BreadcrumbList')) {
-    recs.push('<strong>BreadcrumbList를 추가하세요.</strong> 거의 모든 페이지에 적용 가능하며, 검색 결과 내 사이트 계층 표시를 개선합니다.');
-  }
-  if (!types.includes('WebSite') && !types.includes('Organization')) {
-    recs.push('<strong>홈페이지에 WebSite + Organization 마크업을 추가하세요.</strong> 사이트 전체의 지식 그래프 인식에 기여합니다.');
-  }
-
-  // Missing types suggestions
-  const errors = issues.filter(i => i.severity === 'error');
-  errors.forEach(e => {
-    if (e.title.includes('offers') && types.includes('Product')) {
-      recs.push('`offers` 내부에 `price`, `priceCurrency`, `availability`는 반드시 포함하세요 — 이 3개가 없으면 상품 리치 결과가 표시되지 않습니다.');
-    }
-  });
-
-  // Always add general tip
-  recs.push('<strong>Google Rich Results Test로 최종 검증하세요:</strong> <code>https://search.google.com/test/rich-results</code>에서 실제 렌더링 결과를 확인할 수 있습니다.');
-
-  // Deduplicate and limit
-  const unique = [...new Set(recs)].slice(0, 6);
-
-  rec.innerHTML = `
-    <div class="ai-rec-header">
-      <span>🤖 AI 추천</span>
-    </div>
-    ${unique.map(r => `<div class="ai-rec-item">${r}</div>`).join('')}
-  `;
-}
-
-function renderDetailCards(issues) {
-  const container = document.getElementById('detailCards');
-  const categories = {};
-  issues.filter(i => i.severity !== 'pass').forEach(issue => {
-    (categories[issue.category] = categories[issue.category] || []).push(issue);
-  });
-
-  const passIssues = issues.filter(i => i.severity === 'pass');
-
-  let html = '';
-  for (const [cat, items] of Object.entries(categories)) {
-    const errorCount = items.filter(i => i.severity === 'error').length;
-    const warnCount = items.filter(i => i.severity === 'warn').length;
-    const badge = errorCount > 0 ? `<span style="color:var(--accent-red);font-size:.7rem;margin-left:.5rem">${errorCount} 오류</span>` : '';
-    const wBadge = warnCount > 0 ? `<span style="color:var(--accent-amber);font-size:.7rem;margin-left:.25rem">${warnCount} 경고</span>` : '';
-
-    html += `<div class="card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <h3>${cat === '필수 속성' ? '🔴' : cat === '권장 속성' ? '🟡' : '🔵'} ${cat}${badge}${wBadge}</h3>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
-      <div class="card-body">
-        ${items.map(i => `
-          <div class="issue">
-            <div class="issue-icon ${i.severity}">
-              ${i.severity === 'error' ? '✕' : i.severity === 'warn' ? '!' : 'i'}
-            </div>
-            <div class="issue-content">
-              <h4>${i.title}</h4>
-              ${i.desc ? `<p>${i.desc}</p>` : ''}
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </div>`;
-  }
-
-  if (passIssues.length > 0) {
-    html += `<div class="card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <h3>✅ 통과 항목 <span style="font-size:.7rem;color:var(--accent-green);margin-left:.5rem">${passIssues.length}개</span></h3>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
-      <div class="card-body">
-        ${passIssues.map(i => `
-          <div class="issue"><div class="issue-icon pass">✓</div><div class="issue-content"><h4>${i.title}</h4></div></div>
-        `).join('')}
-      </div>
-    </div>`;
-  }
-
-  container.innerHTML = html;
-}
-
-function syntaxHighlight(json) {
-  return json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?/g, m => {
-      if (/:$/.test(m)) return `<span class="jt-key">${m}</span>`;
-      return `<span class="jt-string">${m}</span>`;
-    })
-    .replace(/\b(true|false)\b/g, '<span class="jt-bool">$&</span>')
-    .replace(/\bnull\b/g, '<span class="jt-null">$&</span>')
-    .replace(/\b\d+\.?\d*\b/g, '<span class="jt-number">$&</span>')
-    .replace(/[{}\[\]]/g, '<span class="jt-bracket">$&</span>');
-}
-
-function animateNumber(el, target) {
-  let current = 0;
-  const step = Math.ceil(target / 40);
-  const interval = setInterval(() => {
-    current = Math.min(current + step, target);
-    el.textContent = current;
-    if (current >= target) clearInterval(interval);
-  }, 30);
-}
-
-// Enter key support
-document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key === 'Enter') analyzeUrl(); });
+document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')analyzeUrl()});
 </script>
 </body>
 </html>
