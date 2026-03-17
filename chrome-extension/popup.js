@@ -206,8 +206,8 @@ function renderJsonldTab(issues, typeResults, jsonlds, rules) {
 
   // 에러/경고 없으면 축하 메시지
   const allGoodHtml = (errors.length === 0 && warns.length === 0 && passes.length > 0)
-    ? `<div class="check-item" style="padding:.8rem .6rem">
-        <div class="check-icon pass" style="width:28px;height:28px;font-size:.9rem">✓</div>
+    ? `<div class="check-item check-item--hero">
+        <div class="check-icon pass check-icon--lg">✓</div>
         <div class="check-body">
           <div class="check-title">${msg('jsonldAllGood')}</div>
           <div class="check-desc">${msg('jsonldAllGoodDesc')}</div>
@@ -215,7 +215,7 @@ function renderJsonldTab(issues, typeResults, jsonlds, rules) {
       </div>` : '';
 
   container.innerHTML = `
-    <div style="margin-bottom:.75rem">${typeHtml}</div>
+    <div class="type-badges">${typeHtml}</div>
     ${allGoodHtml}
     ${errors.length > 0 ? buildCheckGroup(msg('groupError'), errors, showTypes) : ''}
     ${warns.length > 0 ? buildCheckGroup(msg('groupWarn'), warns, showTypes) : ''}
@@ -270,14 +270,15 @@ function switchTab(name) {
 }
 
 function animateNum(el, target) {
+  if (el._animIv) clearInterval(el._animIv);
   const t = isNaN(target) ? 0 : Math.max(0, Math.round(target));
   if (t === 0) { el.textContent = '0'; return; }
   let cur = 0;
   const step = Math.max(1, Math.ceil(t / 25));
-  const iv = setInterval(() => {
+  el._animIv = setInterval(() => {
     cur = Math.min(cur + step, t);
     el.textContent = cur;
-    if (cur >= t) clearInterval(iv);
+    if (cur >= t) { clearInterval(el._animIv); el._animIv = null; }
   }, 25);
 }
 
@@ -313,10 +314,10 @@ function renderCrawlerTab(robotsTxt) {
 
   if (!result.available) {
     container.innerHTML = `
-      <div class="check-group">
-        <div class="check-icon warn" style="margin:0 auto .5rem;width:28px;height:28px;font-size:.85rem">!</div>
-        <div style="text-align:center;font-size:.87rem;font-weight:500">${msg('crawlerNoRobots')}</div>
-        <div style="text-align:center;font-size:.8rem;color:var(--text3);margin-top:.3rem">${msg('crawlerNoRobotsDesc')}</div>
+      <div class="check-group empty-center">
+        <div class="check-icon warn check-icon--lg" style="margin:0 auto .5rem">!</div>
+        <div class="empty-center-title">${msg('crawlerNoRobots')}</div>
+        <div class="empty-center-desc">${msg('crawlerNoRobotsDesc')}</div>
       </div>`;
     updateTabBadge('badgeCrawlers', '?', 'warn');
     return;

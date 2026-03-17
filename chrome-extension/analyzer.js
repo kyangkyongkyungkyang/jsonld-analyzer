@@ -377,8 +377,11 @@ function calculateOverallScores(jsonldIssues, geoIssues, jsonlds, remoteRules) {
   // NaN 방어
   if (isNaN(overall)) overall = 0;
 
+  const catScores = { jsonld: jsonldScore, meta: metaScore, headings: headingScore, eeat: eeatScore, content: contentScore };
+
   return {
     overall: Math.min(100, Math.max(0, overall)),
+    catScores,
     bars: [
       { label: msg('barJsonld'), score: jsonldScore },
       { label: msg('barMeta'), score: metaScore },
@@ -407,13 +410,14 @@ function buildRecommendations(jsonlds, jsonldIssues, geoIssues, scores, rules) {
     }
   });
 
-  if (scores.bars[0].score < 50 && jsonlds.length > 0) {
+  const cs = scores.catScores || {};
+  if ((cs.jsonld || 0) < 50 && jsonlds.length > 0) {
     recs.unshift(msg('recJsonldFirst'));
   }
-  if (scores.bars[1].score < 60) {
+  if ((cs.meta || 0) < 60) {
     recs.push(msg('recMeta'));
   }
-  if (scores.bars[3].score < 60) {
+  if ((cs.eeat || 0) < 60) {
     recs.push(msg('recEeat'));
   }
 

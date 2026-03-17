@@ -106,13 +106,11 @@ function extractHeadings() {
   return headings;
 }
 
-function extractContent() {
+function extractContent(jsonlds) {
   let wordCount = 0;
   try {
     const bodyText = (document.body.innerText || '').trim();
-    // Split on whitespace; works for Latin and CJK (CJK chars count as 1 each)
     const latinWords = bodyText.split(/\s+/).filter(w => w.length > 0).length;
-    // Count CJK characters individually (rough approximation)
     const cjkChars = (bodyText.match(/[\u3000-\u9fff\uac00-\ud7af]/g) || []).length;
     wordCount = latinWords + cjkChars;
   } catch (e) {
@@ -123,67 +121,37 @@ function extractContent() {
   let imagesWithAlt = 0;
   try {
     images.forEach(img => {
-      const alt = (img.getAttribute('alt') || '').trim();
-      if (alt.length > 0) imagesWithAlt++;
+      if ((img.getAttribute('alt') || '').trim().length > 0) imagesWithAlt++;
     });
-  } catch (e) {
-    // keep 0
-  }
+  } catch (e) {}
 
-  const links = document.querySelectorAll('a[href]');
   let externalLinks = 0;
-  let internalLinks = 0;
   const currentHost = window.location.hostname;
   try {
-    links.forEach(a => {
+    document.querySelectorAll('a[href]').forEach(a => {
       const href = a.getAttribute('href') || '';
-      // Skip anchors, javascript:, mailto:, tel:
       if (href.startsWith('#') || href.startsWith('javascript:') ||
-          href.startsWith('mailto:') || href.startsWith('tel:')) {
-        return;
-      }
+          href.startsWith('mailto:') || href.startsWith('tel:')) return;
       try {
         const url = new URL(href, window.location.origin);
-        if (url.hostname && url.hostname !== currentHost) {
-          externalLinks++;
-        } else {
-          internalLinks++;
-        }
-      } catch (e) {
-        internalLinks++; // relative URLs are internal
-      }
+        if (url.hostname && url.hostname !== currentHost) externalLinks++;
+      } catch (e) {}
     });
-  } catch (e) {
-    // keep 0s
-  }
+  } catch (e) {}
 
-  // FAQ detection: look for FAQ schema, or elements with FAQ-like patterns
-  let hasFaq = false;
+  // FAQ/HowTo 감지: 이미 파싱된 jsonlds에서 @type 확인 → DOM 폴백
+  const types = (jsonlds || []).map(ld => {
+    let t = ld['@type']; if (Array.isArray(t)) t = t[0]; return t || '';
+  });
+  let hasFaq = types.some(t => t === 'FAQPage');
+  let hasHowTo = types.some(t => t === 'HowTo');
   try {
-    // Check in JSON-LD
-    const scripts = document.querySelectorAll('script[type="application/ld+json"]');
-    for (const s of scripts) {
-      if (s.textContent.includes('FAQPage')) { hasFaq = true; break; }
-    }
-    // Check for common FAQ HTML patterns
     if (!hasFaq) {
       hasFaq = !!(
         document.querySelector('[itemtype*="FAQPage"]') ||
         document.querySelector('.faq, .faqs, #faq, #faqs, [class*="faq"], [id*="faq"]') ||
-        document.querySelector('details summary') ||
-        document.querySelector('[role="accordion"]')
+        document.querySelector('details summary')
       );
-    }
-  } catch (e) {
-    // keep false
-  }
-
-  // HowTo detection: look for HowTo schema or step-like structures
-  let hasHowTo = false;
-  try {
-    const scripts = document.querySelectorAll('script[type="application/ld+json"]');
-    for (const s of scripts) {
-      if (s.textContent.includes('HowTo')) { hasHowTo = true; break; }
     }
     if (!hasHowTo) {
       hasHowTo = !!(
@@ -191,18 +159,13 @@ function extractContent() {
         document.querySelector('.steps, .step, [class*="step"], ol.instructions, [class*="how-to"]')
       );
     }
-  } catch (e) {
-    // keep false
-  }
+  } catch (e) {}
 
   return {
     wordCount,
-    paragraphCount: document.querySelectorAll('p').length,
     imageCount: images.length,
     imagesWithAlt,
-    linkCount: links.length,
     externalLinks,
-    internalLinks,
     tables: document.querySelectorAll('table').length,
     lists: document.querySelectorAll('ul, ol').length,
     hasFaq,
@@ -245,7 +208,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         jsonlds,
         meta: extractMeta(jsonlds),
         headings: extractHeadings(),
-        content: extractContent()
+        content: extractContent(jsonlds)
       });
 
     } else if (request.action === 'fetchRobotsTxt') {

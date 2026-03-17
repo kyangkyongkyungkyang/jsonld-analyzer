@@ -198,6 +198,14 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .jsonld-empty{text-align:center;padding:2rem 1rem;color:var(--text3)}
 .jsonld-empty-icon{font-size:1.5rem;margin-bottom:.5rem}
 .jsonld-empty-text{font-size:.85rem}
+.check-item--hero{padding:.8rem .6rem}
+.check-icon--lg{width:28px;height:28px;font-size:.9rem}
+.type-badges{margin-bottom:.75rem}
+.btn-refresh{background:none;border:none;cursor:pointer;font-size:.7rem;padding:0 2px;opacity:.6}
+.btn-refresh:hover{opacity:1}
+.empty-center{text-align:center}
+.empty-center-title{font-size:.87rem;font-weight:500}
+.empty-center-desc{font-size:.8rem;color:var(--text3);margin-top:.3rem}
 
 /* ═══ FOOTER ═══ */
 .footer{
@@ -321,7 +329,7 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 <!-- ═══ FOOTER ═══ -->
 <div class="footer">
   Google Rich Results · GEO Guidelines
-  <br><span class="rules-ver" id="rulesVer"></span> <button id="btnRefreshRules" data-i18n-title="refreshRules" style="background:none;border:none;cursor:pointer;font-size:.7rem;padding:0 2px;opacity:.6">🔄</button>
+  <br><span class="rules-ver" id="rulesVer"></span> <button id="btnRefreshRules" class="btn-refresh" data-i18n-title="refreshRules">🔄</button>
 </div>
 
 <script src="rules.js"></script>

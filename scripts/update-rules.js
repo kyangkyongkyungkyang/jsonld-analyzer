@@ -154,7 +154,7 @@ async function main() {
 
     if (newBots.length > 0) {
       rules.geoRules.aiCrawling.bots.push(...newBots);
-      const fromRemote = newBots.filter(b => b._source === 'darkvisitors');
+      const fromRemote = newBots.filter(b => b._source);
       const fromLocal = newBots.filter(b => !b._source);
       if (fromLocal.length) console.log(`🤖 하드코딩 추가: ${fromLocal.map(b => b.name).join(', ')}`);
       if (fromRemote.length) console.log(`🌐 자동 감지 추가: ${fromRemote.map(b => b.name).join(', ')}`);
