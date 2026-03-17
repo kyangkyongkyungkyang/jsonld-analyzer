@@ -7,24 +7,57 @@ const RULES_CACHE_KEY = 'geo_rules_cache';
 const RULES_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
 
 // ── Remote rules loader ──
-async function loadRemoteRules() {
+// chrome.storage.local 사용 (popup localStorage는 세션 스코프라 캐시 효과 불안정)
+async function loadRemoteRules(forceRefresh) {
   try {
-    const cached = localStorage.getItem(RULES_CACHE_KEY);
-    if (cached) {
-      const { data, ts } = JSON.parse(cached);
-      if (Date.now() - ts < RULES_CACHE_TTL) return data;
+    if (!forceRefresh && typeof chrome !== 'undefined' && chrome.storage?.local) {
+      const result = await chrome.storage.local.get(RULES_CACHE_KEY);
+      const cached = result[RULES_CACHE_KEY];
+      if (cached) {
+        const { data, ts } = cached;
+        if (Date.now() - ts < RULES_CACHE_TTL) return data;
+      }
     }
-    const resp = await fetch(RULES_URL, { cache: 'no-cache' });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const resp = await fetch(RULES_URL, { cache: 'no-cache', signal: controller.signal });
+    clearTimeout(timeoutId);
     if (resp.ok) {
       const data = await resp.json();
-      localStorage.setItem(RULES_CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
+      // 스키마 검증: 최소 구조 확인
+      if (!data || typeof data.schemaRules !== 'object' || !data.version) {
+        console.warn('[GEO Analyzer] 원격 규칙 스키마 불일치, 내장 규칙 사용');
+        return null;
+      }
+      if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+        await chrome.storage.local.set({ [RULES_CACHE_KEY]: { data, ts: Date.now() } });
+      }
       return data;
     }
-  } catch {}
+    console.warn('[GEO Analyzer] 규칙 fetch 실패:', resp.status);
+  } catch (e) {
+    console.warn('[GEO Analyzer] 원격 규칙 로딩 실패, 내장 규칙 사용:', e.message);
+  }
   return null; // fallback to built-in SCHEMA_RULES
 }
 
+// ── i18n helper ──
+function msg(key, ...subs) {
+  if (typeof chrome !== 'undefined' && chrome.i18n?.getMessage) {
+    const result = chrome.i18n.getMessage(key, subs.length ? subs.map(String) : undefined);
+    if (result) return result;
+  }
+  return key; // fallback
+}
+
 // ── Helpers ──
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+// 허용 태그만 남기고 나머지 HTML 태그 제거 (remote rules tips 새니타이징용)
+function sanitizeHtml(str) {
+  return String(str).replace(/<(?!\/?(?:strong|code|em|b|br)\b)[^>]*>/gi, '');
+}
 function getType(ld) {
   let t = ld['@type'];
   if (Array.isArray(t)) t = t[0];
@@ -40,62 +73,94 @@ function getScoreColor(score) {
   return 'var(--red)';
 }
 function getGrade(score) {
-  if (score >= 90) return { g: 'A+', t: '우수 — 리치 결과 최적화', cls: 'green' };
-  if (score >= 80) return { g: 'A', t: '양호 — 소폭 개선 필요', cls: 'green' };
-  if (score >= 70) return { g: 'B+', t: '보통 — 권장 속성 보완', cls: 'amber' };
-  if (score >= 60) return { g: 'B', t: '미흡 — 개선 권장', cls: 'amber' };
-  if (score >= 50) return { g: 'C', t: '부족 — 필수 항목 보완 필요', cls: 'amber' };
-  if (score >= 30) return { g: 'D', t: '매우 부족', cls: 'red' };
-  return { g: 'F', t: '심각 — 대폭 수정 필요', cls: 'red' };
+  if (score >= 90) return { g: 'A+', t: msg('gradeApPlus'), cls: 'green' };
+  if (score >= 80) return { g: 'A', t: msg('gradeA'), cls: 'green' };
+  if (score >= 70) return { g: 'B+', t: msg('gradeBPlus'), cls: 'amber' };
+  if (score >= 60) return { g: 'B', t: msg('gradeB'), cls: 'amber' };
+  if (score >= 50) return { g: 'C', t: msg('gradeC'), cls: 'amber' };
+  if (score >= 30) return { g: 'D', t: msg('gradeD'), cls: 'red' };
+  return { g: 'F', t: msg('gradeF'), cls: 'red' };
 }
 
 // ══════════════════════════
 // JSON-LD VALIDATION
 // ══════════════════════════
-function validateJsonLd(jsonlds, rules) {
+// 내장 폴백 (remote rules 로딩 실패 시)
+const FALLBACK_TYPE_MAP = {
+  BlogPosting: 'Article', NewsArticle: 'Article', TechArticle: 'Article', ScholarlyArticle: 'Article',
+  Restaurant: 'LocalBusiness', Hotel: 'LocalBusiness', Store: 'LocalBusiness',
+  Corporation: 'Organization', NGO: 'Organization',
+  MobileApplication: 'SoftwareApplication', WebApplication: 'SoftwareApplication',
+};
+
+// remoteRules가 있으면 typeFallback 사용, 없으면 내장 폴백
+let _typeFallback = null;
+function getTypeFallback(remoteRules) {
+  if (remoteRules?.typeFallback) return remoteRules.typeFallback;
+  return FALLBACK_TYPE_MAP;
+}
+
+function validateJsonLd(jsonlds, rules, remoteRules) {
   const issues = [];
   const typeResults = [];
+  const rulesMap = rules || SCHEMA_RULES;
+  const fallback = getTypeFallback(remoteRules);
 
   jsonlds.forEach((ld, idx) => {
     const type = getType(ld);
-    const r = (rules || SCHEMA_RULES)[type];
-    typeResults.push({ type, label: r?.label || type, supported: !!r });
+    const r = rulesMap[type] || rulesMap[fallback[type]];
+    const safeType = escHtml(type);
+    const tl = escHtml(r?.label || type);
+    typeResults.push({ type: safeType, label: tl, supported: !!r });
 
     if (!r) {
-      issues.push({ sev: 'info', text: `"${type}" — 지원 타입 아님`, cat: 'jsonld' });
+      issues.push({ sev: 'info', text: msg('unsupportedType', safeType), desc: msg('unsupportedTypeDesc'), cat: 'jsonld', typeLabel: safeType });
       return;
     }
 
     // @context
     if (!ld['@context'] || !String(ld['@context']).includes('schema.org')) {
-      issues.push({ sev: 'error', text: '<code>@context</code> 누락 또는 잘못됨', cat: 'jsonld' });
+      issues.push({ sev: 'error', text: msg('missingContext'), desc: msg('missingContextDesc'), cat: 'jsonld', typeLabel: tl });
     }
 
     // Required
     (r.required || []).forEach(f => {
+      const sf = escHtml(f);
       if (!hasField(ld, f)) {
-        issues.push({ sev: 'error', text: `필수 속성 누락: <code>${f}</code>`, desc: `${r.label}에서 필수`, cat: 'jsonld' });
+        issues.push({ sev: 'error', text: msg('requiredMissing', sf), desc: msg('requiredMissingDesc', tl), cat: 'jsonld', typeLabel: tl });
       } else {
-        issues.push({ sev: 'pass', text: `<code>${f}</code> 존재`, cat: 'jsonld' });
+        issues.push({ sev: 'pass', text: msg('fieldExists', sf), cat: 'jsonld', typeLabel: tl });
       }
     });
 
     // Recommended
     (r.recommended || []).forEach(f => {
       if (!hasField(ld, f)) {
-        issues.push({ sev: 'warn', text: `권장 속성 누락: <code>${f}</code>`, cat: 'jsonld' });
+        issues.push({ sev: 'warn', text: msg('recommendedMissing', escHtml(f)), desc: msg('recommendedMissingDesc'), cat: 'jsonld', typeLabel: tl });
       }
     });
 
-    // Nested
-    ['offers','author','publisher','address','mainEntity','itemListElement','acceptedAnswer'].forEach(nested => {
+    // Nested — rules에서 *_required 키를 동적 추출 (하드코딩 불필요)
+    const nestedFields = new Set();
+    // flat 구조 (rules.js): offers_required, author_required 등
+    for (const k of Object.keys(r)) {
+      if (k.endsWith('_required')) nestedFields.add(k.replace('_required', ''));
+    }
+    // nested 구조 (rules.json): nested.offers_required 등
+    if (r.nested) {
+      for (const k of Object.keys(r.nested)) {
+        if (k.endsWith('_required')) nestedFields.add(k.replace('_required', ''));
+      }
+    }
+    nestedFields.forEach(nested => {
       const rk = `${nested}_required`;
-      if (r[rk] && hasField(ld, nested)) {
+      const nestedRule = r[rk] || r.nested?.[rk];
+      if (nestedRule && hasField(ld, nested)) {
         const items = Array.isArray(ld[nested]) ? ld[nested] : [ld[nested]];
         items.forEach(item => {
-          (r[rk] || []).forEach(f => {
+          (nestedRule || []).forEach(f => {
             if (!hasField(item, f)) {
-              issues.push({ sev: 'error', text: `<code>${nested}.${f}</code> 누락`, cat: 'jsonld' });
+              issues.push({ sev: 'error', text: msg('nestedMissing', `${escHtml(nested)}.${escHtml(f)}`), desc: msg('nestedMissingDesc'), cat: 'jsonld', typeLabel: tl });
             }
           });
         });
@@ -104,7 +169,7 @@ function validateJsonLd(jsonlds, rules) {
 
     // Image relative URL
     if (ld.image && typeof ld.image === 'string' && !ld.image.startsWith('http')) {
-      issues.push({ sev: 'warn', text: '이미지 URL이 상대 경로', cat: 'jsonld' });
+      issues.push({ sev: 'warn', text: msg('imageRelative'), desc: msg('imageRelativeDesc'), cat: 'jsonld', typeLabel: tl });
     }
   });
 
@@ -114,12 +179,11 @@ function validateJsonLd(jsonlds, rules) {
 // ══════════════════════════
 // GEO ANALYSIS
 // ══════════════════════════
-function analyzeGeo(data) {
-  const issues = [];
-  const { meta, headings, content } = data;
-
-  // ── META TAGS ──
-  const metaChecks = [
+// 내장 폴백 설정
+const FALLBACK_CONFIG = {
+  metaDescription: { minLength: 50, maxLength: 160 },
+  content: { minWords: 300, goodWords: 1000, altTextMinPercent: 80, minHeadings: 2 },
+  metaChecks: [
     { key: 'title', label: 'Title', req: true },
     { key: 'description', label: 'Meta Description', req: true },
     { key: 'canonical', label: 'Canonical URL', req: true },
@@ -128,121 +192,121 @@ function analyzeGeo(data) {
     { key: 'ogImage', label: 'og:image', req: false },
     { key: 'twitterCard', label: 'twitter:card', req: false },
     { key: 'viewport', label: 'Viewport', req: true },
-    { key: 'lang', label: 'HTML lang 속성', req: true },
-  ];
+    { key: 'lang', label: 'HTML lang', req: true },
+  ]
+};
+
+function analyzeGeo(data, remoteRules) {
+  const issues = [];
+  const { meta, headings, content } = data;
+  const cfg = remoteRules?.analysisConfig || FALLBACK_CONFIG;
+  const metaChecks = cfg.metaChecks || FALLBACK_CONFIG.metaChecks;
+  const descCfg = cfg.metaDescription || FALLBACK_CONFIG.metaDescription;
+  const contentCfg = cfg.content || FALLBACK_CONFIG.content;
 
   metaChecks.forEach(({ key, label, req }) => {
     if (meta[key]) {
-      issues.push({ sev: 'pass', text: `${label} 설정됨`, cat: 'meta' });
+      issues.push({ sev: 'pass', text: msg('metaSet', label), cat: 'meta' });
     } else {
       issues.push({
         sev: req ? 'error' : 'warn',
-        text: `${label} ${req ? '누락' : '미설정'}`,
-        desc: req ? 'SEO 및 AI 검색엔진 인식에 필수입니다' : '설정하면 소셜/AI 노출이 개선됩니다',
+        text: req ? msg('metaMissing', label) : msg('metaNotSet', label),
+        desc: req ? msg('metaRequiredDesc') : msg('metaOptionalDesc'),
         cat: 'meta'
       });
     }
   });
 
-  // robots 체크
   if (meta.robots) {
     if (meta.robots.includes('noindex')) {
-      issues.push({ sev: 'error', text: '<code>noindex</code> 설정됨 — 검색 노출 차단', cat: 'meta' });
+      issues.push({ sev: 'error', text: msg('noindexSet'), cat: 'meta' });
     } else {
-      issues.push({ sev: 'pass', text: 'robots 태그 정상', cat: 'meta' });
+      issues.push({ sev: 'pass', text: msg('robotsOk'), cat: 'meta' });
     }
   }
 
-  // Description 길이
   if (meta.description) {
     const len = meta.description.length;
-    if (len < 50) {
-      issues.push({ sev: 'warn', text: `메타 설명 너무 짧음 (${len}자)`, desc: '50~160자 권장', cat: 'meta' });
-    } else if (len > 160) {
-      issues.push({ sev: 'warn', text: `메타 설명 너무 김 (${len}자)`, desc: '160자 초과 시 SERP에서 잘림', cat: 'meta' });
+    if (len < descCfg.minLength) {
+      issues.push({ sev: 'warn', text: msg('descTooShort', len), desc: msg('descTooShortTip'), cat: 'meta' });
+    } else if (len > descCfg.maxLength) {
+      issues.push({ sev: 'warn', text: msg('descTooLong', len), desc: msg('descTooLongTip'), cat: 'meta' });
     }
   }
 
-  // ── HEADINGS ──
   if (headings.h1.length === 0) {
-    issues.push({ sev: 'error', text: 'H1 태그 없음', desc: '페이지당 H1은 1개 필수', cat: 'headings' });
+    issues.push({ sev: 'error', text: msg('h1None'), desc: msg('h1NoneDesc'), cat: 'headings' });
   } else if (headings.h1.length > 1) {
-    issues.push({ sev: 'warn', text: `H1 태그 ${headings.h1.length}개 (1개 권장)`, cat: 'headings' });
+    issues.push({ sev: 'warn', text: msg('h1Multiple', headings.h1.length), cat: 'headings' });
   } else {
-    issues.push({ sev: 'pass', text: 'H1 태그 1개 존재', cat: 'headings' });
+    issues.push({ sev: 'pass', text: msg('h1Ok'), cat: 'headings' });
   }
 
   if (headings.hierarchy) {
-    issues.push({ sev: 'pass', text: '헤딩 계층 구조 정상', cat: 'headings' });
+    issues.push({ sev: 'pass', text: msg('headingHierarchyOk'), cat: 'headings' });
   } else {
-    issues.push({ sev: 'warn', text: '헤딩 계층 건너뛰기 감지', desc: 'H1→H3처럼 H2 없이 건너뛰면 AI 파싱에 불리', cat: 'headings' });
+    issues.push({ sev: 'warn', text: msg('headingHierarchyBad'), desc: msg('headingHierarchyBadDesc'), cat: 'headings' });
   }
 
   const totalHeadings = Object.keys(headings).filter(k => k !== 'hierarchy').reduce((s, k) => s + headings[k].length, 0);
-  if (totalHeadings < 2) {
-    issues.push({ sev: 'warn', text: '헤딩이 거의 없음', desc: '구조화된 헤딩은 AI 인용 가능성을 높입니다', cat: 'headings' });
+  if (totalHeadings < contentCfg.minHeadings) {
+    issues.push({ sev: 'warn', text: msg('headingsTooFew'), desc: msg('headingsTooFewDesc'), cat: 'headings' });
   }
 
-  // ── E-E-A-T SIGNALS ──
   if (meta.author) {
-    issues.push({ sev: 'pass', text: '저자 정보 존재', cat: 'eeat' });
+    issues.push({ sev: 'pass', text: msg('authorExists'), cat: 'eeat' });
   } else {
-    issues.push({ sev: 'warn', text: '저자(author) 메타 없음', desc: 'E-E-A-T 신호 강화에 권장', cat: 'eeat' });
+    issues.push({ sev: 'warn', text: msg('authorMissing'), desc: msg('authorMissingDesc'), cat: 'eeat' });
   }
 
   if (meta.datePublished) {
-    issues.push({ sev: 'pass', text: '발행일 존재', cat: 'eeat' });
+    issues.push({ sev: 'pass', text: msg('datePublishedExists'), cat: 'eeat' });
   } else {
-    issues.push({ sev: 'warn', text: '발행일(datePublished) 없음', desc: '콘텐츠 신선도 판단에 사용', cat: 'eeat' });
+    issues.push({ sev: 'warn', text: msg('datePublishedMissing'), desc: msg('datePublishedMissingDesc'), cat: 'eeat' });
   }
 
   if (meta.dateModified) {
-    issues.push({ sev: 'pass', text: '수정일 존재', cat: 'eeat' });
+    issues.push({ sev: 'pass', text: msg('dateModifiedExists'), cat: 'eeat' });
   } else {
-    issues.push({ sev: 'info', text: '수정일(dateModified) 없음', cat: 'eeat' });
+    issues.push({ sev: 'info', text: msg('dateModifiedMissing'), cat: 'eeat' });
   }
 
-  // ── CONTENT / CITABILITY ──
-  if (content.wordCount < 300) {
-    issues.push({ sev: 'warn', text: `콘텐츠 분량 부족 (약 ${content.wordCount}자)`, desc: '300자 이상 권장, AI 인용 가능성 낮음', cat: 'content' });
-  } else if (content.wordCount >= 1000) {
-    issues.push({ sev: 'pass', text: `충분한 콘텐츠 분량 (약 ${content.wordCount}자)`, cat: 'content' });
+  if (content.wordCount < contentCfg.minWords) {
+    issues.push({ sev: 'warn', text: msg('contentTooShort', content.wordCount), desc: msg('contentTooShortDesc'), cat: 'content' });
+  } else if (content.wordCount >= contentCfg.goodWords) {
+    issues.push({ sev: 'pass', text: msg('contentGood', content.wordCount), cat: 'content' });
   } else {
-    issues.push({ sev: 'pass', text: `콘텐츠 분량 적절 (약 ${content.wordCount}자)`, cat: 'content' });
+    issues.push({ sev: 'pass', text: msg('contentOk', content.wordCount), cat: 'content' });
   }
 
-  // Images
   if (content.imageCount === 0) {
-    issues.push({ sev: 'warn', text: '이미지 없음', desc: '시각 콘텐츠는 AI 요약에 포함 가능', cat: 'content' });
+    issues.push({ sev: 'warn', text: msg('noImages'), desc: msg('noImagesDesc'), cat: 'content' });
   } else {
     const altRatio = content.imageCount > 0 ? Math.round(content.imagesWithAlt / content.imageCount * 100) : 0;
-    if (altRatio < 80) {
-      issues.push({ sev: 'warn', text: `이미지 alt 속성 부족 (${altRatio}%)`, desc: `${content.imageCount}개 중 ${content.imagesWithAlt}개만 alt 있음`, cat: 'content' });
+    if (altRatio < contentCfg.altTextMinPercent) {
+      issues.push({ sev: 'warn', text: msg('altBad', altRatio), desc: msg('altBadDesc', content.imageCount, content.imagesWithAlt), cat: 'content' });
     } else {
-      issues.push({ sev: 'pass', text: `이미지 alt 속성 양호 (${altRatio}%)`, cat: 'content' });
+      issues.push({ sev: 'pass', text: msg('altGood', altRatio), cat: 'content' });
     }
   }
 
-  // Lists & Tables (citability)
   if (content.lists > 0 || content.tables > 0) {
-    issues.push({ sev: 'pass', text: `구조화 콘텐츠: 리스트 ${content.lists}개, 테이블 ${content.tables}개`, desc: 'AI가 인용하기 좋은 구조', cat: 'content' });
+    issues.push({ sev: 'pass', text: msg('structuredContent', content.lists, content.tables), desc: msg('structuredContentDesc'), cat: 'content' });
   } else {
-    issues.push({ sev: 'info', text: '리스트/테이블 없음', desc: '구조화된 콘텐츠는 AI 인용 확률을 높임', cat: 'content' });
+    issues.push({ sev: 'info', text: msg('noStructured'), desc: msg('noStructuredDesc'), cat: 'content' });
   }
 
-  // FAQ/HowTo
   if (content.hasFaq) {
-    issues.push({ sev: 'pass', text: 'FAQ 구조 감지됨', cat: 'content' });
+    issues.push({ sev: 'pass', text: msg('faqDetected'), cat: 'content' });
   }
   if (content.hasHowTo) {
-    issues.push({ sev: 'pass', text: 'How-To 구조 감지됨', cat: 'content' });
+    issues.push({ sev: 'pass', text: msg('howtoDetected'), cat: 'content' });
   }
 
-  // Links
   if (content.externalLinks > 0) {
-    issues.push({ sev: 'pass', text: `외부 링크 ${content.externalLinks}개 (출처 신뢰도 신호)`, cat: 'content' });
+    issues.push({ sev: 'pass', text: msg('externalLinks', content.externalLinks), cat: 'content' });
   } else {
-    issues.push({ sev: 'info', text: '외부 링크 없음', desc: '신뢰할 수 있는 출처 링크는 E-E-A-T에 긍정적', cat: 'content' });
+    issues.push({ sev: 'info', text: msg('noExternalLinks'), desc: msg('noExternalLinksDesc'), cat: 'content' });
   }
 
   return issues;
@@ -251,7 +315,9 @@ function analyzeGeo(data) {
 // ══════════════════════════
 // SCORING
 // ══════════════════════════
-function calculateOverallScores(jsonldIssues, geoIssues, jsonlds) {
+const FALLBACK_WEIGHTS = { jsonld: 0.30, meta: 0.20, headings: 0.10, eeat: 0.15, content: 0.25 };
+
+function calculateOverallScores(jsonldIssues, geoIssues, jsonlds, remoteRules) {
   function catScore(issues) {
     const errors = issues.filter(i => i.sev === 'error').length;
     const warns = issues.filter(i => i.sev === 'warn').length;
@@ -260,27 +326,64 @@ function calculateOverallScores(jsonldIssues, geoIssues, jsonlds) {
     return Math.max(0, Math.min(100, Math.round(100 - (errors / total) * 120 - (warns / total) * 40)));
   }
 
-  const jsonldScore = jsonlds.length > 0 ? catScore(jsonldIssues) : 0;
+  const hasJsonld = jsonlds.length > 0;
+  const jsonldScore = hasJsonld ? catScore(jsonldIssues) : 0;
   const metaScore = catScore(geoIssues.filter(i => i.cat === 'meta'));
   const headingScore = catScore(geoIssues.filter(i => i.cat === 'headings'));
   const eeatScore = catScore(geoIssues.filter(i => i.cat === 'eeat'));
   const contentScore = catScore(geoIssues.filter(i => i.cat === 'content'));
 
-  // Weights
-  const w = { jsonld: 0.30, meta: 0.20, headings: 0.10, eeat: 0.15, content: 0.25 };
-  const overall = Math.round(
-    jsonldScore * w.jsonld + metaScore * w.meta + headingScore * w.headings +
-    eeatScore * w.eeat + contentScore * w.content
-  );
+  // remote weights 정규화
+  // 구버전: { jsonld: { weight: 0.3, label: "..." }, citability: ... }
+  // 신버전: { jsonld: 0.3, content: 0.25 }
+  const rawW = remoteRules?.scoring?.weights;
+  const w = { ...FALLBACK_WEIGHTS };
+  if (rawW && typeof rawW === 'object') {
+    // citability → content 호환 (구버전 rules.json)
+    const keyMap = { citability: 'content', aiCrawling: null };
+    for (const [rk, rv] of Object.entries(rawW)) {
+      const k = keyMap[rk] !== undefined ? keyMap[rk] : rk;
+      if (!k || !(k in FALLBACK_WEIGHTS)) continue;
+      if (typeof rv === 'number') w[k] = rv;
+      else if (rv?.weight != null) w[k] = Number(rv.weight) || 0;
+    }
+  }
+  // 합계 보정 (aiCrawling 제외 등으로 합계가 1이 아닐 수 있음)
+  const wSum = Object.values(w).reduce((a, b) => a + b, 0);
+  if (wSum > 0 && Math.abs(wSum - 1) > 0.01) {
+    for (const k of Object.keys(w)) w[k] = w[k] / wSum;
+  }
+
+  // JSON-LD 없으면 해당 가중치를 나머지에 비례 재분배
+  let overall;
+  if (!hasJsonld) {
+    const restTotal = (w.meta || 0) + (w.headings || 0) + (w.eeat || 0) + (w.content || 0);
+    if (restTotal > 0) {
+      overall = Math.round(
+        metaScore * (w.meta / restTotal) + headingScore * (w.headings / restTotal) +
+        eeatScore * (w.eeat / restTotal) + contentScore * (w.content / restTotal)
+      );
+    } else {
+      overall = 0;
+    }
+  } else {
+    overall = Math.round(
+      jsonldScore * (w.jsonld || 0) + metaScore * (w.meta || 0) + headingScore * (w.headings || 0) +
+      eeatScore * (w.eeat || 0) + contentScore * (w.content || 0)
+    );
+  }
+
+  // NaN 방어
+  if (isNaN(overall)) overall = 0;
 
   return {
-    overall: Math.min(100, overall),
+    overall: Math.min(100, Math.max(0, overall)),
     bars: [
-      { label: 'JSON-LD', score: jsonldScore },
-      { label: '메타태그', score: metaScore },
-      { label: '헤딩구조', score: headingScore },
-      { label: 'E-E-A-T', score: eeatScore },
-      { label: '콘텐츠', score: contentScore },
+      { label: msg('barJsonld'), score: jsonldScore },
+      { label: msg('barMeta'), score: metaScore },
+      { label: msg('barHeadings'), score: headingScore },
+      { label: msg('barEeat'), score: eeatScore },
+      { label: msg('barContent'), score: contentScore },
     ]
   };
 }
@@ -288,57 +391,149 @@ function calculateOverallScores(jsonldIssues, geoIssues, jsonlds) {
 // ══════════════════════════
 // AI RECOMMENDATIONS
 // ══════════════════════════
-function buildRecommendations(jsonlds, jsonldIssues, geoIssues, scores) {
+function buildRecommendations(jsonlds, jsonldIssues, geoIssues, scores, rules) {
   const recs = [];
   const types = jsonlds.map(getType);
+  const rulesLookup = rules || SCHEMA_RULES;
 
-  // Type-specific tips
+  // Type-specific tips (remote rules 우선, 폴백으로 내장 규칙)
   types.forEach(type => {
-    const r = SCHEMA_RULES[type];
+    const r = rulesLookup[type];
     if (r?.tips) {
       const shuffled = [...r.tips].sort(() => 0.5 - Math.random());
-      recs.push(shuffled[0]);
+      // remote rules tips는 새니타이징 (허용: strong, code, em, b, br만)
+      recs.push(sanitizeHtml(shuffled[0]));
     }
   });
 
-  // Score-based
   if (scores.bars[0].score < 50 && jsonlds.length > 0) {
-    recs.unshift('<strong>JSON-LD 필수 속성부터 채우세요.</strong> 필수 속성 없이는 리치 결과가 표시되지 않습니다.');
+    recs.unshift(msg('recJsonldFirst'));
   }
   if (scores.bars[1].score < 60) {
-    recs.push('<strong>메타태그를 완성하세요.</strong> title, description, og:* 태그는 AI 검색엔진 인식의 기본입니다.');
+    recs.push(msg('recMeta'));
   }
   if (scores.bars[3].score < 60) {
-    recs.push('<strong>E-E-A-T 신호를 강화하세요.</strong> 저자 정보, 발행일, 전문성 표시가 AI 검색에서 중요합니다.');
+    recs.push(msg('recEeat'));
   }
 
-  // GEO specific
-  const hasNoList = geoIssues.some(i => i.text.includes('리스트/테이블 없음'));
+  const hasNoList = geoIssues.some(i => i.text === msg('noStructured'));
   if (hasNoList) {
-    recs.push('<strong>리스트나 테이블을 추가하세요.</strong> AI 검색엔진이 구조화된 정보를 인용할 확률이 높습니다.');
+    recs.push(msg('recList'));
   }
 
   if (jsonlds.length === 0) {
-    recs.push('<strong>JSON-LD 구조화 데이터를 추가하세요.</strong> Google 리치 결과의 기본 조건입니다.');
+    recs.push(msg('recAddJsonld'));
   }
 
   if (!types.includes('BreadcrumbList') && jsonlds.length > 0) {
-    recs.push('<strong>BreadcrumbList 추가를 권장합니다.</strong> 거의 모든 페이지에 적용 가능합니다.');
+    recs.push(msg('recBreadcrumb'));
   }
 
-  recs.push('<strong>Google Rich Results Test로 최종 검증하세요.</strong>');
+  recs.push(msg('recGoogleTest'));
   return [...new Set(recs)].slice(0, 5);
 }
 
-// ── Syntax highlighting ──
-function syntaxHighlight(json) {
-  return json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?/g, m => {
-      if (/:$/.test(m)) return `<span class="jk">${m}</span>`;
-      return `<span class="js">${m}</span>`;
-    })
-    .replace(/\b(true|false)\b/g, '<span class="jb">$&</span>')
-    .replace(/\bnull\b/g, '<span class="jl">$&</span>')
-    .replace(/\b\d+\.?\d*\b/g, '<span class="jn">$&</span>')
-    .replace(/[{}\[\]]/g, '<span class="jbr">$&</span>');
+// ══════════════════════════
+// AI CRAWLER ANALYSIS
+// ══════════════════════════
+// 내장 폴백 목록 (remote rules 로딩 실패 시 사용)
+// update-rules.js AI_CRAWLERS seed 목록과 동기화 (2026-03)
+const FALLBACK_AI_BOTS = [
+  { name: 'GPTBot', label: 'GPTBot (OpenAI)', importance: 'high' },
+  { name: 'ChatGPT-User', label: 'ChatGPT Browse (OpenAI)', importance: 'high' },
+  { name: 'OAI-SearchBot', label: 'SearchGPT (OpenAI)', importance: 'high' },
+  { name: 'ClaudeBot', label: 'ClaudeBot (Anthropic)', importance: 'high' },
+  { name: 'Google-Extended', label: 'Google-Extended (Gemini)', importance: 'high' },
+  { name: 'GoogleOther', label: 'GoogleOther (Google)', importance: 'medium' },
+  { name: 'Googlebot', label: 'Googlebot (Google)', importance: 'high' },
+  { name: 'PerplexityBot', label: 'PerplexityBot (Perplexity)', importance: 'high' },
+  { name: 'Applebot-Extended', label: 'Applebot-Extended (Apple)', importance: 'high' },
+  { name: 'CCBot', label: 'CCBot (Common Crawl)', importance: 'medium' },
+  { name: 'Bytespider', label: 'Bytespider (ByteDance)', importance: 'medium' },
+  { name: 'FacebookBot', label: 'FacebookBot (Meta)', importance: 'medium' },
+  { name: 'Meta-ExternalAgent', label: 'Meta-ExternalAgent (Meta)', importance: 'medium' },
+  { name: 'Amazonbot', label: 'Amazonbot (Amazon)', importance: 'medium' },
+  { name: 'DeepSeekBot', label: 'DeepSeekBot (DeepSeek)', importance: 'medium' },
+  { name: 'YouBot', label: 'YouBot (You.com)', importance: 'medium' },
+  { name: 'AI2Bot', label: 'AI2Bot (Allen AI)', importance: 'low' },
+  { name: 'Kagibot', label: 'Kagibot (Kagi)', importance: 'low' },
+  { name: 'cohere-ai', label: 'Cohere AI', importance: 'low' },
+  { name: 'Diffbot', label: 'Diffbot', importance: 'low' },
+  { name: 'Timpibot', label: 'Timpibot (Timpi)', importance: 'low' },
+  { name: 'ImagesiftBot', label: 'ImagesiftBot (Hive)', importance: 'low' },
+  { name: 'PetalBot', label: 'PetalBot (Huawei)', importance: 'low' },
+  { name: 'VelenpublicBot', label: 'VelenpublicBot (Velen)', importance: 'low' },
+];
+
+// remote rules에서 AI 봇 목록 로딩 (rules.json geoRules.aiCrawling.bots)
+function getAiBots(remoteRules) {
+  const remoteBots = remoteRules?.geoRules?.aiCrawling?.bots;
+  if (!remoteBots || !Array.isArray(remoteBots) || remoteBots.length === 0) return FALLBACK_AI_BOTS;
+  // remote bots를 FALLBACK 형식으로 정규화 (필드명 호환)
+  return remoteBots.map(b => ({
+    name: b.name,
+    label: b.label || `${b.name} (${b.org || b.engine || ''})`,
+    importance: b.importance || 'low',
+  }));
 }
+
+function parseRobotsTxt(text) {
+  if (!text) return null;
+  // 각 user-agent 블록을 파싱하여 { userAgent: string, rules: [{type, path}] }[] 반환
+  const blocks = [];
+  let current = null;
+  for (const rawLine of text.split('\n')) {
+    const line = rawLine.replace(/#.*$/, '').trim();
+    if (!line) continue;
+    const match = line.match(/^(user-agent|disallow|allow)\s*:\s*(.*)/i);
+    if (!match) continue;
+    const [, directive, value] = match;
+    const dir = directive.toLowerCase();
+    const val = value.trim();
+    if (dir === 'user-agent') {
+      current = { userAgent: val.toLowerCase(), rules: [] };
+      blocks.push(current);
+    } else if (current && (dir === 'disallow' || dir === 'allow')) {
+      current.rules.push({ type: dir, path: val });
+    }
+  }
+  return blocks;
+}
+
+function analyzeCrawlerAccess(robotsTxt, remoteRules) {
+  const blocks = parseRobotsTxt(robotsTxt);
+  if (!blocks) return { available: false, bots: [] };
+
+  const wildcardBlock = blocks.find(b => b.userAgent === '*');
+  const wildcardBlocked = wildcardBlock?.rules.some(r => r.type === 'disallow' && (r.path === '/' || r.path === '/*'));
+
+  const results = getAiBots(remoteRules).map(bot => {
+    // 봇 전용 블록 찾기
+    const botBlock = blocks.find(b => b.userAgent === bot.name.toLowerCase());
+
+    let status; // 'allowed' | 'blocked' | 'no_rule'
+    if (botBlock) {
+      // 전용 규칙 있음 — Disallow: / 가 있으면 차단
+      const hasDisallowAll = botBlock.rules.some(r => r.type === 'disallow' && (r.path === '/' || r.path === '/*'));
+      const hasAllowAll = botBlock.rules.some(r => r.type === 'allow' && r.path === '/');
+      const hasEmptyDisallow = botBlock.rules.length === 0 || botBlock.rules.every(r => r.type === 'disallow' && r.path === '');
+      if (hasEmptyDisallow || hasAllowAll) {
+        status = 'allowed';
+      } else if (hasDisallowAll) {
+        status = 'blocked';
+      } else {
+        // 부분 차단 — 일부 경로만 차단된 것은 "allowed"로 분류
+        status = 'allowed';
+      }
+    } else if (wildcardBlocked) {
+      status = 'blocked';
+    } else {
+      status = 'no_rule';
+    }
+
+    return { ...bot, status };
+  });
+
+  return { available: true, bots: results, wildcardBlocked };
+}
+

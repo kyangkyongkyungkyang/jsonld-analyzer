@@ -123,5 +123,82 @@ const SCHEMA_RULES = {
     label: '채용공고', required: ['title','description','datePosted','hiringOrganization','jobLocation'],
     recommended: ['baseSalary','employmentType','validThrough','applicantLocationRequirements','jobLocationType','directApply'],
     tips: ['`baseSalary`를 포함하면 Google for Jobs에서 급여 필터에 노출됩니다.','`validThrough`가 지나면 자동으로 리치 결과에서 제외됩니다.','`jobLocationType`을 "TELECOMMUTE"로 설정하면 재택근무 필터에 포함됩니다.']
+  },
+  Book: {
+    label: '도서', required: ['name','author','workExample'],
+    recommended: ['url','sameAs','image','description','aggregateRating','review'],
+    workExample_required: ['isbn','bookFormat'],
+    tips: ['`workExample`에 isbn(ISBN-13)을 반드시 포함해야 Google Books 리치 결과에 노출됩니다.','`bookFormat`은 EBook, Hardcover, Paperback, AudiobookFormat 중 하나를 사용하세요.']
+  },
+  Movie: {
+    label: '영화', required: ['name','image','dateCreated'],
+    recommended: ['director','actor','description','duration','aggregateRating','review','genre','contentRating','sameAs'],
+    director_required: ['name'], aggregateRating_required: ['ratingValue','bestRating','ratingCount'],
+    tips: ['`aggregateRating`을 포함하면 검색 결과에 별점이 표시됩니다.','`duration`은 ISO 8601 형식(PT2H30M)으로 작성하세요.']
+  },
+  MusicGroup: {
+    label: '음악 그룹', required: ['name','url'],
+    recommended: ['image','sameAs','genre','album','description','member'],
+    tips: ['`sameAs`에 Spotify, Apple Music 등 스트리밍 프로필을 포함하면 Knowledge Panel 생성에 유리합니다.']
+  },
+  Dataset: {
+    label: '데이터셋', required: ['name','description'],
+    recommended: ['url','keywords','license','creator','distribution','temporalCoverage','spatialCoverage','datePublished'],
+    creator_required: ['name'], distribution_required: ['contentUrl'],
+    tips: ['Google Dataset Search에 노출되려면 `name`과 `description`이 명확해야 합니다.','`distribution`에 다운로드 URL과 파일 형식을 명시하세요.']
+  },
+  SpecialAnnouncement: {
+    label: '긴급 공지', required: ['name','datePosted','text'],
+    recommended: ['expires','category','spatialCoverage','announcementLocation','url'],
+    tips: ['긴급 상황(공중보건, 자연재해)에서만 사용하세요.','`expires`를 반드시 설정하여 만료된 공지가 계속 노출되지 않도록 하세요.']
+  },
+  ClaimReview: {
+    label: '팩트체크', required: ['claimReviewed','reviewRating','author','itemReviewed'],
+    recommended: ['url','datePublished','image'],
+    reviewRating_required: ['ratingValue','bestRating','worstRating','alternateName'],
+    author_required: ['name','url'],
+    tips: ['`claimReviewed`에 검증 대상 주장을 정확히 인용하세요.','`reviewRating.alternateName`에 사실/거짓 등 평가를 명시하세요.']
+  },
+  EducationalOccupationalProgram: {
+    label: '교육/직업 프로그램', required: ['name','description','provider','educationalProgramMode','timeToComplete'],
+    recommended: ['url','offers','programPrerequisites','occupationalCategory','salaryUponCompletion'],
+    provider_required: ['name','url','address'],
+    tips: ['`educationalProgramMode`에 IN_PERSON, ONLINE, HYBRID 중 하나를 명시하세요.','`timeToComplete`는 ISO 8601 Duration(P2Y, P6M)으로 작성하세요.']
+  },
+  LearningResource: {
+    label: '학습 자료', required: ['name','description','educationalLevel'],
+    recommended: ['author','publisher','datePublished','learningResourceType','teaches','inLanguage','isAccessibleForFree'],
+    tips: ['`educationalLevel`에 대상 학습 수준을 명시하세요.','`learningResourceType`에 lesson plan, worksheet, video 등 자료 유형을 지정하세요.']
+  },
+  MerchantListing: {
+    label: '판매자 목록', required: ['name','image','offers'],
+    recommended: ['description','brand','sku','gtin','aggregateRating','shippingDetails','hasMerchantReturnPolicy'],
+    offers_required: ['price','priceCurrency','availability'],
+    tips: ['Google 쇼핑 무료 등록에 사용되는 핵심 마크업입니다.','`shippingDetails`와 `hasMerchantReturnPolicy`를 포함하면 쇼핑 탭 노출 확률이 높아집니다.']
+  },
+  VacationRental: {
+    label: '숙박시설', required: ['name','image','address','offers'],
+    recommended: ['description','url','geo','amenityFeature','numberOfRooms','aggregateRating','checkinTime','checkoutTime'],
+    address_required: ['streetAddress','addressLocality','addressRegion','postalCode','addressCountry'],
+    offers_required: ['price','priceCurrency','availability'],
+    tips: ['`address`와 `geo`를 정확히 기재하면 지역 기반 숙박 검색에 노출됩니다.','이미지는 최소 3장 이상 다양한 각도를 제공하세요.']
+  },
+  Vehicle: {
+    label: '차량', required: ['name','image','offers','brand','model','vehicleIdentificationNumber'],
+    recommended: ['description','color','vehicleModelDate','mileageFromOdometer','fuelType','vehicleTransmission','itemCondition'],
+    offers_required: ['price','priceCurrency','availability'],
+    tips: ['VIN은 중고차 거래에서 Google 리치 결과의 핵심 식별자입니다.','`fuelType`에 Gasoline, Diesel, Electric, Hybrid 등을 명시하세요.']
+  },
+  ProfilePage: {
+    label: '프로필 페이지', required: ['name','mainEntity'],
+    recommended: ['dateCreated','dateModified','description','image','url'],
+    mainEntity_required: ['name','url'],
+    tips: ['`mainEntity`에 Person 또는 Organization 타입으로 프로필 소유자를 명시하세요.','Google은 ProfilePage를 E-E-A-T의 경험(Experience) 시그널로 활용합니다.']
+  },
+  DiscussionForumPosting: {
+    label: '포럼 게시글', required: ['headline','author','datePublished'],
+    recommended: ['text','url','dateModified','comment','interactionStatistic','isPartOf','about'],
+    author_required: ['name','url'],
+    tips: ['2024년 Google이 추가한 비교적 새로운 리치 결과 타입입니다.','`comment`에 답글을 구조화하면 검색 결과에 토론 미리보기가 표시됩니다.']
   }
 };

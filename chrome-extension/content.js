@@ -210,10 +210,30 @@ function extractContent() {
   };
 }
 
+async function fetchRobotsTxt() {
+  try {
+    const robotsUrl = new URL('/robots.txt', window.location.origin).href;
+    const resp = await fetch(robotsUrl, { cache: 'no-cache', credentials: 'omit' });
+    if (resp.ok) {
+      const text = await resp.text();
+      // 기본 검증: robots.txt가 실제 텍스트 파일인지 (HTML 반환 방지)
+      if (text.length > 0 && !text.trimStart().startsWith('<!') && !text.trimStart().startsWith('<html')) {
+        return text;
+      }
+    }
+  } catch (e) {
+    // 네트워크 오류, CORS 등
+  }
+  return null;
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (sender.id !== chrome.runtime.id) {
+    sendResponse({ error: 'Unauthorized sender' });
+    return true;
+  }
   try {
     if (request.action === 'extractJsonLd') {
-      // Backward compatible: return just jsonlds
       const jsonlds = extractJsonLds();
       sendResponse({ jsonlds, url: window.location.href, title: document.title });
 
@@ -227,9 +247,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         headings: extractHeadings(),
         content: extractContent()
       });
+
+    } else if (request.action === 'fetchRobotsTxt') {
+      // 비동기 응답
+      fetchRobotsTxt().then(text => sendResponse({ robotsTxt: text }));
+      return true; // keep channel open for async
     }
   } catch (e) {
     sendResponse({ error: e.message });
   }
-  return true; // keep message channel open for async
+  return true;
 });

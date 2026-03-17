@@ -3,47 +3,74 @@
 // ═══════════════════════════════════════════════
 let extractedData = null;
 let remoteRules = null;
+let activeTabId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // ── i18n: HTML 정적 텍스트 로케일 적용 ──
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = msg(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    el.title = msg(el.dataset.i18nTitle);
+  });
+
   // ── Event listeners (Manifest V3 CSP requires no inline handlers) ──
   document.getElementById('btnCopy').addEventListener('click', copyJsonLd);
   document.querySelectorAll('.tab[data-tab]').forEach(tab => {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   });
 
-  // Load remote rules in background
-  loadRemoteRules().then(r => {
+  // 규칙 새로고침 버튼 (캐시 무시)
+  const refreshBtn = document.getElementById('btnRefreshRules');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', async () => {
+      refreshBtn.textContent = '⏳';
+      refreshBtn.disabled = true;
+      const r = await loadRemoteRules(true);
+      remoteRules = r;
+      updateRulesVersionUI(r);
+      refreshBtn.textContent = '🔄';
+      refreshBtn.disabled = false;
+      if (extractedData) handleData(extractedData);
+    });
+  }
+
+  // remote rules 로딩 + 페이지 데이터 추출을 병렬로 실행하되, 둘 다 완료 후 분석 시작
+  const rulesPromise = loadRemoteRules().then(r => {
     remoteRules = r;
-    if (r?.version) {
-      document.getElementById('rulesVer').textContent = `rules v${r.version} · ${r.lastUpdated || ''}`;
-    }
+    updateRulesVersionUI(r);
   });
 
-  // Extract data from active tab
-  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-    const tab = tabs[0];
-    document.getElementById('pageUrl').textContent = tab.url;
+  const dataPromise = new Promise(resolve => {
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+      const tab = tabs[0];
+      activeTabId = tab.id;
+      document.getElementById('pageUrl').textContent = tab.url;
 
-    chrome.tabs.sendMessage(tab.id, { action: 'extractAll' }, response => {
-      if (chrome.runtime.lastError || !response || response.error) {
-        // Fallback: inject and execute
-        chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ['content.js']
-        }, () => {
-          chrome.tabs.sendMessage(tab.id, { action: 'extractAll' }, resp2 => {
-            if (chrome.runtime.lastError || !resp2 || resp2.error) {
-              showEmptyState();
-            } else {
-              handleData(resp2);
-            }
+      chrome.tabs.sendMessage(tab.id, { action: 'extractAll' }, response => {
+        if (chrome.runtime.lastError || !response || response.error) {
+          chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['content.js']
+          }, () => {
+            chrome.tabs.sendMessage(tab.id, { action: 'extractAll' }, resp2 => {
+              resolve((!chrome.runtime.lastError && resp2 && !resp2.error) ? resp2 : null);
+            });
           });
-        });
-        return;
-      }
-      handleData(response);
+          return;
+        }
+        resolve(response);
+      });
     });
   });
+
+  // 둘 다 완료되면 분석 시작
+  const [, pageData] = await Promise.all([rulesPromise, dataPromise]);
+  if (pageData) {
+    handleData(pageData);
+  } else {
+    showEmptyState();
+  }
 });
 
 function handleData(data) {
@@ -51,19 +78,19 @@ function handleData(data) {
   document.getElementById('stateLoading').classList.remove('active');
 
   const rules = remoteRules?.schemaRules || SCHEMA_RULES;
-  const { issues: jsonldIssues, typeResults } = validateJsonLd(data.jsonlds || [], rules);
-  const geoIssues = analyzeGeo(data);
-  const scores = calculateOverallScores(jsonldIssues, geoIssues, data.jsonlds || []);
+  const { issues: jsonldIssues, typeResults } = validateJsonLd(data.jsonlds || [], rules, remoteRules);
+  const geoIssues = analyzeGeo(data, remoteRules);
+  const scores = calculateOverallScores(jsonldIssues, geoIssues, data.jsonlds || [], remoteRules);
   const allIssues = [...jsonldIssues, ...geoIssues];
 
   // Show UI (toggle CSS classes instead of inline styles)
   document.getElementById('tabBar').classList.remove('hidden');
   document.getElementById('tab-overview').classList.add('active');
 
-  renderOverview(scores, allIssues, data);
-  renderJsonldTab(jsonldIssues, typeResults, data.jsonlds || []);
+  renderOverview(scores, allIssues, data, rules);
+  renderJsonldTab(jsonldIssues, typeResults, data.jsonlds || [], rules);
   renderGeoTab(geoIssues);
-  renderRawTab(data.jsonlds || []);
+  loadCrawlerData();
 }
 
 function showEmptyState() {
@@ -79,7 +106,7 @@ function updateTabBadge(id, text, cls) {
 // ══════════════════════════
 // RENDER: OVERVIEW TAB
 // ══════════════════════════
-function renderOverview(scores, allIssues, data) {
+function renderOverview(scores, allIssues, data, rules) {
   // Score ring
   const circ = 2 * Math.PI * 25;
   const offset = circ - (scores.overall / 100) * circ;
@@ -96,7 +123,7 @@ function renderOverview(scores, allIssues, data) {
   document.getElementById('overviewGrade').textContent = `${grade.g} · ${grade.t}`;
   document.getElementById('overviewGrade').style.color = `var(--${grade.cls})`;
   document.getElementById('overviewDesc').textContent =
-    `JSON-LD ${(data.jsonlds||[]).length}개 · 메타 ${Object.values(data.meta||{}).filter(Boolean).length}개 · 이미지 ${data.content?.imageCount||0}개`;
+    msg('overviewDesc', (data.jsonlds||[]).length, Object.values(data.meta||{}).filter(Boolean).length, data.content?.imageCount||0);
 
   // Score bars
   document.getElementById('overviewBars').innerHTML = scores.bars.map(b => {
@@ -108,10 +135,10 @@ function renderOverview(scores, allIssues, data) {
     </div>`;
   }).join('');
 
-  // AI Recommendations
-  const recs = buildRecommendations(data.jsonlds || [], allIssues.filter(i => i.cat === 'jsonld'), allIssues.filter(i => i.cat !== 'jsonld'), scores);
+  // AI Recommendations (remote rules의 tips 우선 사용)
+  const recs = buildRecommendations(data.jsonlds || [], allIssues.filter(i => i.cat === 'jsonld'), allIssues.filter(i => i.cat !== 'jsonld'), scores, rules);
   document.getElementById('aiBox').innerHTML = `
-    <div class="ai-header">💡 AI 추천</div>
+    <div class="ai-header">${msg('aiHeader')}</div>
     ${recs.map(r => `<div class="ai-item">${r}</div>`).join('')}
   `;
 
@@ -120,8 +147,8 @@ function renderOverview(scores, allIssues, data) {
   if (quickIssues.length > 0) {
     document.getElementById('overviewIssues').innerHTML = `
       <div class="check-group">
-        <div class="check-group-title">주요 개선 사항</div>
-        ${quickIssues.map(i => checkItemHtml(i)).join('')}
+        <div class="check-group-title">${msg('issuesHeader')}</div>
+        ${quickIssues.map(i => checkItemHtml(i, (data.jsonlds || []).length > 1)).join('')}
       </div>`;
   }
 
@@ -131,8 +158,14 @@ function renderOverview(scores, allIssues, data) {
   const geoErrors = allIssues.filter(i => i.cat !== 'jsonld' && i.sev === 'error').length;
   const geoWarns = allIssues.filter(i => i.cat !== 'jsonld' && i.sev === 'warn').length;
 
-  updateTabBadge('badgeJsonld', jsonldErrors + jsonldWarns || '✓',
-    jsonldErrors > 0 ? 'error' : jsonldWarns > 0 ? 'warn' : 'ok');
+  // JSON-LD 없으면 ✕, 있으면 에러/경고 수 또는 ✓
+  const hasJsonld = (data.jsonlds || []).length > 0;
+  if (!hasJsonld) {
+    updateTabBadge('badgeJsonld', '✕', 'error');
+  } else {
+    updateTabBadge('badgeJsonld', jsonldErrors + jsonldWarns || '✓',
+      jsonldErrors > 0 ? 'error' : jsonldWarns > 0 ? 'warn' : 'ok');
+  }
   updateTabBadge('badgeGeo', geoErrors + geoWarns || '✓',
     geoErrors > 0 ? 'error' : geoWarns > 0 ? 'warn' : 'ok');
 }
@@ -140,36 +173,53 @@ function renderOverview(scores, allIssues, data) {
 // ══════════════════════════
 // RENDER: JSON-LD TAB
 // ══════════════════════════
-function renderJsonldTab(issues, typeResults, jsonlds) {
+function renderJsonldTab(issues, typeResults, jsonlds, rules) {
   const container = document.getElementById('jsonldChecks');
 
   if (jsonlds.length === 0) {
     container.innerHTML = `
-      <div style="text-align:center;padding:2rem 1rem;color:var(--text3)">
-        <div style="font-size:1.5rem;margin-bottom:.5rem">📭</div>
-        <p style="font-size:.8rem">JSON-LD 구조화 데이터가 없습니다</p>
+      <div class="jsonld-empty">
+        <div class="jsonld-empty-icon">📭</div>
+        <p class="jsonld-empty-text">${msg('noJsonld')}</p>
       </div>`;
     return;
   }
 
-  // Group by type
   const typeHtml = typeResults.map(t =>
-    `<span style="display:inline-block;padding:.2rem .5rem;border-radius:10px;font-size:.68rem;font-weight:500;
-      background:${t.supported ? 'var(--primary-bg)' : 'var(--bg-card)'};
-      color:${t.supported ? 'var(--primary)' : 'var(--text3)'};
-      border:1px solid ${t.supported ? 'var(--primary-light)' : 'var(--border)'};
-      margin:0 .2rem .3rem 0">${t.type} · ${t.label}</span>`
+    `<span class="type-badge ${t.supported ? 'supported' : 'unsupported'}">${t.type} · ${t.label}</span>`
   ).join('');
 
   const errors = issues.filter(i => i.sev === 'error');
   const warns = issues.filter(i => i.sev === 'warn');
   const passes = issues.filter(i => i.sev === 'pass');
+  const multiType = jsonlds.length > 1;
+
+  // 타입별 tips 수집 (remote rules 우선)
+  const rulesLookup = rules || SCHEMA_RULES;
+  const tips = [];
+  jsonlds.map(getType).forEach(type => {
+    const r = rulesLookup[type];
+    if (r?.tips) tips.push(...r.tips.slice(0, 2));
+  });
+  const uniqueTips = [...new Set(tips)].slice(0, 4);
+
+  // 에러/경고 없으면 축하 메시지
+  const allGoodHtml = (errors.length === 0 && warns.length === 0 && passes.length > 0)
+    ? `<div class="check-item" style="padding:.8rem .6rem">
+        <div class="check-icon pass" style="width:28px;height:28px;font-size:.9rem">✓</div>
+        <div class="check-body">
+          <div class="check-title">${msg('jsonldAllGood')}</div>
+          <div class="check-desc">${msg('jsonldAllGoodDesc')}</div>
+        </div>
+      </div>` : '';
 
   container.innerHTML = `
     <div style="margin-bottom:.75rem">${typeHtml}</div>
-    ${errors.length > 0 ? buildCheckGroup('오류', errors) : ''}
-    ${warns.length > 0 ? buildCheckGroup('경고', warns) : ''}
-    ${passes.length > 0 ? buildCheckGroup('통과', passes) : ''}
+    ${allGoodHtml}
+    ${errors.length > 0 ? buildCheckGroup(msg('groupError'), errors, multiType) : ''}
+    ${warns.length > 0 ? buildCheckGroup(msg('groupWarn'), warns, multiType) : ''}
+    ${(errors.length > 0 || warns.length > 0) && passes.length > 0 ? buildCheckGroup(msg('groupPass'), passes, multiType) : ''}
+    ${uniqueTips.length > 0 ? `<div class="section-tip">${uniqueTips.map(t => sanitizeHtml(t)).join('<br><br>')}</div>` : ''}
   `;
 }
 
@@ -179,10 +229,10 @@ function renderJsonldTab(issues, typeResults, jsonlds) {
 function renderGeoTab(issues) {
   const container = document.getElementById('geoChecks');
   const cats = [
-    { key: 'meta', title: '메타태그' },
-    { key: 'headings', title: '헤딩 구조' },
-    { key: 'eeat', title: 'E-E-A-T 신호' },
-    { key: 'content', title: '콘텐츠 / 인용 가능성' },
+    { key: 'meta', title: msg('catMeta') },
+    { key: 'headings', title: msg('catHeadings') },
+    { key: 'eeat', title: msg('catEeat') },
+    { key: 'content', title: msg('catContent') },
   ];
 
   container.innerHTML = cats.map(cat => {
@@ -192,36 +242,24 @@ function renderGeoTab(issues) {
   }).join('');
 }
 
-// ══════════════════════════
-// RENDER: RAW TAB
-// ══════════════════════════
-function renderRawTab(jsonlds) {
-  if (jsonlds.length === 0) {
-    document.getElementById('jsonView').textContent = '// JSON-LD 데이터 없음';
-    return;
-  }
-  document.getElementById('jsonView').innerHTML =
-    jsonlds.map(ld => syntaxHighlight(JSON.stringify(ld, null, 2))).join('\n\n');
-}
-
-// ══════════════════════════
 // UI HELPERS
 // ══════════════════════════
-function checkItemHtml(issue) {
+function checkItemHtml(issue, showTypeLabel) {
   const icons = { pass: '✓', error: '✕', warn: '!', info: 'i' };
+  const typeBadge = (showTypeLabel && issue.typeLabel) ? `<span class="check-type">${issue.typeLabel}</span>` : '';
   return `<div class="check-item">
     <div class="check-icon ${issue.sev}">${icons[issue.sev] || 'i'}</div>
     <div class="check-body">
-      <div class="check-title">${issue.text}</div>
+      <div class="check-title">${typeBadge}${issue.text}</div>
       ${issue.desc ? `<div class="check-desc">${issue.desc}</div>` : ''}
     </div>
   </div>`;
 }
 
-function buildCheckGroup(title, items) {
+function buildCheckGroup(title, items, showTypeLabel) {
   return `<div class="check-group">
     <div class="check-group-title">${title}</div>
-    ${items.map(i => checkItemHtml(i)).join('')}
+    ${items.map(i => checkItemHtml(i, showTypeLabel)).join('')}
   </div>`;
 }
 
@@ -230,19 +268,100 @@ function switchTab(name) {
   document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${name}`));
 }
 
-function toggleSection(header) {
-  header.classList.toggle('open');
-  header.nextElementSibling.classList.toggle('open');
+function animateNum(el, target) {
+  const t = isNaN(target) ? 0 : Math.max(0, Math.round(target));
+  if (t === 0) { el.textContent = '0'; return; }
+  let cur = 0;
+  const step = Math.max(1, Math.ceil(t / 25));
+  const iv = setInterval(() => {
+    cur = Math.min(cur + step, t);
+    el.textContent = cur;
+    if (cur >= t) clearInterval(iv);
+  }, 25);
 }
 
-function animateNum(el, target) {
-  let cur = 0;
-  const step = Math.max(1, Math.ceil(target / 25));
-  const iv = setInterval(() => {
-    cur = Math.min(cur + step, target);
-    el.textContent = cur;
-    if (cur >= target) clearInterval(iv);
-  }, 25);
+function updateRulesVersionUI(r) {
+  const el = document.getElementById('rulesVer');
+  if (!el) return;
+  if (r?.version) {
+    el.textContent = `rules v${r.version} · ${r.lastUpdated || ''}`;
+    el.style.color = '';
+  } else {
+    el.textContent = msg('offlineRules');
+    el.style.color = 'var(--amber, #f59e0b)';
+  }
+}
+
+// ══════════════════════════
+// AI CRAWLERS TAB
+// ══════════════════════════
+function loadCrawlerData() {
+  if (!activeTabId) return;
+  chrome.tabs.sendMessage(activeTabId, { action: 'fetchRobotsTxt' }, response => {
+    if (chrome.runtime.lastError || !response) {
+      renderCrawlerTab(null);
+      return;
+    }
+    renderCrawlerTab(response.robotsTxt);
+  });
+}
+
+function renderCrawlerTab(robotsTxt) {
+  const container = document.getElementById('crawlerChecks');
+  const result = analyzeCrawlerAccess(robotsTxt, remoteRules);
+
+  if (!result.available) {
+    container.innerHTML = `
+      <div class="check-group">
+        <div class="check-icon warn" style="margin:0 auto .5rem;width:28px;height:28px;font-size:.85rem">!</div>
+        <div style="text-align:center;font-size:.87rem;font-weight:500">${msg('crawlerNoRobots')}</div>
+        <div style="text-align:center;font-size:.8rem;color:var(--text3);margin-top:.3rem">${msg('crawlerNoRobotsDesc')}</div>
+      </div>`;
+    updateTabBadge('badgeCrawlers', '?', 'warn');
+    return;
+  }
+
+  const allowed = result.bots.filter(b => b.status === 'allowed');
+  const blocked = result.bots.filter(b => b.status === 'blocked');
+  const noRule = result.bots.filter(b => b.status === 'no_rule');
+
+  // Badge
+  if (blocked.length > 0) {
+    updateTabBadge('badgeCrawlers', blocked.length, 'error');
+  } else {
+    updateTabBadge('badgeCrawlers', '✓', 'ok');
+  }
+
+  const statusText = { allowed: msg('crawlerAllowed'), blocked: msg('crawlerBlocked'), no_rule: msg('crawlerNoRule') };
+
+  function botItemHtml(bot) {
+    const impLabel = bot.importance === 'high' ? '★' : '';
+    return `<div class="crawler-item">
+      <div class="crawler-dot ${bot.status}"></div>
+      <div class="crawler-name">${escHtml(bot.label)}${impLabel ? `<span class="imp">${impLabel}</span>` : ''}</div>
+      <div class="crawler-status ${bot.status}">${statusText[bot.status]}</div>
+    </div>`;
+  }
+
+  let html = `<div class="crawler-summary">${msg('crawlerSummary', allowed.length + noRule.length, blocked.length, noRule.length)}</div>`;
+
+  if (result.wildcardBlocked) {
+    html += `<div class="check-item"><div class="check-icon error">✕</div><div class="check-body">
+      <div class="check-title">${msg('crawlerWildcardBlock')}</div></div></div>`;
+  }
+
+  if (blocked.length > 0) {
+    html += `<div class="check-group"><div class="check-group-title">${msg('crawlerGroupBlocked')}</div>${blocked.map(botItemHtml).join('')}</div>`;
+  }
+  if (allowed.length > 0) {
+    html += `<div class="check-group"><div class="check-group-title">${msg('crawlerGroupAllowed')}</div>${allowed.map(botItemHtml).join('')}</div>`;
+  }
+  if (noRule.length > 0) {
+    html += `<div class="check-group"><div class="check-group-title">${msg('crawlerGroupNoRule')}</div>${noRule.map(botItemHtml).join('')}</div>`;
+  }
+
+  html += `<div class="crawler-tip">${msg('crawlerTip')}</div>`;
+  container.innerHTML = html;
 }
 
 function copyJsonLd() {

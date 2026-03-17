@@ -61,10 +61,10 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
   padding:0 1.1rem;background:var(--bg);
 }
 .tab{
-  padding:.65rem .85rem;border:none;background:none;cursor:pointer;
-  font-size:.87rem;font-weight:500;color:var(--text3);
+  flex:1;padding:.65rem .4rem;border:none;background:none;cursor:pointer;
+  font-size:.82rem;font-weight:500;color:var(--text3);text-align:center;
   border-bottom:2px solid transparent;transition:all .15s;
-  position:relative;
+  position:relative;white-space:nowrap;
 }
 .tab:hover{color:var(--text2)}
 .tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
@@ -120,9 +120,15 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .check-body{flex:1;min-width:0}
 .check-title{font-size:.9rem;font-weight:500;color:var(--text)}
 .check-desc{font-size:.8rem;color:var(--text3);margin-top:2px;line-height:1.5}
-.check-desc code{
-  font-family:var(--mono);font-size:.75rem;padding:1px 5px;
+.check-type{
+  display:inline-block;font-size:.7rem;font-weight:600;color:var(--primary);
+  background:var(--primary-bg);border:1px solid var(--primary-light);
+  padding:1px 6px;border-radius:4px;margin-right:.4rem;vertical-align:1px;
+}
+.check-title code,.check-desc code{
+  font-family:var(--mono);font-size:.78rem;padding:1px 5px;
   background:var(--bg-active);border-radius:3px;color:var(--purple);
+  font-weight:400;
 }
 
 /* ═══ EXPAND SECTION ═══ */
@@ -181,15 +187,17 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .ai-item:last-child{border-bottom:none}
 .ai-item strong{color:var(--text);font-weight:500}
 
-/* ═══ JSON VIEW (dark inset) ═══ */
-.json-view{
-  background:#1e2330;border-radius:var(--radius-sm);padding:.85rem;
-  font-family:var(--mono);font-size:.8rem;line-height:1.7;color:#c9d1d9;
-  max-height:320px;overflow:auto;white-space:pre-wrap;word-break:break-all;
+/* ═══ JSON-LD TAB ═══ */
+.type-badge{
+  display:inline-block;padding:.25rem .55rem;border-radius:10px;
+  font-family:var(--sans);font-size:.8rem;font-weight:500;
+  margin:0 .25rem .35rem 0;
 }
-.json-view::-webkit-scrollbar{width:4px}
-.json-view::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
-.jk{color:#79c0ff}.js{color:#a5d6a7}.jn{color:#ffcc80}.jb{color:#ce93d8}.jl{color:#666}.jbr{color:#666}
+.type-badge.supported{background:var(--primary-bg);color:var(--primary);border:1px solid var(--primary-light)}
+.type-badge.unsupported{background:var(--bg-card);color:var(--text3);border:1px solid var(--border)}
+.jsonld-empty{text-align:center;padding:2rem 1rem;color:var(--text3)}
+.jsonld-empty-icon{font-size:1.5rem;margin-bottom:.5rem}
+.jsonld-empty-text{font-size:.85rem}
 
 /* ═══ FOOTER ═══ */
 .footer{
@@ -199,6 +207,22 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .footer a{color:var(--primary);text-decoration:none}
 .footer a:hover{text-decoration:underline}
 .rules-ver{font-family:var(--mono);font-size:.67rem;color:var(--text3);opacity:.7}
+
+/* ═══ CRAWLER STATUS ═══ */
+.crawler-item{display:flex;align-items:center;gap:.5rem;padding:.45rem .6rem;border-radius:var(--radius-sm);transition:background .15s}
+.crawler-item:hover{background:var(--bg-card)}
+.crawler-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.crawler-dot.allowed{background:var(--green)}
+.crawler-dot.blocked{background:var(--red)}
+.crawler-dot.no_rule{background:var(--border)}
+.crawler-name{flex:1;font-size:.87rem;font-weight:500}
+.crawler-name .imp{font-size:.68rem;color:var(--text3);font-weight:400;margin-left:.3rem}
+.crawler-status{font-size:.78rem;font-weight:600}
+.crawler-status.allowed{color:var(--green)}
+.crawler-status.blocked{color:var(--red)}
+.crawler-status.no_rule{color:var(--text3)}
+.crawler-summary{font-size:.85rem;color:var(--text2);text-align:center;padding:.6rem;margin-bottom:.6rem;background:var(--bg-card);border-radius:var(--radius-sm);border:1px solid var(--border)}
+.crawler-tip,.section-tip{font-size:.8rem;color:var(--text3);padding:.5rem .6rem;line-height:1.5;border-top:1px solid var(--border);margin-top:.5rem}
 </style>
 </head>
 <body>
@@ -208,41 +232,40 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
   <div class="logo">{}</div>
   <div class="header-info">
     <h1>GEO Analyzer</h1>
-    <span class="url" id="pageUrl">분석 대기 중...</span>
+    <span class="url" id="pageUrl" data-i18n="waiting"></span>
   </div>
   <div class="header-actions">
-    <div class="icon-btn" id="btnCopy" title="JSON-LD 복사">📋</div>
+    <div class="icon-btn" id="btnCopy" data-i18n-title="copyJsonld">📋</div>
   </div>
 </div>
 
 <!-- ═══ TABS ═══ -->
 <div class="tabs hidden" id="tabBar">
-  <button class="tab active" data-tab="overview">
-    종합
-  </button>
+  <button class="tab active" data-tab="overview" data-i18n="tabOverview"></button>
   <button class="tab" data-tab="jsonld">
     JSON-LD <span class="badge ok" id="badgeJsonld">0</span>
   </button>
   <button class="tab" data-tab="geo">
-    GEO <span class="badge ok" id="badgeGeo">0</span>
+    SEO · GEO <span class="badge ok" id="badgeGeo">0</span>
   </button>
-  <button class="tab" data-tab="raw">
-    원본
+  <button class="tab" data-tab="crawlers">
+    <span data-i18n="tabCrawlers"></span> <span class="badge ok" id="badgeCrawlers">…</span>
   </button>
+
 </div>
 
 <!-- ═══ LOADING STATE ═══ -->
 <div class="state active" id="stateLoading">
   <div class="spinner"></div>
-  <p>페이지 분석 중...</p>
-  <span class="sub">JSON-LD, 메타태그, 헤딩 구조, AI 크롤링 설정 확인</span>
+  <p data-i18n="analyzing"></p>
+  <span class="sub" data-i18n="analyzingSub"></span>
 </div>
 
 <!-- ═══ EMPTY STATE ═══ -->
 <div class="state" id="stateEmpty">
   <div class="state-icon">🔍</div>
-  <p>이 페이지에서 구조화 데이터를<br>찾을 수 없습니다.</p>
-  <span class="sub">GEO 분석 결과는 아래 탭에서 확인하세요</span>
+  <p data-i18n="noData"></p>
+  <span class="sub" data-i18n="noDataSub"></span>
 </div>
 
 <!-- ═══ TAB: OVERVIEW ═══ -->
@@ -259,7 +282,7 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
         <div class="center" id="ringScore">0</div>
       </div>
       <div class="score-detail">
-        <div class="grade" id="overviewGrade">분석 중...</div>
+        <div class="grade" id="overviewGrade" data-i18n="analyzing"></div>
         <div class="desc" id="overviewDesc">—</div>
       </div>
     </div>
@@ -285,15 +308,20 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
   <div id="geoChecks"></div>
 </div>
 
-<!-- ═══ TAB: RAW ═══ -->
-<div class="tab-content" id="tab-raw">
-  <div class="json-view" id="jsonView" style="margin-bottom:.5rem">데이터 없음</div>
+<!-- ═══ TAB: AI CRAWLERS ═══ -->
+<div class="tab-content" id="tab-crawlers">
+  <div id="crawlerChecks">
+    <div class="state active" style="padding:1.5rem">
+      <div class="spinner"></div>
+      <p data-i18n="crawlerLoading" style="font-size:.85rem;color:var(--text3);margin-top:.5rem"></p>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ FOOTER ═══ -->
 <div class="footer">
   Google Rich Results · GEO Guidelines
-  <br><span class="rules-ver" id="rulesVer"></span>
+  <br><span class="rules-ver" id="rulesVer"></span> <button id="btnRefreshRules" data-i18n-title="refreshRules" style="background:none;border:none;cursor:pointer;font-size:.7rem;padding:0 2px;opacity:.6">🔄</button>
 </div>
 
 <script src="rules.js"></script>

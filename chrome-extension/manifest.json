@@ -1,9 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "GEO Analyzer",
-  "version": "2.0.0",
-  "description": "JSON-LD 구조화 데이터 + GEO(Generative Engine Optimization) 분석기. Google Rich Results & AI 검색엔진 최적화.",
+  "name": "__MSG_extName__",
+  "version": "2.1.0",
+  "description": "__MSG_extDesc__",
+  "default_locale": "ko",
   "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["https://kyangkyongkyungkyang.github.io/*"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -19,7 +24,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["http://*/*", "https://*/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
