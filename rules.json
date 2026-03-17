@@ -650,147 +650,437 @@
       ]
     },
     "Book": {
-      "label": "Book",
+      "label": "도서",
       "required": [
-        "name"
+        "@type",
+        "name",
+        "author",
+        "workExample"
       ],
-      "recommended": [],
+      "recommended": [
+        "url",
+        "sameAs",
+        "image",
+        "description",
+        "aggregateRating",
+        "review"
+      ],
+      "nested": {
+        "author_required": [
+          "@type",
+          "name"
+        ],
+        "workExample_required": [
+          "@type",
+          "isbn",
+          "bookFormat"
+        ],
+        "aggregateRating_required": [
+          "@type",
+          "ratingValue",
+          "ratingCount"
+        ]
+      },
       "tips": [
-        "Book 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "workExample에 isbn(ISBN-13)을 반드시 포함해야 Google Books 리치 결과에 노출됩니다.",
+        "bookFormat은 EBook, Hardcover, Paperback, AudiobookFormat 중 하나를 사용하세요.",
+        "ReadAction을 potentialAction에 추가하면 검색 결과에 읽기 버튼이 표시됩니다.",
+        "여러 판본은 각각 별도의 workExample로 나열하세요."
+      ]
     },
     "Movie": {
-      "label": "Movie",
+      "label": "영화",
       "required": [
-        "name"
+        "@type",
+        "name",
+        "image",
+        "dateCreated"
       ],
-      "recommended": [],
+      "recommended": [
+        "director",
+        "actor",
+        "description",
+        "duration",
+        "aggregateRating",
+        "review",
+        "genre",
+        "contentRating",
+        "sameAs",
+        "url"
+      ],
+      "nested": {
+        "director_required": [
+          "@type",
+          "name"
+        ],
+        "aggregateRating_required": [
+          "@type",
+          "ratingValue",
+          "bestRating",
+          "ratingCount"
+        ]
+      },
       "tips": [
-        "Movie 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "aggregateRating을 포함하면 검색 결과에 별점이 표시됩니다.",
+        "sameAs에 IMDb 등 권위 있는 영화 DB URL을 포함하세요.",
+        "duration은 ISO 8601 형식(PT2H30M)으로 작성하세요.",
+        "contentRating으로 연령 등급을 명시하세요."
+      ]
     },
     "MusicGroup": {
-      "label": "MusicGroup",
+      "label": "음악 그룹/아티스트",
       "required": [
-        "name"
+        "@type",
+        "name",
+        "url"
       ],
-      "recommended": [],
+      "recommended": [
+        "image",
+        "sameAs",
+        "genre",
+        "album",
+        "description",
+        "member"
+      ],
+      "nested": {
+        "album_required": [
+          "@type",
+          "name"
+        ],
+        "member_required": [
+          "@type",
+          "name"
+        ]
+      },
       "tips": [
-        "MusicGroup 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "sameAs에 Spotify, Apple Music 등 스트리밍 프로필을 포함하면 Knowledge Panel 생성에 유리합니다.",
+        "genre는 구체적인 장르를 명시하세요."
+      ]
     },
     "Dataset": {
-      "label": "Dataset",
+      "label": "데이터셋",
       "required": [
-        "name"
+        "@type",
+        "name",
+        "description"
       ],
-      "recommended": [],
+      "recommended": [
+        "url",
+        "keywords",
+        "license",
+        "creator",
+        "distribution",
+        "temporalCoverage",
+        "spatialCoverage",
+        "datePublished",
+        "dateModified"
+      ],
+      "nested": {
+        "creator_required": [
+          "@type",
+          "name"
+        ],
+        "distribution_required": [
+          "@type",
+          "contentUrl"
+        ]
+      },
       "tips": [
-        "Dataset 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "Google Dataset Search에 노출되려면 name과 description이 명확해야 합니다.",
+        "distribution에 다운로드 URL과 파일 형식을 명시하세요.",
+        "temporalCoverage로 데이터 수집 기간을 ISO 8601로 표기하세요."
+      ]
     },
     "SpecialAnnouncement": {
-      "label": "SpecialAnnouncement",
+      "label": "긴급 공지",
       "required": [
-        "name"
+        "@type",
+        "name",
+        "datePosted",
+        "text"
       ],
-      "recommended": [],
+      "recommended": [
+        "expires",
+        "category",
+        "spatialCoverage",
+        "announcementLocation",
+        "url"
+      ],
+      "nested": {
+        "announcementLocation_required": [
+          "@type",
+          "name",
+          "url"
+        ]
+      },
       "tips": [
-        "SpecialAnnouncement 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "공중보건 비상사태, 자연재해 등 긴급 상황에서만 사용하세요.",
+        "expires를 반드시 설정하세요."
+      ]
     },
     "ClaimReview": {
-      "label": "ClaimReview",
+      "label": "팩트체크",
       "required": [
-        "name"
+        "@type",
+        "claimReviewed",
+        "reviewRating",
+        "author",
+        "itemReviewed"
       ],
-      "recommended": [],
+      "recommended": [
+        "url",
+        "datePublished",
+        "image"
+      ],
+      "nested": {
+        "reviewRating_required": [
+          "@type",
+          "ratingValue",
+          "bestRating",
+          "worstRating",
+          "alternateName"
+        ],
+        "author_required": [
+          "@type",
+          "name",
+          "url"
+        ],
+        "itemReviewed_required": [
+          "@type",
+          "author",
+          "datePublished"
+        ]
+      },
       "tips": [
-        "ClaimReview 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "claimReviewed에 검증 대상 주장을 정확히 인용하세요.",
+        "reviewRating.alternateName에 사실/거짓 등 평가를 명시하세요."
+      ]
     },
     "EducationalOccupationalProgram": {
-      "label": "EducationalOccupationalProgram",
+      "label": "교육/직업 프로그램",
       "required": [
-        "name"
+        "@type",
+        "name",
+        "description",
+        "provider",
+        "educationalProgramMode",
+        "timeToComplete"
       ],
-      "recommended": [],
+      "recommended": [
+        "url",
+        "offers",
+        "programPrerequisites",
+        "occupationalCategory",
+        "salaryUponCompletion"
+      ],
+      "nested": {
+        "provider_required": [
+          "@type",
+          "name",
+          "url",
+          "address"
+        ]
+      },
       "tips": [
-        "EducationalOccupationalProgram 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "educationalProgramMode에 IN_PERSON, ONLINE, HYBRID 중 하나를 명시하세요.",
+        "timeToComplete는 ISO 8601 Duration으로 작성하세요."
+      ]
     },
     "LearningResource": {
-      "label": "LearningResource",
+      "label": "학습 자료",
       "required": [
-        "name"
+        "@type",
+        "name",
+        "description",
+        "educationalLevel"
       ],
-      "recommended": [],
+      "recommended": [
+        "author",
+        "publisher",
+        "datePublished",
+        "learningResourceType",
+        "teaches",
+        "inLanguage",
+        "isAccessibleForFree"
+      ],
+      "nested": {
+        "author_required": [
+          "@type",
+          "name"
+        ]
+      },
       "tips": [
-        "LearningResource 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "educationalLevel에 대상 학습 수준을 명시하세요.",
+        "learningResourceType에 자료 유형을 지정하세요."
+      ]
     },
     "MerchantListing": {
-      "label": "MerchantListing",
+      "label": "판매자 목록",
       "required": [
-        "name"
+        "@type",
+        "name",
+        "image",
+        "offers"
       ],
-      "recommended": [],
+      "recommended": [
+        "description",
+        "brand",
+        "sku",
+        "gtin",
+        "aggregateRating",
+        "shippingDetails",
+        "hasMerchantReturnPolicy"
+      ],
+      "nested": {
+        "offers_required": [
+          "@type",
+          "price",
+          "priceCurrency",
+          "availability"
+        ]
+      },
       "tips": [
-        "MerchantListing 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "Google 쇼핑 무료 등록에 사용되는 핵심 마크업입니다.",
+        "shippingDetails와 hasMerchantReturnPolicy를 포함하면 쇼핑 탭 노출 확률이 높아집니다."
+      ]
     },
     "VacationRental": {
-      "label": "VacationRental",
+      "label": "숙박시설",
       "required": [
-        "name"
+        "@type",
+        "name",
+        "image",
+        "address",
+        "offers"
       ],
-      "recommended": [],
+      "recommended": [
+        "description",
+        "url",
+        "geo",
+        "amenityFeature",
+        "numberOfRooms",
+        "aggregateRating",
+        "checkinTime",
+        "checkoutTime"
+      ],
+      "nested": {
+        "address_required": [
+          "@type",
+          "streetAddress",
+          "addressLocality",
+          "addressRegion",
+          "postalCode",
+          "addressCountry"
+        ],
+        "offers_required": [
+          "@type",
+          "price",
+          "priceCurrency",
+          "availability"
+        ]
+      },
       "tips": [
-        "VacationRental 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "address와 geo를 정확히 기재하면 지역 기반 숙박 검색에 노출됩니다.",
+        "이미지는 최소 3장 이상 제공하세요."
+      ]
     },
     "Vehicle": {
-      "label": "Vehicle",
+      "label": "차량",
       "required": [
-        "name"
+        "@type",
+        "name",
+        "image",
+        "offers",
+        "brand",
+        "model",
+        "vehicleIdentificationNumber"
       ],
-      "recommended": [],
+      "recommended": [
+        "description",
+        "color",
+        "vehicleModelDate",
+        "mileageFromOdometer",
+        "fuelType",
+        "vehicleTransmission",
+        "itemCondition"
+      ],
+      "nested": {
+        "offers_required": [
+          "@type",
+          "price",
+          "priceCurrency",
+          "availability"
+        ],
+        "brand_required": [
+          "@type",
+          "name"
+        ]
+      },
       "tips": [
-        "Vehicle 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "VIN은 중고차 거래에서 Google 리치 결과의 핵심 식별자입니다.",
+        "fuelType에 Gasoline, Diesel, Electric, Hybrid 등을 명시하세요."
+      ]
     },
     "ProfilePage": {
-      "label": "ProfilePage",
+      "label": "프로필 페이지",
       "required": [
-        "name"
+        "@type",
+        "name",
+        "mainEntity"
       ],
-      "recommended": [],
+      "recommended": [
+        "dateCreated",
+        "dateModified",
+        "description",
+        "image",
+        "url"
+      ],
+      "nested": {
+        "mainEntity_required": [
+          "@type",
+          "name",
+          "url"
+        ]
+      },
       "tips": [
-        "ProfilePage 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "mainEntity에 Person 또는 Organization 타입으로 프로필 소유자를 명시하세요.",
+        "Google은 ProfilePage를 E-E-A-T의 경험(Experience) 시그널로 활용합니다."
+      ]
     },
     "DiscussionForumPosting": {
-      "label": "DiscussionForumPosting",
+      "label": "포럼 게시글",
       "required": [
-        "name"
+        "@type",
+        "headline",
+        "author",
+        "datePublished"
       ],
-      "recommended": [],
+      "recommended": [
+        "text",
+        "url",
+        "dateModified",
+        "comment",
+        "interactionStatistic",
+        "isPartOf",
+        "about"
+      ],
+      "nested": {
+        "author_required": [
+          "@type",
+          "name",
+          "url"
+        ],
+        "comment_required": [
+          "@type",
+          "text",
+          "author",
+          "datePublished"
+        ]
+      },
       "tips": [
-        "DiscussionForumPosting 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
-      ],
-      "_stub": true
+        "2024년 Google이 추가한 비교적 새로운 리치 결과 타입입니다.",
+        "comment에 답글을 구조화하면 검색 결과에 토론 미리보기가 표시됩니다."
+      ]
     }
   },
   "geoRules": {
@@ -2155,23 +2445,59 @@
       "minHeadings": 2
     },
     "metaChecks": [
-      { "key": "title", "label": "Title", "req": true },
-      { "key": "description", "label": "Meta Description", "req": true },
-      { "key": "canonical", "label": "Canonical URL", "req": true },
-      { "key": "ogTitle", "label": "og:title", "req": false },
-      { "key": "ogDescription", "label": "og:description", "req": false },
-      { "key": "ogImage", "label": "og:image", "req": false },
-      { "key": "twitterCard", "label": "twitter:card", "req": false },
-      { "key": "viewport", "label": "Viewport", "req": true },
-      { "key": "lang", "label": "HTML lang", "req": true }
+      {
+        "key": "title",
+        "label": "Title",
+        "req": true
+      },
+      {
+        "key": "description",
+        "label": "Meta Description",
+        "req": true
+      },
+      {
+        "key": "canonical",
+        "label": "Canonical URL",
+        "req": true
+      },
+      {
+        "key": "ogTitle",
+        "label": "og:title",
+        "req": false
+      },
+      {
+        "key": "ogDescription",
+        "label": "og:description",
+        "req": false
+      },
+      {
+        "key": "ogImage",
+        "label": "og:image",
+        "req": false
+      },
+      {
+        "key": "twitterCard",
+        "label": "twitter:card",
+        "req": false
+      },
+      {
+        "key": "viewport",
+        "label": "Viewport",
+        "req": true
+      },
+      {
+        "key": "lang",
+        "label": "HTML lang",
+        "req": true
+      }
     ]
   },
   "scoring": {
     "description": "각 카테고리의 총점 기여 비율 (합계 100%). analyzer.js에서 자동 로딩",
     "weights": {
-      "jsonld": 0.30,
-      "meta": 0.20,
-      "headings": 0.10,
+      "jsonld": 0.3,
+      "meta": 0.2,
+      "headings": 0.1,
       "eeat": 0.15,
       "content": 0.25
     },
