@@ -1,156 +1,255 @@
-// Popup controller — communicates with content script and renders results
-let extractedJsonLds = [];
+// ═══════════════════════════════════════════════
+// Popup Controller v2 — GEO + JSON-LD Analysis
+// ═══════════════════════════════════════════════
+let extractedData = null;
+let remoteRules = null;
 
-document.addEventListener('DOMContentLoaded', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load remote rules in background
+  loadRemoteRules().then(r => {
+    remoteRules = r;
+    if (r?.version) {
+      document.getElementById('rulesVer').textContent = `rules v${r.version} · ${r.lastUpdated || ''}`;
+    }
+  });
+
+  // Extract data from active tab
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     const tab = tabs[0];
     document.getElementById('pageUrl').textContent = tab.url;
 
-    chrome.tabs.sendMessage(tab.id, { action: 'extractJsonLd' }, (response) => {
-      if (chrome.runtime.lastError || !response) {
-        // Content script might not be injected yet — try scripting API
+    chrome.tabs.sendMessage(tab.id, { action: 'extractAll' }, response => {
+      if (chrome.runtime.lastError || !response || response.error) {
+        // Fallback: inject and execute
         chrome.scripting.executeScript({
           target: { tabId: tab.id },
-          func: () => {
-            const scripts = document.querySelectorAll('script[type="application/ld+json"]');
-            const results = [];
-            scripts.forEach(s => {
-              try {
-                const p = JSON.parse(s.textContent.trim());
-                if (Array.isArray(p)) results.push(...p);
-                else if (p['@graph']) results.push(...p['@graph']);
-                else results.push(p);
-              } catch {}
-            });
-            return { jsonlds: results, url: window.location.href, title: document.title };
-          }
-        }, (injectionResults) => {
-          if (chrome.runtime.lastError || !injectionResults?.[0]?.result) {
-            showEmpty();
-            return;
-          }
-          handleResponse(injectionResults[0].result);
+          files: ['content.js']
+        }, () => {
+          chrome.tabs.sendMessage(tab.id, { action: 'extractAll' }, resp2 => {
+            if (chrome.runtime.lastError || !resp2 || resp2.error) {
+              showEmptyState();
+            } else {
+              handleData(resp2);
+            }
+          });
         });
         return;
       }
-      handleResponse(response);
+      handleData(response);
     });
   });
 });
 
-function handleResponse(data) {
+function handleData(data) {
+  extractedData = data;
   document.getElementById('stateLoading').classList.remove('active');
 
-  if (!data.jsonlds || data.jsonlds.length === 0) {
-    showEmpty();
-    return;
-  }
+  const rules = remoteRules?.schemaRules || SCHEMA_RULES;
+  const { issues: jsonldIssues, typeResults } = validateJsonLd(data.jsonlds || [], rules);
+  const geoIssues = analyzeGeo(data);
+  const scores = calculateOverallScores(jsonldIssues, geoIssues, data.jsonlds || []);
+  const allIssues = [...jsonldIssues, ...geoIssues];
 
-  extractedJsonLds = data.jsonlds;
-  runPopupAnalysis(data.jsonlds);
+  // Show UI
+  document.getElementById('summaryBar').style.display = 'flex';
+  document.getElementById('tabBar').style.display = 'flex';
+  document.getElementById('tab-overview').style.display = 'block';
+
+  renderSummary(data, typeResults, scores);
+  renderOverview(scores, allIssues, data);
+  renderJsonldTab(jsonldIssues, typeResults, data.jsonlds || []);
+  renderGeoTab(geoIssues);
+  renderRawTab(data.jsonlds || []);
 }
 
-function showEmpty() {
+function showEmptyState() {
   document.getElementById('stateLoading').classList.remove('active');
   document.getElementById('stateEmpty').classList.add('active');
 }
 
-function runPopupAnalysis(jsonlds) {
-  document.getElementById('results').style.display = 'block';
+// ══════════════════════════
+// RENDER: SUMMARY BAR
+// ══════════════════════════
+function renderSummary(data, typeResults, scores) {
+  const count = (data.jsonlds || []).length;
+  document.getElementById('summaryItemCount').textContent = count + (data.meta ? '+GEO' : '');
+  document.getElementById('summaryTypesText').textContent = typeResults.map(t => t.type).join(', ') || 'GEO only';
 
-  const allIssues = [];
-  const types = [];
+  const scoreEl = document.getElementById('summaryScoreNum');
+  scoreEl.textContent = scores.overall;
+  scoreEl.style.color = getScoreColor(scores.overall);
 
-  jsonlds.forEach((ld, idx) => {
-    const type = getType(ld);
-    const rules = SCHEMA_RULES[type];
-    types.push({ type, label: rules?.label || type, supported: !!rules });
-    if (rules) {
-      allIssues.push(...validateSchema(ld, type, rules, idx));
-    } else {
-      allIssues.push({ sev: 'info', text: `"${type}" — 전용 검증 규칙 없음` });
-    }
-  });
+  const grade = getGrade(scores.overall);
+  const gradeEl = document.getElementById('summaryGrade');
+  gradeEl.textContent = grade.g;
+  gradeEl.style.background = `var(--${grade.cls}-bg)`;
+  gradeEl.style.color = `var(--${grade.cls})`;
 
-  const scores = calculateScores(allIssues, jsonlds);
-  renderPopup(scores, types, allIssues, jsonlds);
+  // Tab badges
+  const jErrors = data.jsonlds?.length > 0 ? 0 : 1; // placeholder
+  updateTabBadge('badgeJsonld', (data.jsonlds || []).length, 'ok');
+
+  const geoErrors = 0; // will be updated below
+  updateTabBadge('badgeGeo', '—', 'ok');
 }
 
-function renderPopup(scores, types, issues, jsonlds) {
-  // Score
+function updateTabBadge(id, text, cls) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = text; el.className = `badge ${cls}`; }
+}
+
+// ══════════════════════════
+// RENDER: OVERVIEW TAB
+// ══════════════════════════
+function renderOverview(scores, allIssues, data) {
+  // Score ring
+  const circ = 2 * Math.PI * 25;
+  const offset = circ - (scores.overall / 100) * circ;
+  const fill = document.getElementById('ringFill');
   const color = getScoreColor(scores.overall);
+  fill.style.stroke = color;
+  requestAnimationFrame(() => { fill.style.strokeDashoffset = offset; });
+
+  const scoreEl = document.getElementById('ringScore');
+  scoreEl.style.color = color;
+  animateNum(scoreEl, scores.overall);
+
   const grade = getGrade(scores.overall);
-  const scoreNum = document.getElementById('scoreNum');
-  scoreNum.style.color = color;
-  animateNum(scoreNum, scores.overall);
+  document.getElementById('overviewGrade').textContent = `${grade.g} · ${grade.t}`;
+  document.getElementById('overviewGrade').style.color = `var(--${grade.cls})`;
+  document.getElementById('overviewDesc').textContent =
+    `JSON-LD ${(data.jsonlds||[]).length}개 · 메타 ${Object.values(data.meta||{}).filter(Boolean).length}개 · 이미지 ${data.content?.imageCount||0}개`;
 
-  const gradeEl = document.getElementById('scoreGrade');
-  gradeEl.textContent = `${grade.g} · ${grade.t}`;
-  gradeEl.style.color = color;
-  gradeEl.style.background = color === 'var(--green)' ? 'rgba(0,255,136,.12)' :
-    color === 'var(--amber)' ? 'rgba(255,184,0,.12)' : 'rgba(255,61,90,.12)';
+  // Score bars
+  document.getElementById('overviewBars').innerHTML = scores.bars.map(b => {
+    const c = getScoreColor(b.score);
+    return `<div class="sbar">
+      <span class="sbar-label">${b.label}</span>
+      <div class="sbar-track"><div class="sbar-fill" style="width:${b.score}%;background:${c}"></div></div>
+      <span class="sbar-val" style="color:${c}">${b.score}</span>
+    </div>`;
+  }).join('');
 
-  // Bars
-  document.getElementById('scoreBars').innerHTML = scores.bars.map(b => `
-    <div class="bar-item">
-      <span class="bar-label">${b.label}</span>
-      <div class="bar-track"><div class="bar-fill" style="width:${b.score}%;background:${b.color}"></div></div>
-      <span class="bar-val" style="color:${b.color}">${b.score}</span>
-    </div>
-  `).join('');
-
-  // Types
-  document.getElementById('typesList').innerHTML = types.map(t =>
-    `<span class="type-tag${t.supported ? '' : ' unknown'}">${t.type}${t.label !== t.type ? ` · ${t.label}` : ''}</span>`
-  ).join('');
-
-  // AI
-  const recs = buildRecommendations(jsonlds, issues, scores);
+  // AI Recommendations
+  const recs = buildRecommendations(data.jsonlds || [], allIssues.filter(i => i.cat === 'jsonld'), allIssues.filter(i => i.cat !== 'jsonld'), scores);
   document.getElementById('aiBox').innerHTML = `
-    <div class="ai-title">🤖 AI 추천</div>
+    <div class="ai-header">💡 AI 추천</div>
     ${recs.map(r => `<div class="ai-item">${r}</div>`).join('')}
   `;
 
-  // Issues by category
-  const errorIssues = issues.filter(i => i.sev === 'error');
-  const warnIssues = issues.filter(i => i.sev === 'warn');
-  const passIssues = issues.filter(i => i.sev === 'pass');
+  // Quick issues (errors + warns only, max 8)
+  const quickIssues = allIssues.filter(i => i.sev === 'error' || i.sev === 'warn').slice(0, 8);
+  if (quickIssues.length > 0) {
+    document.getElementById('overviewIssues').innerHTML = `
+      <div class="check-group">
+        <div class="check-group-title">주요 개선 사항</div>
+        ${quickIssues.map(i => checkItemHtml(i)).join('')}
+      </div>`;
+  }
 
-  let html = '';
-  if (errorIssues.length > 0) {
-    html += buildSection('🔴 오류', errorIssues, 'error', errorIssues.length);
-  }
-  if (warnIssues.length > 0) {
-    html += buildSection('🟡 경고', warnIssues, 'warn', warnIssues.length);
-  }
-  if (passIssues.length > 0) {
-    html += buildSection('✅ 통과', passIssues, 'pass', passIssues.length);
-  }
-  document.getElementById('issuesList').innerHTML = html;
+  // Update tab badges
+  const jsonldErrors = allIssues.filter(i => i.cat === 'jsonld' && i.sev === 'error').length;
+  const jsonldWarns = allIssues.filter(i => i.cat === 'jsonld' && i.sev === 'warn').length;
+  const geoErrors = allIssues.filter(i => i.cat !== 'jsonld' && i.sev === 'error').length;
+  const geoWarns = allIssues.filter(i => i.cat !== 'jsonld' && i.sev === 'warn').length;
 
-  // JSON view
-  document.getElementById('jsonCount').textContent = `${jsonlds.length}개`;
-  document.getElementById('jsonView').innerHTML = jsonlds.map(ld =>
-    syntaxHighlight(JSON.stringify(ld, null, 2))
-  ).join('\n\n');
+  updateTabBadge('badgeJsonld', jsonldErrors + jsonldWarns || '✓',
+    jsonldErrors > 0 ? 'error' : jsonldWarns > 0 ? 'warn' : 'ok');
+  updateTabBadge('badgeGeo', geoErrors + geoWarns || '✓',
+    geoErrors > 0 ? 'error' : geoWarns > 0 ? 'warn' : 'ok');
 }
 
-function buildSection(title, issues, sev, count) {
-  const countColor = sev === 'error' ? 'var(--red)' : sev === 'warn' ? 'var(--amber)' : 'var(--green)';
-  return `<div class="section">
-    <div class="section-header" onclick="toggleSection(this)">
-      <span>${title} <span class="count" style="background:${countColor}22;color:${countColor}">${count}</span></span>
-      <span class="chevron">▼</span>
-    </div>
-    <div class="section-body">
-      ${issues.map(i => `
-        <div class="issue">
-          <div class="dot ${i.sev}"></div>
-          <div class="issue-text">${i.text}${i.desc ? `<br><span style="font-size:.65rem;color:var(--text3)">${i.desc}</span>` : ''}</div>
-        </div>
-      `).join('')}
+// ══════════════════════════
+// RENDER: JSON-LD TAB
+// ══════════════════════════
+function renderJsonldTab(issues, typeResults, jsonlds) {
+  const container = document.getElementById('jsonldChecks');
+
+  if (jsonlds.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:2rem 1rem;color:var(--text3)">
+        <div style="font-size:1.5rem;margin-bottom:.5rem">📭</div>
+        <p style="font-size:.8rem">JSON-LD 구조화 데이터가 없습니다</p>
+      </div>`;
+    return;
+  }
+
+  // Group by type
+  const typeHtml = typeResults.map(t =>
+    `<span style="display:inline-block;padding:.2rem .5rem;border-radius:10px;font-size:.68rem;font-weight:500;
+      background:${t.supported ? 'var(--primary-bg)' : 'var(--bg-card)'};
+      color:${t.supported ? 'var(--primary)' : 'var(--text3)'};
+      border:1px solid ${t.supported ? 'var(--primary-light)' : 'var(--border)'};
+      margin:0 .2rem .3rem 0">${t.type} · ${t.label}</span>`
+  ).join('');
+
+  const errors = issues.filter(i => i.sev === 'error');
+  const warns = issues.filter(i => i.sev === 'warn');
+  const passes = issues.filter(i => i.sev === 'pass');
+
+  container.innerHTML = `
+    <div style="margin-bottom:.75rem">${typeHtml}</div>
+    ${errors.length > 0 ? buildCheckGroup('오류', errors) : ''}
+    ${warns.length > 0 ? buildCheckGroup('경고', warns) : ''}
+    ${passes.length > 0 ? buildCheckGroup('통과', passes) : ''}
+  `;
+}
+
+// ══════════════════════════
+// RENDER: GEO TAB
+// ══════════════════════════
+function renderGeoTab(issues) {
+  const container = document.getElementById('geoChecks');
+  const cats = [
+    { key: 'meta', title: '메타태그' },
+    { key: 'headings', title: '헤딩 구조' },
+    { key: 'eeat', title: 'E-E-A-T 신호' },
+    { key: 'content', title: '콘텐츠 / 인용 가능성' },
+  ];
+
+  container.innerHTML = cats.map(cat => {
+    const items = issues.filter(i => i.cat === cat.key);
+    if (items.length === 0) return '';
+    return buildCheckGroup(cat.title, items);
+  }).join('');
+}
+
+// ══════════════════════════
+// RENDER: RAW TAB
+// ══════════════════════════
+function renderRawTab(jsonlds) {
+  if (jsonlds.length === 0) {
+    document.getElementById('jsonView').textContent = '// JSON-LD 데이터 없음';
+    return;
+  }
+  document.getElementById('jsonView').innerHTML =
+    jsonlds.map(ld => syntaxHighlight(JSON.stringify(ld, null, 2))).join('\n\n');
+}
+
+// ══════════════════════════
+// UI HELPERS
+// ══════════════════════════
+function checkItemHtml(issue) {
+  const icons = { pass: '✓', error: '✕', warn: '!', info: 'i' };
+  return `<div class="check-item">
+    <div class="check-icon ${issue.sev}">${icons[issue.sev] || 'i'}</div>
+    <div class="check-body">
+      <div class="check-title">${issue.text}</div>
+      ${issue.desc ? `<div class="check-desc">${issue.desc}</div>` : ''}
     </div>
   </div>`;
+}
+
+function buildCheckGroup(title, items) {
+  return `<div class="check-group">
+    <div class="check-group-title">${title}</div>
+    ${items.map(i => checkItemHtml(i)).join('')}
+  </div>`;
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${name}`));
 }
 
 function toggleSection(header) {
@@ -160,7 +259,7 @@ function toggleSection(header) {
 
 function animateNum(el, target) {
   let cur = 0;
-  const step = Math.ceil(target / 30);
+  const step = Math.max(1, Math.ceil(target / 25));
   const iv = setInterval(() => {
     cur = Math.min(cur + step, target);
     el.textContent = cur;
@@ -169,11 +268,11 @@ function animateNum(el, target) {
 }
 
 function copyJsonLd() {
-  const text = JSON.stringify(extractedJsonLds, null, 2);
-  navigator.clipboard.writeText(text).then(() => {
+  if (!extractedData?.jsonlds?.length) return;
+  navigator.clipboard.writeText(JSON.stringify(extractedData.jsonlds, null, 2)).then(() => {
     const btn = document.getElementById('btnCopy');
-    btn.textContent = '✅ 복사됨!';
-    setTimeout(() => btn.textContent = '📋 JSON-LD 복사', 1500);
+    btn.textContent = '✅';
+    setTimeout(() => btn.textContent = '📋', 1200);
   });
 }
 

@@ -5,211 +5,334 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0e17;--bg-card:#111827;--bg-surface:#1a2235;
-  --text:#e8edf5;--text2:#8b97b0;--text3:#4a5568;
-  --cyan:#00f0ff;--green:#00ff88;--amber:#ffb800;--red:#ff3d5a;--purple:#a78bfa;
-  --border:#1e2d45;--radius:10px;
-  --mono:'Segoe UI Mono','SF Mono','Cascadia Mono',monospace;
-  --sans:'Segoe UI','Malgun Gothic',sans-serif;
+  --bg:#ffffff;--bg-card:#f7f8fa;--bg-hover:#f0f1f5;--bg-active:#edf0f7;
+  --text:#1a1a1a;--text2:#555b66;--text3:#999da6;
+  --primary:#3366ff;--primary-bg:#eef2ff;--primary-light:#dbe4ff;
+  --green:#00c853;--green-bg:#e6f9ee;
+  --amber:#ff9800;--amber-bg:#fff4e5;
+  --red:#f44336;--red-bg:#ffeaea;
+  --purple:#7c4dff;--purple-bg:#f3edff;
+  --border:#e5e8ed;--border-hover:#d0d5dd;
+  --radius:12px;--radius-sm:8px;
+  --mono:'SF Mono','Cascadia Mono','Segoe UI Mono',monospace;
+  --sans:-apple-system,'Malgun Gothic','Segoe UI',sans-serif;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08);
 }
 html{font-size:13px}
 body{
-  width:420px;max-height:560px;overflow-y:auto;
+  width:440px;max-height:580px;overflow-y:auto;
   font-family:var(--sans);background:var(--bg);color:var(--text);
-  padding:1rem;
 }
-body::-webkit-scrollbar{width:5px}
-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+body::-webkit-scrollbar{width:4px}
+body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
-/* HEADER */
-.header{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
+/* ═══ HEADER ═══ */
+.header{
+  display:flex;align-items:center;gap:.65rem;
+  padding:.85rem 1rem;border-bottom:1px solid var(--border);
+  background:var(--bg);position:sticky;top:0;z-index:10;
+}
 .logo{
-  width:28px;height:28px;border-radius:6px;
-  background:linear-gradient(135deg,var(--cyan),var(--green));
-  display:flex;align-items:center;justify-content:center;
-  font-size:.8rem;font-weight:700;color:var(--bg);flex-shrink:0;
+  width:32px;height:32px;border-radius:var(--radius-sm);
+  background:var(--primary);display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:.9rem;flex-shrink:0;
+  box-shadow:var(--shadow);
 }
-.header h1{font-family:var(--mono);font-size:.95rem;font-weight:600}
-.header .url{
-  font-size:.65rem;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  max-width:320px;display:block;margin-top:2px;
+.header-info{flex:1;min-width:0}
+.header-info h1{font-size:.9rem;font-weight:700;letter-spacing:-.01em}
+.header-info .url{
+  font-size:.65rem;color:var(--text3);overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;display:block;margin-top:1px;max-width:340px;
+}
+.header-actions{display:flex;gap:.35rem}
+.icon-btn{
+  width:28px;height:28px;border:1px solid var(--border);border-radius:6px;
+  background:var(--bg);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text3);font-size:.75rem;transition:all .15s;
+}
+.icon-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-bg)}
+
+/* ═══ SUMMARY BAR ═══ */
+.summary-bar{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.65rem 1rem;background:var(--bg-card);border-bottom:1px solid var(--border);
+  font-size:.75rem;
+}
+.summary-count{
+  display:flex;align-items:center;gap:.3rem;
+  font-weight:600;color:var(--text);
+}
+.summary-count .num{
+  background:var(--primary);color:#fff;
+  width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:700;
+}
+.summary-sep{color:var(--border);font-size:.7rem}
+.summary-score{
+  margin-left:auto;display:flex;align-items:center;gap:.35rem;
+  font-family:var(--mono);font-weight:700;font-size:.85rem;
+}
+.summary-grade{
+  font-size:.6rem;font-weight:600;padding:.15rem .4rem;border-radius:10px;
 }
 
-/* STATES */
-.state{display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem;text-align:center;gap:.75rem}
+/* ═══ TABS ═══ */
+.tabs{
+  display:flex;border-bottom:1px solid var(--border);
+  padding:0 1rem;background:var(--bg);
+}
+.tab{
+  padding:.6rem .75rem;border:none;background:none;cursor:pointer;
+  font-size:.75rem;font-weight:500;color:var(--text3);
+  border-bottom:2px solid transparent;transition:all .15s;
+  position:relative;
+}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.tab .badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:16px;height:16px;padding:0 4px;border-radius:8px;
+  font-size:.6rem;font-weight:700;margin-left:.3rem;
+}
+.tab .badge.error{background:var(--red-bg);color:var(--red)}
+.tab .badge.warn{background:var(--amber-bg);color:var(--amber)}
+.tab .badge.ok{background:var(--green-bg);color:var(--green)}
+
+/* ═══ TAB CONTENT ═══ */
+.tab-content{display:none;padding:.75rem 1rem}
+.tab-content.active{display:block}
+
+/* ═══ STATES ═══ */
+.state{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:3rem 1.5rem;text-align:center;gap:.75rem;
+}
 .state.active{display:flex}
-.state p{font-size:.8rem;color:var(--text2);line-height:1.5}
-.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
+.state-icon{font-size:2.5rem;opacity:.4}
+.state p{font-size:.8rem;color:var(--text2);line-height:1.6}
+.state .sub{font-size:.7rem;color:var(--text3)}
+.spinner{
+  width:28px;height:28px;border:3px solid var(--border);
+  border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
-.empty-icon{font-size:2rem;opacity:.5}
 
-/* SCORE ROW */
-.score-row{
-  display:flex;gap:.75rem;margin-bottom:1rem;align-items:stretch;
+/* ═══ CHECK ITEM (Kakao Pixel Helper style) ═══ */
+.check-group{margin-bottom:.75rem}
+.check-group-title{
+  font-size:.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;
+  letter-spacing:.04em;padding:0 0 .4rem;margin-bottom:.4rem;
+  border-bottom:1px solid var(--border);
 }
-.score-main{
+.check-item{
+  display:flex;align-items:flex-start;gap:.5rem;
+  padding:.5rem .6rem;border-radius:var(--radius-sm);
+  transition:background .15s;
+}
+.check-item:hover{background:var(--bg-card)}
+.check-icon{
+  width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;font-size:.6rem;font-weight:700;
+}
+.check-icon.pass{background:var(--green-bg);color:var(--green)}
+.check-icon.error{background:var(--red-bg);color:var(--red)}
+.check-icon.warn{background:var(--amber-bg);color:var(--amber)}
+.check-icon.info{background:var(--primary-bg);color:var(--primary)}
+.check-body{flex:1;min-width:0}
+.check-title{font-size:.78rem;font-weight:500;color:var(--text)}
+.check-desc{font-size:.68rem;color:var(--text3);margin-top:2px;line-height:1.4}
+.check-desc code{
+  font-family:var(--mono);font-size:.65rem;padding:1px 4px;
+  background:var(--bg-active);border-radius:3px;color:var(--purple);
+}
+
+/* ═══ EXPAND SECTION ═══ */
+.expand{
   background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-width:100px;
+  margin-bottom:.5rem;overflow:hidden;
 }
-.score-num{font-family:var(--mono);font-size:2.2rem;font-weight:700;line-height:1}
-.score-label{font-size:.6rem;color:var(--text3);margin-top:.2rem}
-.score-grade{
-  font-family:var(--mono);font-size:.7rem;font-weight:600;margin-top:.5rem;
-  padding:.2rem .6rem;border-radius:12px;
+.expand-header{
+  padding:.55rem .7rem;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;font-size:.78rem;font-weight:500;transition:background .15s;
 }
-.score-bars{
-  flex:1;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:.75rem;display:flex;flex-direction:column;justify-content:center;gap:.5rem;
+.expand-header:hover{background:var(--bg-hover)}
+.expand-header .label{display:flex;align-items:center;gap:.4rem}
+.expand-chevron{
+  font-size:.55rem;color:var(--text3);transition:transform .2s;
 }
-.bar-item{display:flex;align-items:center;gap:.5rem}
-.bar-label{font-size:.65rem;color:var(--text2);min-width:55px}
-.bar-track{flex:1;height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;transition:width .8s ease}
-.bar-val{font-family:var(--mono);font-size:.7rem;font-weight:600;min-width:28px;text-align:right}
+.expand-header.open .expand-chevron{transform:rotate(180deg)}
+.expand-body{display:none;padding:.4rem .7rem .7rem;border-top:1px solid var(--border)}
+.expand-body.open{display:block}
 
-/* TYPES */
-.types{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.75rem}
-.type-tag{
-  padding:.25rem .5rem;border-radius:12px;font-family:var(--mono);font-size:.65rem;
-  border:1px solid var(--cyan);color:var(--cyan);
-}
-.type-tag.unknown{border-color:var(--text3);color:var(--text3)}
-
-/* SECTIONS */
-.section{
+/* ═══ SCORE CARD ═══ */
+.score-card{
   background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
-  margin-bottom:.6rem;overflow:hidden;
+  padding:1rem;margin-bottom:.75rem;
 }
-.section-header{
-  padding:.6rem .75rem;display:flex;align-items:center;justify-content:space-between;
-  cursor:pointer;font-size:.78rem;font-weight:500;
-  transition:background .2s;
+.score-card-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
+.score-ring{position:relative;width:56px;height:56px;flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring circle{fill:none;stroke-width:5;stroke-linecap:round}
+.score-ring .bg{stroke:var(--border)}
+.score-ring .fill{transition:stroke-dashoffset 1s ease}
+.score-ring .center{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:1rem;font-weight:700;
 }
-.section-header:hover{background:var(--bg-surface)}
-.section-header .count{font-family:var(--mono);font-size:.65rem;padding:.15rem .4rem;border-radius:8px}
-.section-body{display:none;padding:.5rem .75rem .75rem}
-.section-body.open{display:block}
-.chevron{font-size:.6rem;color:var(--text3);transition:transform .2s}
-.section-header.open .chevron{transform:rotate(180deg)}
+.score-detail{flex:1}
+.score-detail .grade{font-size:.85rem;font-weight:700}
+.score-detail .desc{font-size:.68rem;color:var(--text3);margin-top:2px}
+.score-bars{display:flex;flex-direction:column;gap:.4rem}
+.sbar{display:flex;align-items:center;gap:.4rem}
+.sbar-label{font-size:.65rem;color:var(--text2);min-width:60px}
+.sbar-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:3px;transition:width .8s ease}
+.sbar-val{font-family:var(--mono);font-size:.65rem;font-weight:600;min-width:24px;text-align:right}
 
-/* ISSUES */
-.issue{
-  display:flex;gap:.5rem;padding:.45rem 0;
-  border-bottom:1px solid rgba(255,255,255,.03);
-  font-size:.75rem;line-height:1.5;
-}
-.issue:last-child{border-bottom:none}
-.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.dot.error{background:var(--red)}.dot.warn{background:var(--amber)}.dot.pass{background:var(--green)}.dot.info{background:var(--cyan)}
-.issue-text{color:var(--text2)}
-.issue-text strong{color:var(--text);font-weight:500}
-.issue-text code{
-  font-family:var(--mono);font-size:.68rem;padding:.1rem .3rem;
-  background:var(--bg-surface);border-radius:3px;color:var(--purple);
-}
-
-/* AI REC */
+/* ═══ AI BOX ═══ */
 .ai-box{
-  background:linear-gradient(135deg,rgba(0,240,255,.05),rgba(0,255,136,.05));
-  border:1px solid rgba(0,240,255,.12);border-radius:var(--radius);
-  padding:.75rem;margin-bottom:.6rem;
+  background:var(--primary-bg);border:1px solid var(--primary-light);border-radius:var(--radius);
+  padding:.75rem;margin-bottom:.75rem;
 }
-.ai-title{font-family:var(--mono);font-size:.75rem;font-weight:600;margin-bottom:.5rem;
-  background:linear-gradient(135deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+.ai-header{display:flex;align-items:center;gap:.35rem;margin-bottom:.4rem;font-size:.75rem;font-weight:600;color:var(--primary)}
+.ai-item{
+  font-size:.7rem;color:var(--text2);line-height:1.5;
+  padding:.3rem 0;border-bottom:1px solid rgba(51,102,255,.08);
 }
-.ai-item{font-size:.72rem;color:var(--text2);line-height:1.5;padding:.3rem 0;border-bottom:1px solid rgba(0,240,255,.06)}
 .ai-item:last-child{border-bottom:none}
 .ai-item strong{color:var(--text);font-weight:500}
 
-/* JSON VIEW */
+/* ═══ JSON VIEW (dark inset) ═══ */
 .json-view{
-  background:var(--bg-surface);border-radius:6px;padding:.75rem;
-  font-family:var(--mono);font-size:.68rem;line-height:1.7;
-  max-height:300px;overflow:auto;white-space:pre-wrap;word-break:break-all;
+  background:#1e2330;border-radius:var(--radius-sm);padding:.75rem;
+  font-family:var(--mono);font-size:.67rem;line-height:1.7;color:#c9d1d9;
+  max-height:280px;overflow:auto;white-space:pre-wrap;word-break:break-all;
 }
-.jk{color:var(--cyan)}.js{color:var(--green)}.jn{color:var(--amber)}.jb{color:var(--purple)}.jl{color:var(--text3)}.jbr{color:var(--text3)}
+.json-view::-webkit-scrollbar{width:4px}
+.json-view::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+.jk{color:#79c0ff}.js{color:#a5d6a7}.jn{color:#ffcc80}.jb{color:#ce93d8}.jl{color:#666}.jbr{color:#666}
 
-/* ACTIONS */
-.actions{display:flex;gap:.4rem;margin-bottom:.75rem}
-.btn{
-  flex:1;padding:.5rem;border:1px solid var(--border);border-radius:6px;
-  background:transparent;color:var(--text2);cursor:pointer;font-size:.7rem;
-  font-family:var(--mono);transition:all .2s;
+/* ═══ FOOTER ═══ */
+.footer{
+  text-align:center;padding:.6rem 1rem;border-top:1px solid var(--border);
+  font-size:.6rem;color:var(--text3);
 }
-.btn:hover{border-color:var(--cyan);color:var(--cyan)}
-.btn.primary{background:linear-gradient(135deg,var(--cyan),var(--green));color:var(--bg);border:none;font-weight:600}
-.btn.primary:hover{opacity:.9}
-
-/* FOOTER */
-.footer{text-align:center;padding:.5rem 0;font-size:.6rem;color:var(--text3);font-family:var(--mono)}
-.footer a{color:var(--cyan);text-decoration:none}
+.footer a{color:var(--primary);text-decoration:none}
+.footer a:hover{text-decoration:underline}
+.rules-ver{font-family:var(--mono);font-size:.55rem;color:var(--text3);opacity:.7}
 </style>
 </head>
 <body>
-  <!-- HEADER -->
-  <div class="header">
-    <div class="logo">{}</div>
-    <div>
-      <h1>JSON-LD Analyzer</h1>
-      <span class="url" id="pageUrl">—</span>
-    </div>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <div class="logo">{}</div>
+  <div class="header-info">
+    <h1>GEO Analyzer</h1>
+    <span class="url" id="pageUrl">분석 대기 중...</span>
   </div>
-
-  <!-- LOADING STATE -->
-  <div class="state active" id="stateLoading">
-    <div class="spinner"></div>
-    <p>페이지에서 JSON-LD 추출 중...</p>
+  <div class="header-actions">
+    <div class="icon-btn" id="btnCopy" onclick="copyJsonLd()" title="JSON-LD 복사">📋</div>
+    <div class="icon-btn" onclick="openFullAnalyzer()" title="전체 분석기 열기">↗</div>
   </div>
+</div>
 
-  <!-- EMPTY STATE -->
-  <div class="state" id="stateEmpty">
-    <div class="empty-icon">∅</div>
-    <p>이 페이지에서 JSON-LD 구조화 데이터를<br>찾을 수 없습니다.</p>
+<!-- ═══ SUMMARY BAR ═══ -->
+<div class="summary-bar" id="summaryBar" style="display:none">
+  <div class="summary-count">
+    <span class="num" id="summaryItemCount">0</span>
+    <span>개 항목 감지</span>
   </div>
+  <div class="summary-sep">·</div>
+  <span id="summaryTypesText" style="color:var(--text3);font-size:.68rem"></span>
+  <div class="summary-score">
+    <span id="summaryScoreNum">0</span>
+    <span class="summary-grade" id="summaryGrade">—</span>
+  </div>
+</div>
 
-  <!-- RESULTS -->
-  <div id="results" style="display:none">
-    <!-- Actions -->
-    <div class="actions">
-      <button class="btn" id="btnCopy" onclick="copyJsonLd()">📋 JSON-LD 복사</button>
-      <button class="btn" id="btnOpen" onclick="openFullAnalyzer()">🔗 전체 분석기</button>
-    </div>
+<!-- ═══ TABS ═══ -->
+<div class="tabs" id="tabBar" style="display:none">
+  <button class="tab active" data-tab="overview" onclick="switchTab('overview')">
+    종합
+  </button>
+  <button class="tab" data-tab="jsonld" onclick="switchTab('jsonld')">
+    JSON-LD <span class="badge ok" id="badgeJsonld">0</span>
+  </button>
+  <button class="tab" data-tab="geo" onclick="switchTab('geo')">
+    GEO <span class="badge ok" id="badgeGeo">0</span>
+  </button>
+  <button class="tab" data-tab="raw" onclick="switchTab('raw')">
+    원본
+  </button>
+</div>
 
-    <!-- Score -->
-    <div class="score-row">
-      <div class="score-main">
-        <div class="score-num" id="scoreNum">0</div>
-        <div class="score-label">/ 100</div>
-        <div class="score-grade" id="scoreGrade">—</div>
+<!-- ═══ LOADING STATE ═══ -->
+<div class="state active" id="stateLoading">
+  <div class="spinner"></div>
+  <p>페이지 분석 중...</p>
+  <span class="sub">JSON-LD, 메타태그, 헤딩 구조, AI 크롤링 설정 확인</span>
+</div>
+
+<!-- ═══ EMPTY STATE ═══ -->
+<div class="state" id="stateEmpty">
+  <div class="state-icon">🔍</div>
+  <p>이 페이지에서 구조화 데이터를<br>찾을 수 없습니다.</p>
+  <span class="sub">GEO 분석 결과는 아래 탭에서 확인하세요</span>
+</div>
+
+<!-- ═══ TAB: OVERVIEW ═══ -->
+<div class="tab-content active" id="tab-overview" style="display:none">
+  <!-- Score Card -->
+  <div class="score-card">
+    <div class="score-card-row">
+      <div class="score-ring">
+        <svg viewBox="0 0 60 60">
+          <circle class="bg" cx="30" cy="30" r="25" />
+          <circle class="fill" id="ringFill" cx="30" cy="30" r="25"
+            stroke-dasharray="157" stroke-dashoffset="157" />
+        </svg>
+        <div class="center" id="ringScore">0</div>
       </div>
-      <div class="score-bars" id="scoreBars"></div>
-    </div>
-
-    <!-- Types -->
-    <div class="types" id="typesList"></div>
-
-    <!-- AI Recommendations -->
-    <div class="ai-box" id="aiBox"></div>
-
-    <!-- Issues -->
-    <div id="issuesList"></div>
-
-    <!-- Raw JSON -->
-    <div class="section">
-      <div class="section-header" onclick="toggleSection(this)">
-        <span>🔍 원본 JSON-LD <span style="color:var(--text3);font-size:.65rem" id="jsonCount"></span></span>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="section-body">
-        <div class="json-view" id="jsonView"></div>
+      <div class="score-detail">
+        <div class="grade" id="overviewGrade">분석 중...</div>
+        <div class="desc" id="overviewDesc">—</div>
       </div>
     </div>
+    <div class="score-bars" id="overviewBars"></div>
   </div>
 
-  <div class="footer">
-    <a href="https://kyangkyongkyungkyang.github.io/jsonld-analyzer/" target="_blank">Full Version</a> · Google Rich Results Guidelines
+  <!-- AI Recommendations -->
+  <div class="ai-box" id="aiBox">
+    <div class="ai-header">💡 AI 추천</div>
   </div>
+
+  <!-- Quick Issues -->
+  <div id="overviewIssues"></div>
+</div>
+
+<!-- ═══ TAB: JSON-LD ═══ -->
+<div class="tab-content" id="tab-jsonld">
+  <div id="jsonldChecks"></div>
+</div>
+
+<!-- ═══ TAB: GEO ═══ -->
+<div class="tab-content" id="tab-geo">
+  <div id="geoChecks"></div>
+</div>
+
+<!-- ═══ TAB: RAW ═══ -->
+<div class="tab-content" id="tab-raw">
+  <div class="json-view" id="jsonView" style="margin-bottom:.5rem">데이터 없음</div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="footer">
+  <a href="https://kyangkyongkyungkyang.github.io/jsonld-analyzer/" target="_blank">Full Version</a>
+  · Google Rich Results · GEO Guidelines
+  <br><span class="rules-ver" id="rulesVer"></span>
+</div>
 
 <script src="rules.js"></script>
 <script src="analyzer.js"></script>

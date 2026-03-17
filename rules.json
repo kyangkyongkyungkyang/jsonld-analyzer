@@ -1,0 +1,628 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-17",
+  "schemaRules": {
+    "Product": {
+      "label": "제품",
+      "required": ["@type", "name", "image", "offers"],
+      "recommended": ["description", "brand", "sku", "gtin", "aggregateRating", "review", "color", "material"],
+      "nested": {
+        "offers_required": ["@type", "price", "priceCurrency", "availability"],
+        "offers_recommended": ["url", "priceValidUntil", "itemCondition", "seller"],
+        "aggregateRating_required": ["@type", "ratingValue", "reviewCount"],
+        "review_required": ["@type", "author", "reviewRating"],
+        "brand_required": ["@type", "name"]
+      },
+      "tips": [
+        "Google 2025 가이드라인에 따라 offers에 priceValidUntil과 availability를 반드시 포함하세요.",
+        "제품 이미지는 최소 1장 이상 필수이며, 고해상도(최소 800x800) 권장입니다.",
+        "gtin, mpn, sku 중 하나 이상의 고유 식별자를 포함하면 리치 결과 노출 확률이 높아집니다.",
+        "aggregateRating과 review를 함께 제공하면 별점 리치 스니펫이 표시됩니다.",
+        "2025년부터 shippingDetails와 returnPolicy 마크업이 가격 비교 노출에 영향을 줍니다."
+      ]
+    },
+    "Article": {
+      "label": "기사/블로그",
+      "required": ["@type", "headline", "image", "datePublished", "author"],
+      "recommended": ["dateModified", "publisher", "description", "mainEntityOfPage", "articleBody", "wordCount"],
+      "nested": {
+        "author_required": ["@type", "name"],
+        "author_recommended": ["url", "sameAs", "image"],
+        "publisher_required": ["@type", "name", "logo"],
+        "publisher_logo_required": ["@type", "url"]
+      },
+      "tips": [
+        "author에 url과 sameAs를 포함하면 Google의 E-E-A-T 평가에 긍정적입니다.",
+        "datePublished와 dateModified를 ISO 8601 형식(YYYY-MM-DDTHH:mm:ss+09:00)으로 정확히 기재하세요.",
+        "2025년부터 author에 실제 프로필 페이지 URL 연결이 강력히 권장됩니다.",
+        "headline은 110자 이내로 작성하고 실제 페이지 제목과 일치시키세요.",
+        "image는 최소 696px 이상, 가로세로비 16:9, 4:3, 1:1 중 하나를 권장합니다."
+      ]
+    },
+    "FAQPage": {
+      "label": "자주 묻는 질문",
+      "required": ["@type", "mainEntity"],
+      "recommended": ["name", "description"],
+      "nested": {
+        "mainEntity_required": ["@type", "name", "acceptedAnswer"],
+        "acceptedAnswer_required": ["@type", "text"]
+      },
+      "tips": [
+        "각 질문(Question)의 name에는 사용자가 실제 검색할 만한 자연어 질문을 사용하세요.",
+        "답변(acceptedAnswer)에 HTML 링크를 포함할 수 있지만, 과도한 마크업은 피하세요.",
+        "2025년 Google 정책에 따라 자동 생성된 FAQ는 리치 결과에서 제외될 수 있습니다.",
+        "페이지당 FAQ 항목은 실제 사용자 질문 기반으로 5~10개가 적절합니다.",
+        "AI 검색엔진이 FAQ를 직접 인용하므로, 답변을 명확하고 간결하게 작성하세요."
+      ]
+    },
+    "BreadcrumbList": {
+      "label": "탐색경로",
+      "required": ["@type", "itemListElement"],
+      "recommended": [],
+      "nested": {
+        "itemListElement_required": ["@type", "position", "name"],
+        "itemListElement_recommended": ["item"]
+      },
+      "tips": [
+        "마지막 항목(현재 페이지)에는 item(URL)을 생략하는 것이 Google 권장사항입니다.",
+        "position은 1부터 순서대로 증가해야 하며 빈 번호가 없어야 합니다.",
+        "사이트의 URL 구조와 breadcrumb 경로가 논리적으로 일치해야 합니다.",
+        "모바일 검색에서 breadcrumb이 URL 대신 표시되므로 간결한 name을 사용하세요."
+      ]
+    },
+    "Organization": {
+      "label": "조직/기업",
+      "required": ["@type", "name", "url"],
+      "recommended": ["logo", "sameAs", "contactPoint", "address", "description", "foundingDate", "email", "telephone"],
+      "nested": {
+        "logo_required": ["@type", "url"],
+        "contactPoint_required": ["@type", "telephone", "contactType"],
+        "address_required": ["@type", "addressCountry"]
+      },
+      "tips": [
+        "sameAs에 공식 SNS 프로필(LinkedIn, Facebook, X 등)을 모두 포함하면 Knowledge Panel 생성에 유리합니다.",
+        "logo는 112x112px 이상, 정사각형 권장이며 흰색 배경을 사용하세요.",
+        "2025년부터 Organization 마크업이 브랜드 신뢰도 평가에 더 큰 영향을 줍니다.",
+        "contactPoint에 고객센터 정보를 포함하면 비즈니스 신뢰성이 향상됩니다."
+      ]
+    },
+    "LocalBusiness": {
+      "label": "지역 비즈니스",
+      "required": ["@type", "name", "address", "telephone"],
+      "recommended": ["image", "url", "openingHoursSpecification", "geo", "priceRange", "servesCuisine", "aggregateRating", "review", "sameAs"],
+      "nested": {
+        "address_required": ["@type", "streetAddress", "addressLocality", "addressRegion", "postalCode", "addressCountry"],
+        "geo_required": ["@type", "latitude", "longitude"],
+        "openingHoursSpecification_required": ["@type", "dayOfWeek", "opens", "closes"]
+      },
+      "tips": [
+        "address는 Google 비즈니스 프로필에 등록된 주소와 정확히 일치시키세요.",
+        "geo 좌표를 포함하면 지도 검색과 '내 주변' 검색에 유리합니다.",
+        "openingHoursSpecification으로 요일별 영업시간을 정확히 마크업하세요.",
+        "2026년 Google 지역 검색에서 리뷰 수와 평점이 노출 순위에 큰 영향을 줍니다.",
+        "priceRange는 '$', '$$', '$$$' 형태로 가격대를 표시하세요."
+      ]
+    },
+    "WebSite": {
+      "label": "웹사이트",
+      "required": ["@type", "name", "url"],
+      "recommended": ["potentialAction", "description", "publisher", "inLanguage"],
+      "nested": {
+        "potentialAction_required": ["@type", "target", "query-input"],
+        "publisher_required": ["@type", "name"]
+      },
+      "tips": [
+        "potentialAction(SearchAction)을 추가하면 검색 결과에 사이트 내 검색창이 표시됩니다.",
+        "WebSite 마크업은 홈페이지에만 한 번 포함하는 것이 권장됩니다.",
+        "inLanguage를 명시하면 다국어 사이트에서 올바른 언어 버전이 검색됩니다.",
+        "2025년 기준 SearchAction의 target은 https URL을 사용해야 합니다."
+      ]
+    },
+    "Event": {
+      "label": "이벤트",
+      "required": ["@type", "name", "startDate", "location"],
+      "recommended": ["endDate", "description", "image", "offers", "performer", "organizer", "eventStatus", "eventAttendanceMode"],
+      "nested": {
+        "location_required": ["@type", "name", "address"],
+        "offers_required": ["@type", "price", "priceCurrency", "url", "availability"],
+        "organizer_required": ["@type", "name", "url"]
+      },
+      "tips": [
+        "eventAttendanceMode로 온라인/오프라인/혼합 여부를 반드시 명시하세요 (2025년 필수화).",
+        "eventStatus로 예정(EventScheduled), 취소(EventCancelled), 연기(EventPostponed) 상태를 표시하세요.",
+        "온라인 이벤트는 location 대신 VirtualLocation을 사용하세요.",
+        "startDate와 endDate는 타임존을 포함한 ISO 8601 형식을 사용하세요.",
+        "무료 이벤트도 offers를 포함하고 price를 0으로 설정하세요."
+      ]
+    },
+    "Recipe": {
+      "label": "레시피",
+      "required": ["@type", "name", "image", "recipeIngredient", "recipeInstructions"],
+      "recommended": ["author", "datePublished", "description", "prepTime", "cookTime", "totalTime", "recipeYield", "recipeCategory", "recipeCuisine", "nutrition", "aggregateRating", "video"],
+      "nested": {
+        "recipeInstructions_required": ["@type", "text"],
+        "nutrition_required": ["@type", "calories"],
+        "author_required": ["@type", "name"],
+        "video_required": ["@type", "name", "thumbnailUrl", "uploadDate"]
+      },
+      "tips": [
+        "recipeInstructions는 HowToStep 배열로 단계별로 구분하면 리치 결과 표시에 유리합니다.",
+        "조리시간(prepTime, cookTime)은 ISO 8601 Duration 형식(PT30M, PT1H)으로 작성하세요.",
+        "영양정보(nutrition)에 calories를 포함하면 건강 관련 검색에서 노출이 향상됩니다.",
+        "2025년부터 레시피에 동영상(VideoObject)을 포함하면 캐러셀 노출 확률이 크게 높아집니다.",
+        "recipeYield는 '4인분', '2인분' 등 구체적인 양을 명시하세요."
+      ]
+    },
+    "VideoObject": {
+      "label": "동영상",
+      "required": ["@type", "name", "description", "thumbnailUrl", "uploadDate"],
+      "recommended": ["contentUrl", "embedUrl", "duration", "interactionStatistic", "expires", "hasPart", "publication", "regionsAllowed"],
+      "nested": {
+        "interactionStatistic_required": ["@type", "interactionType", "userInteractionCount"],
+        "hasPart_required": ["@type", "name", "startOffset", "endOffset", "url"]
+      },
+      "tips": [
+        "thumbnailUrl은 실제 접근 가능한 URL이어야 하며 최소 160x90px 이상이어야 합니다.",
+        "duration은 ISO 8601 형식(PT5M30S)으로 표기하세요.",
+        "hasPart(Clip)를 추가하면 동영상 핵심 순간(Key Moments)이 검색 결과에 표시됩니다.",
+        "2025년 Google 가이드라인에 따라 contentUrl 또는 embedUrl 중 하나는 반드시 포함하세요.",
+        "uploadDate를 정확히 기재해야 동영상 검색 결과에 게시일이 표시됩니다."
+      ]
+    },
+    "HowTo": {
+      "label": "방법/가이드",
+      "required": ["@type", "name", "step"],
+      "recommended": ["description", "image", "totalTime", "estimatedCost", "supply", "tool"],
+      "nested": {
+        "step_required": ["@type", "name", "text"],
+        "step_recommended": ["image", "url"],
+        "estimatedCost_required": ["@type", "value", "currency"],
+        "supply_required": ["@type", "name"],
+        "tool_required": ["@type", "name"]
+      },
+      "tips": [
+        "각 step에 이미지를 포함하면 비주얼 HowTo 리치 결과가 표시됩니다.",
+        "AI 검색엔진은 HowTo 구조를 직접 인용하므로 단계별 설명을 명확히 작성하세요.",
+        "totalTime을 포함하면 '빠른 방법' 관련 검색에서 노출이 향상됩니다.",
+        "supply(재료)와 tool(도구)을 명시하면 상세 리치 결과가 표시됩니다.",
+        "2025년부터 HowTo 마크업이 AI Overview 인용 대상으로 중요도가 높아졌습니다."
+      ]
+    },
+    "Review": {
+      "label": "리뷰",
+      "required": ["@type", "itemReviewed", "author", "reviewRating"],
+      "recommended": ["datePublished", "reviewBody", "publisher"],
+      "nested": {
+        "itemReviewed_required": ["@type", "name"],
+        "author_required": ["@type", "name"],
+        "author_recommended": ["url", "sameAs"],
+        "reviewRating_required": ["@type", "ratingValue", "bestRating"],
+        "publisher_required": ["@type", "name"]
+      },
+      "tips": [
+        "reviewRating에 bestRating과 worstRating을 명시하면 평점 체계가 명확해집니다.",
+        "author에 실제 작성자 프로필 URL을 연결하면 E-E-A-T 점수에 긍정적입니다.",
+        "자체 리뷰(self-serving review)는 2025년 Google 정책에 의해 리치 결과에서 제외됩니다.",
+        "itemReviewed에 리뷰 대상의 @type을 정확히 지정하세요 (Product, Book, Movie 등)."
+      ]
+    },
+    "SoftwareApplication": {
+      "label": "소프트웨어/앱",
+      "required": ["@type", "name", "offers"],
+      "recommended": ["applicationCategory", "operatingSystem", "aggregateRating", "review", "screenshot", "description", "author", "softwareVersion", "downloadUrl"],
+      "nested": {
+        "offers_required": ["@type", "price", "priceCurrency"],
+        "aggregateRating_required": ["@type", "ratingValue", "ratingCount"],
+        "author_required": ["@type", "name"]
+      },
+      "tips": [
+        "무료 앱이라도 offers를 포함하고 price를 '0'으로 설정해야 리치 결과가 표시됩니다.",
+        "applicationCategory에 'GameApplication', 'BusinessApplication' 등 정확한 카테고리를 사용하세요.",
+        "operatingSystem에 'Android', 'iOS', 'Windows' 등 지원 플랫폼을 명시하세요.",
+        "2025년부터 앱 마크업에 screenshot 포함이 강력히 권장됩니다.",
+        "aggregateRating을 포함하면 검색 결과에 별점이 표시됩니다."
+      ]
+    },
+    "Course": {
+      "label": "강좌/교육",
+      "required": ["@type", "name", "description", "provider"],
+      "recommended": ["offers", "coursePrerequisites", "educationalLevel", "inLanguage", "hasCourseInstance", "aggregateRating", "image", "totalHistoricalEnrollment"],
+      "nested": {
+        "provider_required": ["@type", "name", "url"],
+        "hasCourseInstance_required": ["@type", "courseMode", "courseWorkload"],
+        "hasCourseInstance_recommended": ["startDate", "endDate", "instructor", "location"],
+        "offers_required": ["@type", "price", "priceCurrency"]
+      },
+      "tips": [
+        "2025년 Course 마크업이 대폭 업데이트되어 hasCourseInstance가 필수에 가까워졌습니다.",
+        "courseMode에 'online', 'onsite', 'blended' 중 정확한 수강 형태를 명시하세요.",
+        "무료 강좌는 offers의 price를 '0', isAccessibleForFree를 true로 설정하세요.",
+        "totalHistoricalEnrollment(누적 수강생 수)을 포함하면 인기도가 표시됩니다.",
+        "provider에 교육기관의 공식 URL과 로고를 연결하면 신뢰도가 향상됩니다."
+      ]
+    },
+    "JobPosting": {
+      "label": "채용공고",
+      "required": ["@type", "title", "description", "datePosted", "hiringOrganization", "jobLocation"],
+      "recommended": ["validThrough", "employmentType", "baseSalary", "applicantLocationRequirements", "jobLocationType", "directApply", "educationRequirements", "experienceRequirements"],
+      "nested": {
+        "hiringOrganization_required": ["@type", "name", "sameAs"],
+        "hiringOrganization_recommended": ["logo", "url"],
+        "jobLocation_required": ["@type", "address"],
+        "address_required": ["@type", "addressLocality", "addressRegion", "addressCountry"],
+        "baseSalary_required": ["@type", "currency", "value"],
+        "baseSalary_value_required": ["@type", "value", "unitText"]
+      },
+      "tips": [
+        "validThrough(마감일)을 반드시 포함하고 만료된 공고는 즉시 삭제하세요.",
+        "2025년부터 directApply(직접 지원 가능 여부)가 Google Jobs 노출에 영향을 줍니다.",
+        "baseSalary에 급여 범위를 포함하면 구직자 클릭률이 크게 향상됩니다.",
+        "employmentType은 'FULL_TIME', 'PART_TIME', 'CONTRACT' 등 정확한 값을 사용하세요.",
+        "원격근무 공고는 jobLocationType을 'TELECOMMUTE'로 설정하고 applicantLocationRequirements를 명시하세요."
+      ]
+    }
+  },
+  "geoRules": {
+    "meta": {
+      "required": [
+        {
+          "name": "title",
+          "selector": "title",
+          "label": "페이지 제목",
+          "maxLength": 60,
+          "tip": "60자 이내로 핵심 키워드를 포함한 제목을 작성하세요."
+        },
+        {
+          "name": "description",
+          "selector": "meta[name='description']",
+          "label": "메타 설명",
+          "maxLength": 160,
+          "tip": "160자 이내로 페이지 내용을 요약하고 행동 유도 문구를 포함하세요."
+        },
+        {
+          "name": "og:title",
+          "selector": "meta[property='og:title']",
+          "label": "OG 제목",
+          "tip": "소셜 미디어 공유 시 표시되는 제목입니다."
+        },
+        {
+          "name": "og:description",
+          "selector": "meta[property='og:description']",
+          "label": "OG 설명",
+          "tip": "소셜 미디어 공유 시 표시되는 설명입니다."
+        },
+        {
+          "name": "og:image",
+          "selector": "meta[property='og:image']",
+          "label": "OG 이미지",
+          "tip": "1200x630px 이상의 이미지 URL을 지정하세요."
+        },
+        {
+          "name": "og:type",
+          "selector": "meta[property='og:type']",
+          "label": "OG 유형",
+          "tip": "website, article, product 등 적절한 유형을 지정하세요."
+        },
+        {
+          "name": "twitter:card",
+          "selector": "meta[name='twitter:card']",
+          "label": "Twitter 카드",
+          "tip": "summary_large_image를 권장합니다."
+        },
+        {
+          "name": "canonical",
+          "selector": "link[rel='canonical']",
+          "label": "정규 URL",
+          "tip": "중복 콘텐츠 문제를 방지하기 위해 정규 URL을 반드시 설정하세요."
+        },
+        {
+          "name": "robots",
+          "selector": "meta[name='robots']",
+          "label": "로봇 메타",
+          "tip": "index, follow가 기본값이며 필요에 따라 noindex, nofollow를 설정하세요."
+        }
+      ]
+    },
+    "headings": {
+      "rules": [
+        {
+          "id": "h1_exists",
+          "label": "H1 태그 존재 여부",
+          "description": "페이지에 H1 태그가 반드시 하나 존재해야 합니다.",
+          "severity": "error"
+        },
+        {
+          "id": "h1_unique",
+          "label": "H1 태그 고유성",
+          "description": "H1 태그는 페이지당 하나만 사용해야 합니다.",
+          "severity": "error"
+        },
+        {
+          "id": "heading_hierarchy",
+          "label": "제목 태그 계층 구조",
+          "description": "H1 > H2 > H3 > H4 > H5 > H6 순서로 계층이 유지되어야 합니다. 레벨을 건너뛰면 안 됩니다.",
+          "severity": "warning"
+        },
+        {
+          "id": "h2_exists",
+          "label": "H2 태그 존재 여부",
+          "description": "콘텐츠 구조화를 위해 최소 하나의 H2 태그가 필요합니다.",
+          "severity": "warning"
+        }
+      ],
+      "tips": [
+        "H1에 페이지의 핵심 키워드를 포함하고 사용자 의도에 맞는 제목을 작성하세요.",
+        "H2-H3로 콘텐츠를 논리적으로 구분하면 AI 검색엔진의 인용 확률이 높아집니다.",
+        "제목 태그에 질문 형태를 사용하면 AI Overview에 인용될 가능성이 높습니다."
+      ]
+    },
+    "aiCrawling": {
+      "description": "AI 검색엔진 크롤러의 robots.txt 접근 허용 여부를 확인합니다.",
+      "bots": [
+        {
+          "name": "GPTBot",
+          "engine": "OpenAI / ChatGPT",
+          "label": "GPTBot (OpenAI)",
+          "importance": "high",
+          "tip": "ChatGPT와 OpenAI 검색에 콘텐츠를 노출하려면 허용하세요."
+        },
+        {
+          "name": "ClaudeBot",
+          "engine": "Anthropic / Claude",
+          "label": "ClaudeBot (Anthropic)",
+          "importance": "high",
+          "tip": "Claude AI 검색에 콘텐츠를 노출하려면 허용하세요."
+        },
+        {
+          "name": "Google-Extended",
+          "engine": "Google / Gemini",
+          "label": "Google-Extended (Gemini)",
+          "importance": "high",
+          "tip": "Google AI Overview와 Gemini에 콘텐츠를 노출하려면 허용하세요."
+        },
+        {
+          "name": "CCBot",
+          "engine": "Common Crawl",
+          "label": "CCBot (Common Crawl)",
+          "importance": "medium",
+          "tip": "다양한 AI 모델 학습 데이터로 활용되는 Common Crawl 크롤러입니다."
+        },
+        {
+          "name": "PerplexityBot",
+          "engine": "Perplexity AI",
+          "label": "PerplexityBot (Perplexity)",
+          "importance": "high",
+          "tip": "Perplexity AI 검색에 콘텐츠를 노출하려면 허용하세요."
+        },
+        {
+          "name": "Amazonbot",
+          "engine": "Amazon / Alexa",
+          "label": "Amazonbot (Amazon)",
+          "importance": "medium",
+          "tip": "Amazon Alexa와 Amazon 검색에 콘텐츠를 노출하려면 허용하세요."
+        },
+        {
+          "name": "AI2Bot",
+          "engine": "Allen AI",
+          "label": "AI2Bot (Allen AI)",
+          "importance": "low",
+          "tip": "Allen Institute for AI 연구용 크롤러입니다."
+        },
+        {
+          "name": "Bytespider",
+          "engine": "ByteDance / TikTok",
+          "label": "Bytespider (ByteDance)",
+          "importance": "medium",
+          "tip": "TikTok 검색과 ByteDance AI 서비스에 콘텐츠를 노출하려면 허용하세요."
+        },
+        {
+          "name": "FacebookBot",
+          "engine": "Meta / Facebook",
+          "label": "FacebookBot (Meta)",
+          "importance": "medium",
+          "tip": "Meta AI와 Facebook/Instagram 미리보기에 콘텐츠를 노출하려면 허용하세요."
+        },
+        {
+          "name": "Applebot-Extended",
+          "engine": "Apple / Siri",
+          "label": "Applebot-Extended (Apple)",
+          "importance": "high",
+          "tip": "Apple Intelligence와 Siri 검색에 콘텐츠를 노출하려면 허용하세요."
+        }
+      ],
+      "tips": [
+        "GEO 전략상 주요 AI 크롤러(GPTBot, ClaudeBot, Google-Extended, PerplexityBot)는 허용하는 것이 권장됩니다.",
+        "robots.txt에서 특정 봇만 차단하고 나머지는 허용하는 선택적 전략을 사용하세요.",
+        "AI 크롤러를 모두 차단하면 AI 검색 결과에서 완전히 제외될 수 있습니다."
+      ]
+    },
+    "eeat": {
+      "description": "Google E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) 신호를 확인합니다.",
+      "checks": [
+        {
+          "id": "author_info",
+          "label": "저자 정보",
+          "description": "콘텐츠에 저자 이름, 프로필, 자격 정보가 포함되어 있는지 확인합니다.",
+          "selectors": ["[rel='author']", ".author", "[itemprop='author']", "meta[name='author']"],
+          "jsonldField": "author",
+          "severity": "warning",
+          "tip": "저자의 전문성을 보여주는 프로필 페이지를 연결하세요."
+        },
+        {
+          "id": "date_published",
+          "label": "게시일",
+          "description": "콘텐츠 게시일이 명시되어 있는지 확인합니다.",
+          "selectors": ["time[datetime]", "[itemprop='datePublished']", "meta[property='article:published_time']"],
+          "jsonldField": "datePublished",
+          "severity": "warning",
+          "tip": "최신 정보임을 보여주기 위해 게시일을 명시하세요."
+        },
+        {
+          "id": "date_modified",
+          "label": "수정일",
+          "description": "콘텐츠 최종 수정일이 명시되어 있는지 확인합니다.",
+          "selectors": ["[itemprop='dateModified']", "meta[property='article:modified_time']"],
+          "jsonldField": "dateModified",
+          "severity": "info",
+          "tip": "정기적으로 콘텐츠를 업데이트하고 수정일을 갱신하세요."
+        },
+        {
+          "id": "sources_citations",
+          "label": "출처/인용",
+          "description": "외부 권위 있는 출처에 대한 링크나 인용이 포함되어 있는지 확인합니다.",
+          "patterns": ["a[href*='wikipedia']", "a[href*='gov']", "a[href*='edu']", "blockquote", "cite", "[role='doc-bibliography']"],
+          "severity": "info",
+          "tip": "권위 있는 외부 출처(학술 논문, 정부 사이트 등)를 인용하면 신뢰도가 향상됩니다."
+        }
+      ],
+      "tips": [
+        "E-E-A-T는 2025년 Google 핵심 업데이트에서 더욱 강화된 평가 기준입니다.",
+        "YMYL(건강, 금융 등) 콘텐츠는 E-E-A-T 기준이 더 엄격하게 적용됩니다.",
+        "저자의 실제 경험(Experience)을 보여주는 1인칭 서술이 중요해졌습니다."
+      ]
+    },
+    "citability": {
+      "description": "AI 검색엔진이 콘텐츠를 인용하기 쉬운 구조인지 확인합니다.",
+      "checks": [
+        {
+          "id": "faq_presence",
+          "label": "FAQ 섹션",
+          "description": "질문-답변 형태의 콘텐츠가 포함되어 있는지 확인합니다.",
+          "patterns": ["[itemtype*='FAQPage']", ".faq", "#faq", "details > summary", "dt + dd"],
+          "tip": "자주 묻는 질문을 Q&A 형태로 구성하면 AI가 직접 인용하기 쉽습니다."
+        },
+        {
+          "id": "howto_presence",
+          "label": "HowTo/단계별 가이드",
+          "description": "단계별 설명 콘텐츠가 포함되어 있는지 확인합니다.",
+          "patterns": ["[itemtype*='HowTo']", "ol > li", ".steps", ".step"],
+          "tip": "단계별 가이드는 AI 검색 결과에서 높은 인용률을 보입니다."
+        },
+        {
+          "id": "table_presence",
+          "label": "표/테이블",
+          "description": "구조화된 데이터 테이블이 포함되어 있는지 확인합니다.",
+          "patterns": ["table:has(thead)", "table:has(th)"],
+          "tip": "비교 데이터나 사양을 표로 정리하면 AI가 정확한 데이터를 인용합니다."
+        },
+        {
+          "id": "list_presence",
+          "label": "목록 구조",
+          "description": "정리된 목록(ul/ol) 콘텐츠가 포함되어 있는지 확인합니다.",
+          "patterns": ["ul:has(> li:nth-child(3))", "ol:has(> li:nth-child(3))"],
+          "tip": "핵심 정보를 목록으로 정리하면 AI 스니펫에 선택될 확률이 높아집니다."
+        },
+        {
+          "id": "definition_patterns",
+          "label": "정의/설명 패턴",
+          "description": "'~란', '~이란', '~의 뜻' 등 정의 형태의 콘텐츠가 포함되어 있는지 확인합니다.",
+          "patterns": ["dfn", "abbr[title]", "dl > dt + dd"],
+          "regexPatterns": ["(이란|란|의 뜻|의 의미|정의|개념)[은는이가]?\\s*(무엇|뭐|어떤)", "(은|는|이란|란)\\s+.{10,50}(을|를)\\s+(말한다|의미한다|뜻한다|가리킨다)"],
+          "tip": "핵심 용어의 명확한 정의를 포함하면 AI가 정의형 답변에 인용합니다."
+        }
+      ],
+      "tips": [
+        "AI 검색엔진은 명확하고 구조화된 콘텐츠를 우선 인용합니다.",
+        "질문-답변, 단계별 가이드, 비교표, 정의 등 다양한 형식을 활용하세요.",
+        "핵심 정보를 글의 초반부에 배치하면 인용 확률이 높아집니다."
+      ]
+    },
+    "contentQuality": {
+      "description": "콘텐츠의 전반적인 품질과 구조를 평가합니다.",
+      "checks": [
+        {
+          "id": "word_count",
+          "label": "콘텐츠 분량",
+          "thresholds": {
+            "minimum": 300,
+            "recommended": 800,
+            "optimal": 1500
+          },
+          "tip": "주제에 따라 다르지만, 심층 콘텐츠는 1500자 이상이 AI 인용에 유리합니다."
+        },
+        {
+          "id": "paragraph_structure",
+          "label": "문단 구조",
+          "rules": {
+            "maxSentencesPerParagraph": 5,
+            "minParagraphs": 3,
+            "maxConsecutiveShortParagraphs": 3
+          },
+          "tip": "문단을 3~5문장으로 구성하고 각 문단에 하나의 핵심 주제를 다루세요."
+        },
+        {
+          "id": "internal_links",
+          "label": "내부 링크",
+          "thresholds": {
+            "minimum": 2,
+            "recommended": 5
+          },
+          "tip": "관련 내부 페이지로 연결하면 사이트 구조와 크롤링 효율이 향상됩니다."
+        },
+        {
+          "id": "external_links",
+          "label": "외부 링크",
+          "thresholds": {
+            "minimum": 1,
+            "recommended": 3
+          },
+          "tip": "권위 있는 외부 사이트를 인용하면 콘텐츠 신뢰도가 향상됩니다."
+        },
+        {
+          "id": "image_alt_text",
+          "label": "이미지 대체 텍스트",
+          "description": "모든 이미지에 의미 있는 alt 텍스트가 포함되어 있는지 확인합니다.",
+          "tip": "이미지에 설명적인 alt 텍스트를 추가하면 접근성과 이미지 검색 SEO가 향상됩니다."
+        }
+      ],
+      "tips": [
+        "AI 검색엔진은 포괄적이고 깊이 있는 콘텐츠를 선호합니다.",
+        "짧은 문단, 목록, 표를 활용하여 스캔하기 쉬운 구조를 만드세요.",
+        "내부 링크와 외부 인용을 적절히 혼합하면 콘텐츠 권위도가 향상됩니다.",
+        "모든 이미지에 설명적인 alt 텍스트를 포함하세요."
+      ]
+    }
+  },
+  "scoring": {
+    "description": "각 카테고리의 총점 기여 비율 (합계 100%)",
+    "weights": {
+      "jsonld": {
+        "label": "JSON-LD 구조화 데이터",
+        "weight": 0.30,
+        "description": "스키마 마크업의 존재 여부, 필수/권장 필드 충족도"
+      },
+      "meta": {
+        "label": "메타 태그",
+        "weight": 0.20,
+        "description": "필수 메타 태그 존재 여부 및 품질"
+      },
+      "headings": {
+        "label": "제목 태그 구조",
+        "weight": 0.10,
+        "description": "H1~H6 태그의 존재, 고유성, 계층 구조"
+      },
+      "aiCrawling": {
+        "label": "AI 크롤링 허용",
+        "weight": 0.15,
+        "description": "주요 AI 크롤러의 robots.txt 접근 허용 여부"
+      },
+      "eeat": {
+        "label": "E-E-A-T 신호",
+        "weight": 0.15,
+        "description": "저자 정보, 게시일, 수정일, 출처 인용 여부"
+      },
+      "citability": {
+        "label": "AI 인용 용이성",
+        "weight": 0.10,
+        "description": "FAQ, HowTo, 표, 목록, 정의 패턴의 존재 여부"
+      }
+    },
+    "grading": {
+      "A": { "min": 90, "max": 100, "label": "우수", "color": "#22c55e" },
+      "B": { "min": 70, "max": 89, "label": "양호", "color": "#3b82f6" },
+      "C": { "min": 50, "max": 69, "label": "보통", "color": "#f59e0b" },
+      "D": { "min": 30, "max": 49, "label": "미흡", "color": "#f97316" },
+      "F": { "min": 0, "max": 29, "label": "부족", "color": "#ef4444" }
+    }
+  }
+}
