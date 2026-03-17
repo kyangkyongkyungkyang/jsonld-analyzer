@@ -5,6 +5,13 @@ let extractedData = null;
 let remoteRules = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // ── Event listeners (Manifest V3 CSP requires no inline handlers) ──
+  document.getElementById('btnCopy').addEventListener('click', copyJsonLd);
+  document.getElementById('btnFullAnalyzer').addEventListener('click', openFullAnalyzer);
+  document.querySelectorAll('.tab[data-tab]').forEach(tab => {
+    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+  });
+
   // Load remote rules in background
   loadRemoteRules().then(r => {
     remoteRules = r;
@@ -50,10 +57,10 @@ function handleData(data) {
   const scores = calculateOverallScores(jsonldIssues, geoIssues, data.jsonlds || []);
   const allIssues = [...jsonldIssues, ...geoIssues];
 
-  // Show UI
-  document.getElementById('summaryBar').style.display = 'flex';
-  document.getElementById('tabBar').style.display = 'flex';
-  document.getElementById('tab-overview').style.display = 'block';
+  // Show UI (toggle CSS classes instead of inline styles)
+  document.getElementById('summaryBar').classList.remove('hidden');
+  document.getElementById('tabBar').classList.remove('hidden');
+  document.getElementById('tab-overview').classList.add('active');
 
   renderSummary(data, typeResults, scores);
   renderOverview(scores, allIssues, data);

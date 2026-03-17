@@ -269,26 +269,26 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <!-- INPUT -->
   <div class="input-card">
     <div class="tab-row">
-      <button class="tab-btn active" data-t="url" onclick="switchInput('url')">URL 입력</button>
-      <button class="tab-btn" data-t="paste" onclick="switchInput('paste')">직접 붙여넣기</button>
+      <button class="tab-btn active" data-t="url">URL 입력</button>
+      <button class="tab-btn" data-t="paste">직접 붙여넣기</button>
     </div>
     <div id="inputUrl">
       <div class="input-group">
         <input type="url" class="url-input" id="urlInput" placeholder="https://example.com">
-        <button class="btn-go" id="btnGo" onclick="analyzeUrl()">분석</button>
+        <button class="btn-go" id="btnGo">분석</button>
       </div>
       <div class="samples">
-        <button class="sample-btn" onclick="loadSample('product')">Product</button>
-        <button class="sample-btn" onclick="loadSample('article')">Article</button>
-        <button class="sample-btn" onclick="loadSample('faq')">FAQPage</button>
-        <button class="sample-btn" onclick="loadSample('breadcrumb')">Breadcrumb</button>
-        <button class="sample-btn" onclick="loadSample('org')">Organization</button>
-        <button class="sample-btn" onclick="loadSample('local')">LocalBusiness</button>
+        <button class="sample-btn" data-sample="product">Product</button>
+        <button class="sample-btn" data-sample="article">Article</button>
+        <button class="sample-btn" data-sample="faq">FAQPage</button>
+        <button class="sample-btn" data-sample="breadcrumb">Breadcrumb</button>
+        <button class="sample-btn" data-sample="org">Organization</button>
+        <button class="sample-btn" data-sample="local">LocalBusiness</button>
       </div>
     </div>
     <div id="inputPaste" class="hidden">
       <textarea class="paste-area" id="pasteInput" placeholder='HTML 소스 또는 JSON-LD를 붙여넣으세요&#10;&#10;<script type="application/ld+json">&#10;{ "@context": "https://schema.org", "@type": "Product", "name": "..." }&#10;</script>'></textarea>
-      <button class="btn-go-block" onclick="analyzePaste()">분석 시작</button>
+      <button class="btn-go-block" id="btnPaste">분석 시작</button>
     </div>
   </div>
 
@@ -325,10 +325,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
     <!-- Result Tabs -->
     <div class="result-tabs">
-      <button class="rtab active" data-rt="issues" onclick="switchRtab('issues')">주요 이슈</button>
-      <button class="rtab" data-rt="jsonld" onclick="switchRtab('jsonld')">JSON-LD <span class="badge b-green" id="bjld">0</span></button>
-      <button class="rtab" data-rt="geo" onclick="switchRtab('geo')">GEO <span class="badge b-green" id="bgeo">0</span></button>
-      <button class="rtab" data-rt="raw" onclick="switchRtab('raw')">원본</button>
+      <button class="rtab active" data-rt="issues">주요 이슈</button>
+      <button class="rtab" data-rt="jsonld">JSON-LD <span class="badge b-green" id="bjld">0</span></button>
+      <button class="rtab" data-rt="geo">GEO <span class="badge b-green" id="bgeo">0</span></button>
+      <button class="rtab" data-rt="raw">원본</button>
     </div>
 
     <div class="rtab-content active" id="rt-issues"><div id="issuesList"></div></div>
@@ -535,7 +535,8 @@ function render(scores,typeResults,all,ji,gi,jsonlds){
   const je=ji.filter(i=>i.sev==='error'),jw=ji.filter(i=>i.sev==='warn'),jp=ji.filter(i=>i.sev==='pass');
   document.getElementById('jsonldList').innerHTML=(jsonlds.length===0?'<p style="text-align:center;color:var(--text3);padding:2rem">JSON-LD 없음</p>':(je.length?cg('오류',je):'')+(jw.length?cg('경고',jw):'')+(jp.length?cg('통과',jp):''));
   // GEO tab
-  [{k:'meta',t:'메타태그'},{k:'headings',t:'헤딩 구조'},{k:'eeat',t:'E-E-A-T'},{k:'content',t:'콘텐츠/인용'}].forEach(c=>{const items=gi.filter(i=>i.cat===c.k);document.getElementById('geoList').innerHTML+=(items.length?cg(c.t,items):'')});
+  const geoHtml=[{k:'meta',t:'메타태그'},{k:'headings',t:'헤딩 구조'},{k:'eeat',t:'E-E-A-T'},{k:'content',t:'콘텐츠/인용'}].map(c=>{const items=gi.filter(i=>i.cat===c.k);return items.length?cg(c.t,items):''}).join('');
+  document.getElementById('geoList').innerHTML=geoHtml;
   // Raw
   document.getElementById('jsonView').innerHTML=jsonlds.length?jsonlds.map(ld=>sh(JSON.stringify(ld,null,2))).join('\n\n'):'// 데이터 없음';
   // Badges
@@ -562,7 +563,15 @@ function buildRecs(jl,all,scores){
   return[...new Set(recs)].slice(0,5);
 }
 
+// ═══════════════════════════════════════
+// EVENT BINDINGS (no inline onclick)
+// ═══════════════════════════════════════
 document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')analyzeUrl()});
+document.getElementById('btnGo').addEventListener('click',analyzeUrl);
+document.getElementById('btnPaste').addEventListener('click',analyzePaste);
+document.querySelectorAll('.tab-btn[data-t]').forEach(b=>{b.addEventListener('click',()=>switchInput(b.dataset.t))});
+document.querySelectorAll('.sample-btn[data-sample]').forEach(b=>{b.addEventListener('click',()=>loadSample(b.dataset.sample))});
+document.querySelectorAll('.rtab[data-rt]').forEach(b=>{b.addEventListener('click',()=>switchRtab(b.dataset.rt))});
 </script>
 </body>
 </html>

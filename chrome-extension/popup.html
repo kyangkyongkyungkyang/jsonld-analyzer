@@ -53,6 +53,8 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 }
 .icon-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-bg)}
 
+.hidden{display:none!important}
+
 /* ═══ SUMMARY BAR ═══ */
 .summary-bar{
   display:flex;align-items:center;gap:.5rem;
@@ -233,13 +235,13 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
     <span class="url" id="pageUrl">분석 대기 중...</span>
   </div>
   <div class="header-actions">
-    <div class="icon-btn" id="btnCopy" onclick="copyJsonLd()" title="JSON-LD 복사">📋</div>
-    <div class="icon-btn" onclick="openFullAnalyzer()" title="전체 분석기 열기">↗</div>
+    <div class="icon-btn" id="btnCopy" title="JSON-LD 복사">📋</div>
+    <div class="icon-btn" id="btnFullAnalyzer" title="전체 분석기 열기">↗</div>
   </div>
 </div>
 
 <!-- ═══ SUMMARY BAR ═══ -->
-<div class="summary-bar" id="summaryBar" style="display:none">
+<div class="summary-bar hidden" id="summaryBar">
   <div class="summary-count">
     <span class="num" id="summaryItemCount">0</span>
     <span>개 항목 감지</span>
@@ -253,17 +255,17 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 </div>
 
 <!-- ═══ TABS ═══ -->
-<div class="tabs" id="tabBar" style="display:none">
-  <button class="tab active" data-tab="overview" onclick="switchTab('overview')">
+<div class="tabs hidden" id="tabBar">
+  <button class="tab active" data-tab="overview">
     종합
   </button>
-  <button class="tab" data-tab="jsonld" onclick="switchTab('jsonld')">
+  <button class="tab" data-tab="jsonld">
     JSON-LD <span class="badge ok" id="badgeJsonld">0</span>
   </button>
-  <button class="tab" data-tab="geo" onclick="switchTab('geo')">
+  <button class="tab" data-tab="geo">
     GEO <span class="badge ok" id="badgeGeo">0</span>
   </button>
-  <button class="tab" data-tab="raw" onclick="switchTab('raw')">
+  <button class="tab" data-tab="raw">
     원본
   </button>
 </div>
@@ -283,7 +285,7 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 </div>
 
 <!-- ═══ TAB: OVERVIEW ═══ -->
-<div class="tab-content active" id="tab-overview" style="display:none">
+<div class="tab-content" id="tab-overview">
   <!-- Score Card -->
   <div class="score-card">
     <div class="score-card-row">
