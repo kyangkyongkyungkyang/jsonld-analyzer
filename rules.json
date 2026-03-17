@@ -1,17 +1,52 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "lastUpdated": "2026-03-17",
   "schemaRules": {
     "Product": {
       "label": "제품",
-      "required": ["@type", "name", "image", "offers"],
-      "recommended": ["description", "brand", "sku", "gtin", "aggregateRating", "review", "color", "material"],
+      "required": [
+        "@type",
+        "name",
+        "image",
+        "offers"
+      ],
+      "recommended": [
+        "description",
+        "brand",
+        "sku",
+        "gtin",
+        "aggregateRating",
+        "review",
+        "color",
+        "material"
+      ],
       "nested": {
-        "offers_required": ["@type", "price", "priceCurrency", "availability"],
-        "offers_recommended": ["url", "priceValidUntil", "itemCondition", "seller"],
-        "aggregateRating_required": ["@type", "ratingValue", "reviewCount"],
-        "review_required": ["@type", "author", "reviewRating"],
-        "brand_required": ["@type", "name"]
+        "offers_required": [
+          "@type",
+          "price",
+          "priceCurrency",
+          "availability"
+        ],
+        "offers_recommended": [
+          "url",
+          "priceValidUntil",
+          "itemCondition",
+          "seller"
+        ],
+        "aggregateRating_required": [
+          "@type",
+          "ratingValue",
+          "reviewCount"
+        ],
+        "review_required": [
+          "@type",
+          "author",
+          "reviewRating"
+        ],
+        "brand_required": [
+          "@type",
+          "name"
+        ]
       },
       "tips": [
         "Google 2025 가이드라인에 따라 offers에 priceValidUntil과 availability를 반드시 포함하세요.",
@@ -23,13 +58,40 @@
     },
     "Article": {
       "label": "기사/블로그",
-      "required": ["@type", "headline", "image", "datePublished", "author"],
-      "recommended": ["dateModified", "publisher", "description", "mainEntityOfPage", "articleBody", "wordCount"],
+      "required": [
+        "@type",
+        "headline",
+        "image",
+        "datePublished",
+        "author"
+      ],
+      "recommended": [
+        "dateModified",
+        "publisher",
+        "description",
+        "mainEntityOfPage",
+        "articleBody",
+        "wordCount"
+      ],
       "nested": {
-        "author_required": ["@type", "name"],
-        "author_recommended": ["url", "sameAs", "image"],
-        "publisher_required": ["@type", "name", "logo"],
-        "publisher_logo_required": ["@type", "url"]
+        "author_required": [
+          "@type",
+          "name"
+        ],
+        "author_recommended": [
+          "url",
+          "sameAs",
+          "image"
+        ],
+        "publisher_required": [
+          "@type",
+          "name",
+          "logo"
+        ],
+        "publisher_logo_required": [
+          "@type",
+          "url"
+        ]
       },
       "tips": [
         "author에 url과 sameAs를 포함하면 Google의 E-E-A-T 평가에 긍정적입니다.",
@@ -41,11 +103,24 @@
     },
     "FAQPage": {
       "label": "자주 묻는 질문",
-      "required": ["@type", "mainEntity"],
-      "recommended": ["name", "description"],
+      "required": [
+        "@type",
+        "mainEntity"
+      ],
+      "recommended": [
+        "name",
+        "description"
+      ],
       "nested": {
-        "mainEntity_required": ["@type", "name", "acceptedAnswer"],
-        "acceptedAnswer_required": ["@type", "text"]
+        "mainEntity_required": [
+          "@type",
+          "name",
+          "acceptedAnswer"
+        ],
+        "acceptedAnswer_required": [
+          "@type",
+          "text"
+        ]
       },
       "tips": [
         "각 질문(Question)의 name에는 사용자가 실제 검색할 만한 자연어 질문을 사용하세요.",
@@ -57,11 +132,20 @@
     },
     "BreadcrumbList": {
       "label": "탐색경로",
-      "required": ["@type", "itemListElement"],
+      "required": [
+        "@type",
+        "itemListElement"
+      ],
       "recommended": [],
       "nested": {
-        "itemListElement_required": ["@type", "position", "name"],
-        "itemListElement_recommended": ["item"]
+        "itemListElement_required": [
+          "@type",
+          "position",
+          "name"
+        ],
+        "itemListElement_recommended": [
+          "item"
+        ]
       },
       "tips": [
         "마지막 항목(현재 페이지)에는 item(URL)을 생략하는 것이 Google 권장사항입니다.",
@@ -72,12 +156,35 @@
     },
     "Organization": {
       "label": "조직/기업",
-      "required": ["@type", "name", "url"],
-      "recommended": ["logo", "sameAs", "contactPoint", "address", "description", "foundingDate", "email", "telephone"],
+      "required": [
+        "@type",
+        "name",
+        "url"
+      ],
+      "recommended": [
+        "logo",
+        "sameAs",
+        "contactPoint",
+        "address",
+        "description",
+        "foundingDate",
+        "email",
+        "telephone"
+      ],
       "nested": {
-        "logo_required": ["@type", "url"],
-        "contactPoint_required": ["@type", "telephone", "contactType"],
-        "address_required": ["@type", "addressCountry"]
+        "logo_required": [
+          "@type",
+          "url"
+        ],
+        "contactPoint_required": [
+          "@type",
+          "telephone",
+          "contactType"
+        ],
+        "address_required": [
+          "@type",
+          "addressCountry"
+        ]
       },
       "tips": [
         "sameAs에 공식 SNS 프로필(LinkedIn, Facebook, X 등)을 모두 포함하면 Knowledge Panel 생성에 유리합니다.",
@@ -88,12 +195,43 @@
     },
     "LocalBusiness": {
       "label": "지역 비즈니스",
-      "required": ["@type", "name", "address", "telephone"],
-      "recommended": ["image", "url", "openingHoursSpecification", "geo", "priceRange", "servesCuisine", "aggregateRating", "review", "sameAs"],
+      "required": [
+        "@type",
+        "name",
+        "address",
+        "telephone"
+      ],
+      "recommended": [
+        "image",
+        "url",
+        "openingHoursSpecification",
+        "geo",
+        "priceRange",
+        "servesCuisine",
+        "aggregateRating",
+        "review",
+        "sameAs"
+      ],
       "nested": {
-        "address_required": ["@type", "streetAddress", "addressLocality", "addressRegion", "postalCode", "addressCountry"],
-        "geo_required": ["@type", "latitude", "longitude"],
-        "openingHoursSpecification_required": ["@type", "dayOfWeek", "opens", "closes"]
+        "address_required": [
+          "@type",
+          "streetAddress",
+          "addressLocality",
+          "addressRegion",
+          "postalCode",
+          "addressCountry"
+        ],
+        "geo_required": [
+          "@type",
+          "latitude",
+          "longitude"
+        ],
+        "openingHoursSpecification_required": [
+          "@type",
+          "dayOfWeek",
+          "opens",
+          "closes"
+        ]
       },
       "tips": [
         "address는 Google 비즈니스 프로필에 등록된 주소와 정확히 일치시키세요.",
@@ -105,11 +243,27 @@
     },
     "WebSite": {
       "label": "웹사이트",
-      "required": ["@type", "name", "url"],
-      "recommended": ["potentialAction", "description", "publisher", "inLanguage"],
+      "required": [
+        "@type",
+        "name",
+        "url"
+      ],
+      "recommended": [
+        "potentialAction",
+        "description",
+        "publisher",
+        "inLanguage"
+      ],
       "nested": {
-        "potentialAction_required": ["@type", "target", "query-input"],
-        "publisher_required": ["@type", "name"]
+        "potentialAction_required": [
+          "@type",
+          "target",
+          "query-input"
+        ],
+        "publisher_required": [
+          "@type",
+          "name"
+        ]
       },
       "tips": [
         "potentialAction(SearchAction)을 추가하면 검색 결과에 사이트 내 검색창이 표시됩니다.",
@@ -120,12 +274,40 @@
     },
     "Event": {
       "label": "이벤트",
-      "required": ["@type", "name", "startDate", "location"],
-      "recommended": ["endDate", "description", "image", "offers", "performer", "organizer", "eventStatus", "eventAttendanceMode"],
+      "required": [
+        "@type",
+        "name",
+        "startDate",
+        "location"
+      ],
+      "recommended": [
+        "endDate",
+        "description",
+        "image",
+        "offers",
+        "performer",
+        "organizer",
+        "eventStatus",
+        "eventAttendanceMode"
+      ],
       "nested": {
-        "location_required": ["@type", "name", "address"],
-        "offers_required": ["@type", "price", "priceCurrency", "url", "availability"],
-        "organizer_required": ["@type", "name", "url"]
+        "location_required": [
+          "@type",
+          "name",
+          "address"
+        ],
+        "offers_required": [
+          "@type",
+          "price",
+          "priceCurrency",
+          "url",
+          "availability"
+        ],
+        "organizer_required": [
+          "@type",
+          "name",
+          "url"
+        ]
       },
       "tips": [
         "eventAttendanceMode로 온라인/오프라인/혼합 여부를 반드시 명시하세요 (2025년 필수화).",
@@ -137,13 +319,46 @@
     },
     "Recipe": {
       "label": "레시피",
-      "required": ["@type", "name", "image", "recipeIngredient", "recipeInstructions"],
-      "recommended": ["author", "datePublished", "description", "prepTime", "cookTime", "totalTime", "recipeYield", "recipeCategory", "recipeCuisine", "nutrition", "aggregateRating", "video"],
+      "required": [
+        "@type",
+        "name",
+        "image",
+        "recipeIngredient",
+        "recipeInstructions"
+      ],
+      "recommended": [
+        "author",
+        "datePublished",
+        "description",
+        "prepTime",
+        "cookTime",
+        "totalTime",
+        "recipeYield",
+        "recipeCategory",
+        "recipeCuisine",
+        "nutrition",
+        "aggregateRating",
+        "video"
+      ],
       "nested": {
-        "recipeInstructions_required": ["@type", "text"],
-        "nutrition_required": ["@type", "calories"],
-        "author_required": ["@type", "name"],
-        "video_required": ["@type", "name", "thumbnailUrl", "uploadDate"]
+        "recipeInstructions_required": [
+          "@type",
+          "text"
+        ],
+        "nutrition_required": [
+          "@type",
+          "calories"
+        ],
+        "author_required": [
+          "@type",
+          "name"
+        ],
+        "video_required": [
+          "@type",
+          "name",
+          "thumbnailUrl",
+          "uploadDate"
+        ]
       },
       "tips": [
         "recipeInstructions는 HowToStep 배열로 단계별로 구분하면 리치 결과 표시에 유리합니다.",
@@ -155,11 +370,36 @@
     },
     "VideoObject": {
       "label": "동영상",
-      "required": ["@type", "name", "description", "thumbnailUrl", "uploadDate"],
-      "recommended": ["contentUrl", "embedUrl", "duration", "interactionStatistic", "expires", "hasPart", "publication", "regionsAllowed"],
+      "required": [
+        "@type",
+        "name",
+        "description",
+        "thumbnailUrl",
+        "uploadDate"
+      ],
+      "recommended": [
+        "contentUrl",
+        "embedUrl",
+        "duration",
+        "interactionStatistic",
+        "expires",
+        "hasPart",
+        "publication",
+        "regionsAllowed"
+      ],
       "nested": {
-        "interactionStatistic_required": ["@type", "interactionType", "userInteractionCount"],
-        "hasPart_required": ["@type", "name", "startOffset", "endOffset", "url"]
+        "interactionStatistic_required": [
+          "@type",
+          "interactionType",
+          "userInteractionCount"
+        ],
+        "hasPart_required": [
+          "@type",
+          "name",
+          "startOffset",
+          "endOffset",
+          "url"
+        ]
       },
       "tips": [
         "thumbnailUrl은 실제 접근 가능한 URL이어야 하며 최소 160x90px 이상이어야 합니다.",
@@ -171,14 +411,42 @@
     },
     "HowTo": {
       "label": "방법/가이드",
-      "required": ["@type", "name", "step"],
-      "recommended": ["description", "image", "totalTime", "estimatedCost", "supply", "tool"],
+      "required": [
+        "@type",
+        "name",
+        "step"
+      ],
+      "recommended": [
+        "description",
+        "image",
+        "totalTime",
+        "estimatedCost",
+        "supply",
+        "tool"
+      ],
       "nested": {
-        "step_required": ["@type", "name", "text"],
-        "step_recommended": ["image", "url"],
-        "estimatedCost_required": ["@type", "value", "currency"],
-        "supply_required": ["@type", "name"],
-        "tool_required": ["@type", "name"]
+        "step_required": [
+          "@type",
+          "name",
+          "text"
+        ],
+        "step_recommended": [
+          "image",
+          "url"
+        ],
+        "estimatedCost_required": [
+          "@type",
+          "value",
+          "currency"
+        ],
+        "supply_required": [
+          "@type",
+          "name"
+        ],
+        "tool_required": [
+          "@type",
+          "name"
+        ]
       },
       "tips": [
         "각 step에 이미지를 포함하면 비주얼 HowTo 리치 결과가 표시됩니다.",
@@ -190,14 +458,39 @@
     },
     "Review": {
       "label": "리뷰",
-      "required": ["@type", "itemReviewed", "author", "reviewRating"],
-      "recommended": ["datePublished", "reviewBody", "publisher"],
+      "required": [
+        "@type",
+        "itemReviewed",
+        "author",
+        "reviewRating"
+      ],
+      "recommended": [
+        "datePublished",
+        "reviewBody",
+        "publisher"
+      ],
       "nested": {
-        "itemReviewed_required": ["@type", "name"],
-        "author_required": ["@type", "name"],
-        "author_recommended": ["url", "sameAs"],
-        "reviewRating_required": ["@type", "ratingValue", "bestRating"],
-        "publisher_required": ["@type", "name"]
+        "itemReviewed_required": [
+          "@type",
+          "name"
+        ],
+        "author_required": [
+          "@type",
+          "name"
+        ],
+        "author_recommended": [
+          "url",
+          "sameAs"
+        ],
+        "reviewRating_required": [
+          "@type",
+          "ratingValue",
+          "bestRating"
+        ],
+        "publisher_required": [
+          "@type",
+          "name"
+        ]
       },
       "tips": [
         "reviewRating에 bestRating과 worstRating을 명시하면 평점 체계가 명확해집니다.",
@@ -208,12 +501,37 @@
     },
     "SoftwareApplication": {
       "label": "소프트웨어/앱",
-      "required": ["@type", "name", "offers"],
-      "recommended": ["applicationCategory", "operatingSystem", "aggregateRating", "review", "screenshot", "description", "author", "softwareVersion", "downloadUrl"],
+      "required": [
+        "@type",
+        "name",
+        "offers"
+      ],
+      "recommended": [
+        "applicationCategory",
+        "operatingSystem",
+        "aggregateRating",
+        "review",
+        "screenshot",
+        "description",
+        "author",
+        "softwareVersion",
+        "downloadUrl"
+      ],
       "nested": {
-        "offers_required": ["@type", "price", "priceCurrency"],
-        "aggregateRating_required": ["@type", "ratingValue", "ratingCount"],
-        "author_required": ["@type", "name"]
+        "offers_required": [
+          "@type",
+          "price",
+          "priceCurrency"
+        ],
+        "aggregateRating_required": [
+          "@type",
+          "ratingValue",
+          "ratingCount"
+        ],
+        "author_required": [
+          "@type",
+          "name"
+        ]
       },
       "tips": [
         "무료 앱이라도 offers를 포함하고 price를 '0'으로 설정해야 리치 결과가 표시됩니다.",
@@ -225,13 +543,44 @@
     },
     "Course": {
       "label": "강좌/교육",
-      "required": ["@type", "name", "description", "provider"],
-      "recommended": ["offers", "coursePrerequisites", "educationalLevel", "inLanguage", "hasCourseInstance", "aggregateRating", "image", "totalHistoricalEnrollment"],
+      "required": [
+        "@type",
+        "name",
+        "description",
+        "provider"
+      ],
+      "recommended": [
+        "offers",
+        "coursePrerequisites",
+        "educationalLevel",
+        "inLanguage",
+        "hasCourseInstance",
+        "aggregateRating",
+        "image",
+        "totalHistoricalEnrollment"
+      ],
       "nested": {
-        "provider_required": ["@type", "name", "url"],
-        "hasCourseInstance_required": ["@type", "courseMode", "courseWorkload"],
-        "hasCourseInstance_recommended": ["startDate", "endDate", "instructor", "location"],
-        "offers_required": ["@type", "price", "priceCurrency"]
+        "provider_required": [
+          "@type",
+          "name",
+          "url"
+        ],
+        "hasCourseInstance_required": [
+          "@type",
+          "courseMode",
+          "courseWorkload"
+        ],
+        "hasCourseInstance_recommended": [
+          "startDate",
+          "endDate",
+          "instructor",
+          "location"
+        ],
+        "offers_required": [
+          "@type",
+          "price",
+          "priceCurrency"
+        ]
       },
       "tips": [
         "2025년 Course 마크업이 대폭 업데이트되어 hasCourseInstance가 필수에 가까워졌습니다.",
@@ -243,15 +592,54 @@
     },
     "JobPosting": {
       "label": "채용공고",
-      "required": ["@type", "title", "description", "datePosted", "hiringOrganization", "jobLocation"],
-      "recommended": ["validThrough", "employmentType", "baseSalary", "applicantLocationRequirements", "jobLocationType", "directApply", "educationRequirements", "experienceRequirements"],
+      "required": [
+        "@type",
+        "title",
+        "description",
+        "datePosted",
+        "hiringOrganization",
+        "jobLocation"
+      ],
+      "recommended": [
+        "validThrough",
+        "employmentType",
+        "baseSalary",
+        "applicantLocationRequirements",
+        "jobLocationType",
+        "directApply",
+        "educationRequirements",
+        "experienceRequirements"
+      ],
       "nested": {
-        "hiringOrganization_required": ["@type", "name", "sameAs"],
-        "hiringOrganization_recommended": ["logo", "url"],
-        "jobLocation_required": ["@type", "address"],
-        "address_required": ["@type", "addressLocality", "addressRegion", "addressCountry"],
-        "baseSalary_required": ["@type", "currency", "value"],
-        "baseSalary_value_required": ["@type", "value", "unitText"]
+        "hiringOrganization_required": [
+          "@type",
+          "name",
+          "sameAs"
+        ],
+        "hiringOrganization_recommended": [
+          "logo",
+          "url"
+        ],
+        "jobLocation_required": [
+          "@type",
+          "address"
+        ],
+        "address_required": [
+          "@type",
+          "addressLocality",
+          "addressRegion",
+          "addressCountry"
+        ],
+        "baseSalary_required": [
+          "@type",
+          "currency",
+          "value"
+        ],
+        "baseSalary_value_required": [
+          "@type",
+          "value",
+          "unitText"
+        ]
       },
       "tips": [
         "validThrough(마감일)을 반드시 포함하고 만료된 공고는 즉시 삭제하세요.",
@@ -260,6 +648,149 @@
         "employmentType은 'FULL_TIME', 'PART_TIME', 'CONTRACT' 등 정확한 값을 사용하세요.",
         "원격근무 공고는 jobLocationType을 'TELECOMMUTE'로 설정하고 applicantLocationRequirements를 명시하세요."
       ]
+    },
+    "Book": {
+      "label": "Book",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "Book 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "Movie": {
+      "label": "Movie",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "Movie 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "MusicGroup": {
+      "label": "MusicGroup",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "MusicGroup 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "Dataset": {
+      "label": "Dataset",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "Dataset 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "SpecialAnnouncement": {
+      "label": "SpecialAnnouncement",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "SpecialAnnouncement 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "ClaimReview": {
+      "label": "ClaimReview",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "ClaimReview 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "EducationalOccupationalProgram": {
+      "label": "EducationalOccupationalProgram",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "EducationalOccupationalProgram 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "LearningResource": {
+      "label": "LearningResource",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "LearningResource 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "MerchantListing": {
+      "label": "MerchantListing",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "MerchantListing 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "VacationRental": {
+      "label": "VacationRental",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "VacationRental 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "Vehicle": {
+      "label": "Vehicle",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "Vehicle 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "ProfilePage": {
+      "label": "ProfilePage",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "ProfilePage 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
+    },
+    "DiscussionForumPosting": {
+      "label": "DiscussionForumPosting",
+      "required": [
+        "name"
+      ],
+      "recommended": [],
+      "tips": [
+        "DiscussionForumPosting 타입의 세부 규칙은 아직 정의되지 않았습니다. 수동 업데이트가 필요합니다."
+      ],
+      "_stub": true
     }
   },
   "geoRules": {
@@ -428,6 +959,41 @@
           "label": "Applebot-Extended (Apple)",
           "importance": "high",
           "tip": "Apple Intelligence와 Siri 검색에 콘텐츠를 노출하려면 허용하세요."
+        },
+        {
+          "name": "ChatGPT-User",
+          "org": "OpenAI",
+          "desc": "ChatGPT 브라우징 모드"
+        },
+        {
+          "name": "OAI-SearchBot",
+          "org": "OpenAI",
+          "desc": "OpenAI 검색 크롤러"
+        },
+        {
+          "name": "Googlebot",
+          "org": "Google",
+          "desc": "Google 검색 크롤러"
+        },
+        {
+          "name": "Timpibot",
+          "org": "Timpi",
+          "desc": "분산형 검색엔진 크롤러"
+        },
+        {
+          "name": "Diffbot",
+          "org": "Diffbot",
+          "desc": "AI 기반 웹 스크래핑"
+        },
+        {
+          "name": "ImagesiftBot",
+          "org": "Hive",
+          "desc": "Hive AI 이미지 분석"
+        },
+        {
+          "name": "cohere-ai",
+          "org": "Cohere",
+          "desc": "Cohere AI 크롤러"
         }
       ],
       "tips": [
@@ -443,7 +1009,12 @@
           "id": "author_info",
           "label": "저자 정보",
           "description": "콘텐츠에 저자 이름, 프로필, 자격 정보가 포함되어 있는지 확인합니다.",
-          "selectors": ["[rel='author']", ".author", "[itemprop='author']", "meta[name='author']"],
+          "selectors": [
+            "[rel='author']",
+            ".author",
+            "[itemprop='author']",
+            "meta[name='author']"
+          ],
           "jsonldField": "author",
           "severity": "warning",
           "tip": "저자의 전문성을 보여주는 프로필 페이지를 연결하세요."
@@ -452,7 +1023,11 @@
           "id": "date_published",
           "label": "게시일",
           "description": "콘텐츠 게시일이 명시되어 있는지 확인합니다.",
-          "selectors": ["time[datetime]", "[itemprop='datePublished']", "meta[property='article:published_time']"],
+          "selectors": [
+            "time[datetime]",
+            "[itemprop='datePublished']",
+            "meta[property='article:published_time']"
+          ],
           "jsonldField": "datePublished",
           "severity": "warning",
           "tip": "최신 정보임을 보여주기 위해 게시일을 명시하세요."
@@ -461,7 +1036,10 @@
           "id": "date_modified",
           "label": "수정일",
           "description": "콘텐츠 최종 수정일이 명시되어 있는지 확인합니다.",
-          "selectors": ["[itemprop='dateModified']", "meta[property='article:modified_time']"],
+          "selectors": [
+            "[itemprop='dateModified']",
+            "meta[property='article:modified_time']"
+          ],
           "jsonldField": "dateModified",
           "severity": "info",
           "tip": "정기적으로 콘텐츠를 업데이트하고 수정일을 갱신하세요."
@@ -470,7 +1048,14 @@
           "id": "sources_citations",
           "label": "출처/인용",
           "description": "외부 권위 있는 출처에 대한 링크나 인용이 포함되어 있는지 확인합니다.",
-          "patterns": ["a[href*='wikipedia']", "a[href*='gov']", "a[href*='edu']", "blockquote", "cite", "[role='doc-bibliography']"],
+          "patterns": [
+            "a[href*='wikipedia']",
+            "a[href*='gov']",
+            "a[href*='edu']",
+            "blockquote",
+            "cite",
+            "[role='doc-bibliography']"
+          ],
           "severity": "info",
           "tip": "권위 있는 외부 출처(학술 논문, 정부 사이트 등)를 인용하면 신뢰도가 향상됩니다."
         }
@@ -488,36 +1073,60 @@
           "id": "faq_presence",
           "label": "FAQ 섹션",
           "description": "질문-답변 형태의 콘텐츠가 포함되어 있는지 확인합니다.",
-          "patterns": ["[itemtype*='FAQPage']", ".faq", "#faq", "details > summary", "dt + dd"],
+          "patterns": [
+            "[itemtype*='FAQPage']",
+            ".faq",
+            "#faq",
+            "details > summary",
+            "dt + dd"
+          ],
           "tip": "자주 묻는 질문을 Q&A 형태로 구성하면 AI가 직접 인용하기 쉽습니다."
         },
         {
           "id": "howto_presence",
           "label": "HowTo/단계별 가이드",
           "description": "단계별 설명 콘텐츠가 포함되어 있는지 확인합니다.",
-          "patterns": ["[itemtype*='HowTo']", "ol > li", ".steps", ".step"],
+          "patterns": [
+            "[itemtype*='HowTo']",
+            "ol > li",
+            ".steps",
+            ".step"
+          ],
           "tip": "단계별 가이드는 AI 검색 결과에서 높은 인용률을 보입니다."
         },
         {
           "id": "table_presence",
           "label": "표/테이블",
           "description": "구조화된 데이터 테이블이 포함되어 있는지 확인합니다.",
-          "patterns": ["table:has(thead)", "table:has(th)"],
+          "patterns": [
+            "table:has(thead)",
+            "table:has(th)"
+          ],
           "tip": "비교 데이터나 사양을 표로 정리하면 AI가 정확한 데이터를 인용합니다."
         },
         {
           "id": "list_presence",
           "label": "목록 구조",
           "description": "정리된 목록(ul/ol) 콘텐츠가 포함되어 있는지 확인합니다.",
-          "patterns": ["ul:has(> li:nth-child(3))", "ol:has(> li:nth-child(3))"],
+          "patterns": [
+            "ul:has(> li:nth-child(3))",
+            "ol:has(> li:nth-child(3))"
+          ],
           "tip": "핵심 정보를 목록으로 정리하면 AI 스니펫에 선택될 확률이 높아집니다."
         },
         {
           "id": "definition_patterns",
           "label": "정의/설명 패턴",
           "description": "'~란', '~이란', '~의 뜻' 등 정의 형태의 콘텐츠가 포함되어 있는지 확인합니다.",
-          "patterns": ["dfn", "abbr[title]", "dl > dt + dd"],
-          "regexPatterns": ["(이란|란|의 뜻|의 의미|정의|개념)[은는이가]?\\s*(무엇|뭐|어떤)", "(은|는|이란|란)\\s+.{10,50}(을|를)\\s+(말한다|의미한다|뜻한다|가리킨다)"],
+          "patterns": [
+            "dfn",
+            "abbr[title]",
+            "dl > dt + dd"
+          ],
+          "regexPatterns": [
+            "(이란|란|의 뜻|의 의미|정의|개념)[은는이가]?\\s*(무엇|뭐|어떤)",
+            "(은|는|이란|란)\\s+.{10,50}(을|를)\\s+(말한다|의미한다|뜻한다|가리킨다)"
+          ],
           "tip": "핵심 용어의 명확한 정의를 포함하면 AI가 정의형 답변에 인용합니다."
         }
       ],
@@ -588,17 +1197,17 @@
     "weights": {
       "jsonld": {
         "label": "JSON-LD 구조화 데이터",
-        "weight": 0.30,
+        "weight": 0.3,
         "description": "스키마 마크업의 존재 여부, 필수/권장 필드 충족도"
       },
       "meta": {
         "label": "메타 태그",
-        "weight": 0.20,
+        "weight": 0.2,
         "description": "필수 메타 태그 존재 여부 및 품질"
       },
       "headings": {
         "label": "제목 태그 구조",
-        "weight": 0.10,
+        "weight": 0.1,
         "description": "H1~H6 태그의 존재, 고유성, 계층 구조"
       },
       "aiCrawling": {
@@ -613,16 +1222,41 @@
       },
       "citability": {
         "label": "AI 인용 용이성",
-        "weight": 0.10,
+        "weight": 0.1,
         "description": "FAQ, HowTo, 표, 목록, 정의 패턴의 존재 여부"
       }
     },
     "grading": {
-      "A": { "min": 90, "max": 100, "label": "우수", "color": "#22c55e" },
-      "B": { "min": 70, "max": 89, "label": "양호", "color": "#3b82f6" },
-      "C": { "min": 50, "max": 69, "label": "보통", "color": "#f59e0b" },
-      "D": { "min": 30, "max": 49, "label": "미흡", "color": "#f97316" },
-      "F": { "min": 0, "max": 29, "label": "부족", "color": "#ef4444" }
+      "A": {
+        "min": 90,
+        "max": 100,
+        "label": "우수",
+        "color": "#22c55e"
+      },
+      "B": {
+        "min": 70,
+        "max": 89,
+        "label": "양호",
+        "color": "#3b82f6"
+      },
+      "C": {
+        "min": 50,
+        "max": 69,
+        "label": "보통",
+        "color": "#f59e0b"
+      },
+      "D": {
+        "min": 30,
+        "max": 49,
+        "label": "미흡",
+        "color": "#f97316"
+      },
+      "F": {
+        "min": 0,
+        "max": 29,
+        "label": "부족",
+        "color": "#ef4444"
+      }
     }
   }
 }

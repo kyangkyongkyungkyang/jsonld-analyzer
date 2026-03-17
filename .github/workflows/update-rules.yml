@@ -1,0 +1,42 @@
+name: Update GEO Rules
+
+on:
+  schedule:
+    # 매주 월요일 오전 9시 (KST) = 일요일 자정 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '강제 업데이트 (버전 변경 없어도 커밋)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+jobs:
+  update-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Update rules.json
+        run: node scripts/update-rules.js
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet rules.json && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true' || github.event.inputs.force == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add rules.json
+          git commit -m "chore: auto-update rules.json ($(date +%Y-%m-%d))"
+          git push
