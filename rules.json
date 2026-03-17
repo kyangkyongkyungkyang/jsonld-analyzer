@@ -1352,22 +1352,19 @@
           "name": "AddSearchBot",
           "org": "",
           "desc": "AddSearchBot is a web crawler that indexes website content for AddSearch's AI-powered site search so",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "AI2Bot-DeepResearchEval",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "Ai2Bot-Dolma",
           "org": "Ai2",
           "desc": "Explores 'certain domains' to find web content.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Ai2Bot-Dolma (Ai2)"
         },
         {
@@ -1375,7 +1372,6 @@
           "org": "aiHit",
           "desc": "Scrapes data for AI systems.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "aiHitBot (aiHit)"
         },
         {
@@ -1383,7 +1379,6 @@
           "org": "Amazon",
           "desc": "Amazon Kendra is a highly accurate intelligent search service that enables your users to search unst",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "amazon-kendra (Amazon)"
         },
         {
@@ -1391,29 +1386,25 @@
           "org": "Amazon",
           "desc": "Buy For Me is an AI agent that helps buy products at the direction of customers.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "AmazonBuyForMe (Amazon)"
         },
         {
           "name": "Amzn-SearchBot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "Amzn-User",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "Andibot",
           "org": "Andi",
           "desc": "Scrapes website and provides AI summary.",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "Andibot (Andi)"
         },
         {
@@ -1421,7 +1412,6 @@
           "org": "Direqt",
           "desc": "Anomura is Direqt's search crawler, it discovers and indexes pages their customers websites.",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "Anomura (Direqt)"
         },
         {
@@ -1429,36 +1419,31 @@
           "org": "Anthropic",
           "desc": "Scrapes data to train LLMs and AI products offered by Anthropic.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "anthropic-ai (Anthropic)"
         },
         {
           "name": "ApifyBot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "ApifyWebsiteContentCrawler",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "Applebot",
           "org": "",
           "desc": "Applebot is a web crawler used by Apple to index search results that allow the Siri AI Assistant to ",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "atlassian-bot",
           "org": "Atlassian",
           "desc": "atlassian-bot is a web crawler used to index website content for its AI search, assistants and agent",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "atlassian-bot (Atlassian)"
         },
         {
@@ -1466,22 +1451,19 @@
           "org": "Awario",
           "desc": "Awario is an AI data scraper operated by Awario. It's not currently known to be artificially intelli",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Awario (Awario)"
         },
         {
           "name": "AzureAI-SearchBot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "bedrockbot",
           "org": "Amazon",
           "desc": "Connects to and crawls URLs that have been selected for use in a user's AWS bedrock application.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "bedrockbot (Amazon)"
         },
         {
@@ -1489,7 +1471,6 @@
           "org": "Big Sur AI that fetches website content to enable AI-powered web agents, sales assistants, and content marketing solutions for businesses",
           "desc": "bigsur.ai is a web crawler operated by Big Sur AI that fetches website content to enable AI-powered ",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "bigsur.ai (Big Sur AI that fetches website content to enable AI-powered web agents, sales assistants, and content marketing solutions for businesses)"
         },
         {
@@ -1497,7 +1478,6 @@
           "org": "https://safe.search.brave.com/help/brave-search-crawler",
           "desc": "Brave search has a crawler to discover new pages and index their content.",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "Bravebot (https://safe.search.brave.com/help/brave-search-crawler)"
         },
         {
@@ -1505,7 +1485,6 @@
           "org": "https://brightdata.com/brightbot",
           "desc": "Scrapes data to train LLMs and AI products focused on website customer support, [uses residential IP",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Brightbot 1.0 (https://brightdata.com/brightbot)"
         },
         {
@@ -1513,29 +1492,25 @@
           "org": "BuddyBotLearning",
           "desc": "BuddyBot is a voice-controlled AI learning companion targeted at childhooded STEM education.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "BuddyBot (BuddyBotLearning)"
         },
         {
           "name": "Channel3Bot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "ChatGLM-Spider",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "ChatGPT Agent",
           "org": "OpenAI",
           "desc": "ChatGPT Agent is an AI agent created by OpenAI that can use a web browser. It can intelligently navi",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "ChatGPT Agent (OpenAI)"
         },
         {
@@ -1543,7 +1518,6 @@
           "org": "Anthropic",
           "desc": "Claude-SearchBot navigates the web to improve search result quality for users. It analyzes online co",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "Claude-SearchBot (Anthropic)"
         },
         {
@@ -1551,7 +1525,6 @@
           "org": "Anthropic",
           "desc": "Claude-User supports Claude AI users. When individuals ask questions to Claude, it may access websit",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Claude-User (Anthropic)"
         },
         {
@@ -1559,7 +1532,6 @@
           "org": "Anthropic",
           "desc": "Claude-Web is an AI-related agent operated by Anthropic. It's currently unclear exactly what it's us",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Claude-Web (Anthropic)"
         },
         {
@@ -1567,22 +1539,19 @@
           "org": "Cloudflare",
           "desc": "AutoRAG is an all-in-one AI search solution.",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "Cloudflare-AutoRAG (Cloudflare)"
         },
         {
           "name": "CloudVertexBot",
           "org": "",
           "desc": "CloudVertexBot is a Google-operated crawler available to site owners to request targeted crawls of t",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "cohere-training-data-crawler",
           "org": "Cohere to download training data for its LLMs (Large Language Models) that power its enterprise AI products",
           "desc": "cohere-training-data-crawler is a web crawler operated by Cohere to download training data for its L",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "cohere-training-data-crawler (Cohere to download training data for its LLMs (Large Language Models) that power its enterprise AI products)"
         },
         {
@@ -1590,22 +1559,19 @@
           "org": "ROIS",
           "desc": "Scrapes data for AI training in Japanese language.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Cotoyogi (ROIS)"
         },
         {
           "name": "Crawl4AI",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "Crawlspace",
           "org": "Crawlspace",
           "desc": "Provides crawling services for any purpose, probably including AI model training.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Crawlspace (Crawlspace)"
         },
         {
@@ -1613,7 +1579,6 @@
           "org": "Datenbank",
           "desc": "Datenbank Crawler is an AI data scraper operated by Datenbank. It's not currently known to be artifi",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Datenbank Crawler (Datenbank)"
         },
         {
@@ -1621,22 +1586,19 @@
           "org": "Devin AI",
           "desc": "Devin is a collaborative AI teammate built to help ambitious engineering teams achieve more.",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "Devin (Devin AI)"
         },
         {
           "name": "DuckAssistBot",
           "org": "",
           "desc": "DuckAssistBot is used by DuckDuckGo's DuckAssist feature to fetch content and generate realtime AI a",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "Echobot Bot",
           "org": "Echobox",
           "desc": "Echobot Bot is an AI data scraper operated by Echobox. It's not currently known to be artificially i",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Echobot Bot (Echobox)"
         },
         {
@@ -1644,22 +1606,19 @@
           "org": "Echobox",
           "desc": "Supports company's AI-powered social and email management products.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "EchoboxBot (Echobox)"
         },
         {
           "name": "ExaBot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "facebookexternalhit",
           "org": "Meta/Facebook",
           "desc": "Note that excluding FacebookExternalHit will block incorporating OpenGraph data when sharing in soci",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "facebookexternalhit (Meta/Facebook)"
         },
         {
@@ -1667,7 +1626,6 @@
           "org": "Factset",
           "desc": "Scrapes data for AI training.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Factset_spyderbot (Factset)"
         },
         {
@@ -1675,7 +1633,6 @@
           "org": "Firecrawl",
           "desc": "Scrapes data for AI systems and LLM training.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "FirecrawlAgent (Firecrawl)"
         },
         {
@@ -1683,22 +1640,19 @@
           "org": "Unknown",
           "desc": "Unclear who the operator is; but data is used for training/machine learning.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "FriendlyCrawler (Unknown)"
         },
         {
           "name": "Gemini-Deep-Research",
           "org": "",
           "desc": "Gemini-Deep-Research is the agent responsible for collecting and scanning resources used in Google G",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "Google-CloudVertexBot",
           "org": "Google",
           "desc": "Google-CloudVertexBot crawls sites on the site owners' request when building Vertex AI Agents.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Google-CloudVertexBot (Google)"
         },
         {
@@ -1706,22 +1660,19 @@
           "org": "Google",
           "desc": "Supports Google's Firebase AI products.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Google-Firebase (Google)"
         },
         {
           "name": "Google-NotebookLM",
           "org": "",
           "desc": "Google-NotebookLM is an AI-powered research and note-taking assistant that helps users synthesize in",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "GoogleAgent-Mariner",
           "org": "Google",
           "desc": "GoogleAgent-Mariner is an AI agent created by Google that can use a web browser. It can intelligentl",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "GoogleAgent-Mariner (Google)"
         },
         {
@@ -1729,7 +1680,6 @@
           "org": "Google",
           "desc": "\"Used by various product teams for fetching publicly accessible content from sites. For example, it ",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "GoogleOther-Image (Google)"
         },
         {
@@ -1737,29 +1687,25 @@
           "org": "Google",
           "desc": "\"Used by various product teams for fetching publicly accessible content from sites. For example, it ",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "GoogleOther-Video (Google)"
         },
         {
           "name": "iAskBot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "iaskspider",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "iaskspider/2.0",
           "org": "iAsk",
           "desc": "Used to provide answers to user queries.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "iaskspider/2.0 (iAsk)"
         },
         {
@@ -1767,7 +1713,6 @@
           "org": "Ibou",
           "desc": "Ibou.io operates a crawler service named IbouBot which fuels and updates their graph representation ",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "IbouBot (Ibou)"
         },
         {
@@ -1775,22 +1720,19 @@
           "org": "NICT",
           "desc": "Use the collected data for artificial intelligence technologies; provide data to third parties, incl",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "ICC-Crawler (NICT)"
         },
         {
           "name": "imageSpider",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "img2dataset",
           "org": "img2dataset",
           "desc": "Downloads large sets of images into datasets for LLM training or other purposes.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "img2dataset (img2dataset)"
         },
         {
@@ -1798,117 +1740,101 @@
           "org": "ISS-Corporate",
           "desc": "Used to train machine learning based models to quantify cyber risk.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "ISSCyberRiskCrawler (ISS-Corporate)"
         },
         {
           "name": "kagi-fetcher",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "Kangaroo Bot",
           "org": "",
           "desc": "Kangaroo Bot is used by the company Kangaroo LLM to download data to train AI models tailored to Aus",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "KlaviyoAIBot",
           "org": "Klaviyo",
           "desc": "Indexes content to tailor AI experiences, generate content, answers and recommendations.",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "KlaviyoAIBot (Klaviyo)"
         },
         {
           "name": "KunatoCrawler",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "laion-huggingface-processor",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "LAIONDownloader",
           "org": "Large-scale Artificial Intelligence Open Network",
           "desc": "LAIONDownloader is a bot by LAION, a non-profit organization that provides datasets, tools and model",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "LAIONDownloader (Large-scale Artificial Intelligence Open Network)"
         },
         {
           "name": "LCC",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "LinerBot",
           "org": "",
           "desc": "LinerBot is the web crawler used by Liner AI assistant to gather information from academic sources a",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "Linguee Bot",
           "org": "Linguee",
           "desc": "Linguee Bot is a web crawler used by Linguee to gather training data for its AI powered translation ",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Linguee Bot (Linguee)"
         },
         {
           "name": "LinkupBot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "Manus-User",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "meta-externalagent",
           "org": "Meta",
           "desc": "\"The Meta-ExternalAgent crawler crawls the web for use cases such as training AI models or improving",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "meta-externalagent (Meta)"
         },
         {
           "name": "meta-externalfetcher",
           "org": "",
           "desc": "Meta-ExternalFetcher is dispatched by Meta AI products in response to user prompts, when they need t",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "Meta-ExternalFetcher",
           "org": "",
           "desc": "Meta-ExternalFetcher is dispatched by Meta AI products in response to user prompts, when they need t",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "meta-webindexer",
           "org": "Meta",
           "desc": "As per their documentation, \"The Meta-WebIndexer crawler navigates the web to improve Meta AI search",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "meta-webindexer (Meta)"
         },
         {
@@ -1916,7 +1842,6 @@
           "org": "Mistral",
           "desc": "MistralAI-User is an AI assistant operated by Mistral. It's not currently known to be artificially i",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "MistralAI-User (Mistral)"
         },
         {
@@ -1924,44 +1849,38 @@
           "org": "Mistral AI",
           "desc": "MistralAI-User is for user actions in LeChat. When users ask LeChat a question, it may visit a web p",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "MistralAI-User/1.0 (Mistral AI)"
         },
         {
           "name": "MyCentralAIScraperBot",
           "org": "",
           "desc": "Operator and data use is unclear at this time.",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "netEstate Imprint Crawler",
           "org": "netEstate",
           "desc": "netEstate Imprint Crawler is an AI data scraper operated by netEstate. If you think this is incorrec",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "netEstate Imprint Crawler (netEstate)"
         },
         {
           "name": "NotebookLM",
           "org": "",
           "desc": "NotebookLM is an AI-powered research and note-taking assistant that helps users synthesize informati",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "NovaAct",
           "org": "",
           "desc": "Nova Act is an AI agent created by Amazon that can use a web browser. It can intelligently navigate ",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "omgili",
           "org": "Webz.io",
           "desc": "Crawls sites for APIs used by Hootsuite, Sprinklr, NetBase, and other companies. Data also sold for ",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "omgili (Webz.io)"
         },
         {
@@ -1969,7 +1888,6 @@
           "org": "Webz.io",
           "desc": "Legacy user agent initially used for Omgili search engine. Unknown if still used, `omgili` agent sti",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "omgilibot (Webz.io)"
         },
         {
@@ -1977,22 +1895,19 @@
           "org": "OpenAI",
           "desc": "The purpose of this bot is unclear at this time but it is a member of OpenAI's suite of crawlers.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "OpenAI (OpenAI)"
         },
         {
           "name": "Operator",
           "org": "",
           "desc": "Operator is an AI agent created by OpenAI that can use a web browser. It can intelligently navigate ",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "PanguBot",
           "org": "the Chinese company Huawei",
           "desc": "PanguBot is a web crawler operated by the Chinese company Huawei. It's used to download training dat",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "PanguBot (the Chinese company Huawei)"
         },
         {
@@ -2000,7 +1915,6 @@
           "org": "Panscient",
           "desc": "Compiles data on businesses and business professionals that is structured using AI and machine learn",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Panscient (Panscient)"
         },
         {
@@ -2008,7 +1922,6 @@
           "org": "Panscient",
           "desc": "Compiles data on businesses and business professionals that is structured using AI and machine learn",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "panscient.com (Panscient)"
         },
         {
@@ -2016,7 +1929,6 @@
           "org": "Perplexity",
           "desc": "Visit web pages to help provide an accurate answer and include links to the page in Perplexity respo",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Perplexity-User (Perplexity)"
         },
         {
@@ -2024,22 +1936,19 @@
           "org": "phind",
           "desc": "Company offers an AI agent that uses AI and generate extra web query on the fly",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "PhindBot (phind)"
         },
         {
           "name": "Poggio-Citations",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "Poseidon Research Crawler",
           "org": "Poseidon Research",
           "desc": "Lab focused on scaling the interpretability research necessary to make better AI systems possible.",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "Poseidon Research Crawler (Poseidon Research)"
         },
         {
@@ -2047,7 +1956,6 @@
           "org": "Qualified",
           "desc": "Operated by Qualified as part of their suite of AI product offerings.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "QualifiedBot (Qualified)"
         },
         {
@@ -2055,7 +1963,6 @@
           "org": "Quillbot",
           "desc": "Operated by QuillBot as part of their suite of AI product offerings.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "QuillBot (Quillbot)"
         },
         {
@@ -2063,7 +1970,6 @@
           "org": "Quillbot",
           "desc": "Operated by QuillBot as part of their suite of AI product offerings.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "quillbot.com (Quillbot)"
         },
         {
@@ -2071,7 +1977,6 @@
           "org": "SB Intuitions",
           "desc": "AI development and information analysis",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "SBIntuitionsBot (SB Intuitions)"
         },
         {
@@ -2079,7 +1984,6 @@
           "org": "Zyte",
           "desc": "\"AI and machine learning applications often need large amounts of quality data, and web data extract",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Scrapy (Zyte)"
         },
         {
@@ -2087,7 +1991,6 @@
           "org": "Semrush",
           "desc": "Data collected is used for the ContentShake AI tool reports.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "SemrushBot-OCOB (Semrush)"
         },
         {
@@ -2095,7 +1998,6 @@
           "org": "Semrush",
           "desc": "Data collected is used for the SEO Writing Assistant tool to check if URL is accessible.",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "SemrushBot-SWA (Semrush)"
         },
         {
@@ -2103,7 +2005,6 @@
           "org": "Parallel",
           "desc": "ShapBot helps discover and index websites for Parallel's web APIs.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "ShapBot (Parallel)"
         },
         {
@@ -2111,29 +2012,25 @@
           "org": "Sidetrade",
           "desc": "AI product training.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Sidetrade indexer bot (Sidetrade)"
         },
         {
           "name": "Spider",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "TavilyBot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         },
         {
           "name": "TerraCotta",
           "org": "Ceramic AI",
           "desc": "Downloads data to train LLMs.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "TerraCotta (Ceramic AI)"
         },
         {
@@ -2141,7 +2038,6 @@
           "org": "Thinkbot",
           "desc": "Collects data for analysis on AI usage and automation.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "Thinkbot (Thinkbot)"
         },
         {
@@ -2149,22 +2045,19 @@
           "org": "ByteDance",
           "desc": "Downloads data to train LLMS, as per Bytespider.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "TikTokSpider (ByteDance)"
         },
         {
           "name": "TwinAgent",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "VelenPublicWebCrawler",
           "org": "Velen Crawler",
           "desc": "\"Our goal with this crawler is to build business datasets and machine learning models to better unde",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "VelenPublicWebCrawler (Velen Crawler)"
         },
         {
@@ -2172,44 +2065,38 @@
           "org": "WEBSPARK",
           "desc": "WARDBot is an AI data scraper operated by WEBSPARK. It's not currently known to be artificially inte",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "WARDBot (WEBSPARK)"
         },
         {
           "name": "Webzio-Extended",
           "org": "",
           "desc": "Webzio-Extended is a web crawler used by Webz.io to maintain a repository of web crawl data that it ",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "webzio-extended",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "wpbot",
           "org": "QuantumCloud",
           "desc": "wpbot is a used to support the functionality of the AI Chatbot for WordPress plugin. It supports the",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "wpbot (QuantumCloud)"
         },
         {
           "name": "WRTNBot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium",
-          "_source": "ai-robots-txt"
+          "importance": "medium"
         },
         {
           "name": "YaK",
           "org": "Meltwater",
           "desc": "Retrieves data used for Meltwater's AI enabled consumer intelligence suite",
           "importance": "high",
-          "_source": "ai-robots-txt",
           "label": "YaK (Meltwater)"
         },
         {
@@ -2217,7 +2104,6 @@
           "org": "Yandex",
           "desc": "Retrieves data used for YandexGPT quick answers features.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "YandexAdditional (Yandex)"
         },
         {
@@ -2225,15 +2111,13 @@
           "org": "Yandex",
           "desc": "Retrieves data used for YandexGPT quick answers features.",
           "importance": "medium",
-          "_source": "ai-robots-txt",
           "label": "YandexAdditionalBot (Yandex)"
         },
         {
           "name": "ZanistaBot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high",
-          "_source": "ai-robots-txt"
+          "importance": "high"
         }
       ],
       "tips": [

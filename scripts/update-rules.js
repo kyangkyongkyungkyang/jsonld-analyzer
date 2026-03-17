@@ -268,7 +268,12 @@ async function main() {
     console.log(`📡 schema.org fetch 실패 (기존 매핑 유지): ${e.message}`);
   }
 
-  // ── 5. Update version and date ──
+  // ── 5. 내부 필드 정리 (배포 불필요 데이터 제거) ──
+  if (rules.geoRules?.aiCrawling?.bots) {
+    rules.geoRules.aiCrawling.bots.forEach(b => { delete b._source; });
+  }
+
+  // ── 6. Update version and date ──
   if (updated) {
     const parts = rules.version.split('.').map(Number);
     parts[2] = (parts[2] || 0) + 1; // bump patch
