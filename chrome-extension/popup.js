@@ -7,7 +7,6 @@ let remoteRules = null;
 document.addEventListener('DOMContentLoaded', async () => {
   // ── Event listeners (Manifest V3 CSP requires no inline handlers) ──
   document.getElementById('btnCopy').addEventListener('click', copyJsonLd);
-  document.getElementById('btnFullAnalyzer').addEventListener('click', openFullAnalyzer);
   document.querySelectorAll('.tab[data-tab]').forEach(tab => {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   });
@@ -58,11 +57,9 @@ function handleData(data) {
   const allIssues = [...jsonldIssues, ...geoIssues];
 
   // Show UI (toggle CSS classes instead of inline styles)
-  document.getElementById('summaryBar').classList.remove('hidden');
   document.getElementById('tabBar').classList.remove('hidden');
   document.getElementById('tab-overview').classList.add('active');
 
-  renderSummary(data, typeResults, scores);
   renderOverview(scores, allIssues, data);
   renderJsonldTab(jsonldIssues, typeResults, data.jsonlds || []);
   renderGeoTab(geoIssues);
@@ -72,32 +69,6 @@ function handleData(data) {
 function showEmptyState() {
   document.getElementById('stateLoading').classList.remove('active');
   document.getElementById('stateEmpty').classList.add('active');
-}
-
-// ══════════════════════════
-// RENDER: SUMMARY BAR
-// ══════════════════════════
-function renderSummary(data, typeResults, scores) {
-  const count = (data.jsonlds || []).length;
-  document.getElementById('summaryItemCount').textContent = count + (data.meta ? '+GEO' : '');
-  document.getElementById('summaryTypesText').textContent = typeResults.map(t => t.type).join(', ') || 'GEO only';
-
-  const scoreEl = document.getElementById('summaryScoreNum');
-  scoreEl.textContent = scores.overall;
-  scoreEl.style.color = getScoreColor(scores.overall);
-
-  const grade = getGrade(scores.overall);
-  const gradeEl = document.getElementById('summaryGrade');
-  gradeEl.textContent = grade.g;
-  gradeEl.style.background = `var(--${grade.cls}-bg)`;
-  gradeEl.style.color = `var(--${grade.cls})`;
-
-  // Tab badges
-  const jErrors = data.jsonlds?.length > 0 ? 0 : 1; // placeholder
-  updateTabBadge('badgeJsonld', (data.jsonlds || []).length, 'ok');
-
-  const geoErrors = 0; // will be updated below
-  updateTabBadge('badgeGeo', '—', 'ok');
 }
 
 function updateTabBadge(id, text, cls) {
@@ -283,6 +254,4 @@ function copyJsonLd() {
   });
 }
 
-function openFullAnalyzer() {
-  chrome.tabs.create({ url: 'https://kyangkyongkyungkyang.github.io/jsonld-analyzer/' });
-}
+
