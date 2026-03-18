@@ -49,6 +49,17 @@ function msg(key, ...subs) {
   }
   return key; // fallback
 }
+function isKoLocale() {
+  if (typeof chrome !== 'undefined' && chrome.i18n?.getUILanguage) {
+    return chrome.i18n.getUILanguage().startsWith('ko');
+  }
+  return true; // default ko
+}
+// 스키마 타입 라벨: 한국어면 rules의 label, 영어면 영문 타입명 사용
+function typeLabel(rule, typeName) {
+  if (isKoLocale() && rule?.label) return rule.label;
+  return typeName; // Organization, WebSite 등 영문 그대로
+}
 
 // ── Helpers ──
 function escHtml(str) {
@@ -109,7 +120,7 @@ function validateJsonLd(jsonlds, rules, remoteRules) {
     const isFallback = !rulesMap[type] && !!fallback[type];
     const r = rulesMap[type] || rulesMap[fallback[type]];
     const safeType = escHtml(type);
-    const tl = escHtml(r?.label || type);
+    const tl = escHtml(typeLabel(r, type));
     typeResults.push({ type: safeType, label: tl, supported: !!r, isFallback });
 
     if (!r) {
@@ -398,15 +409,16 @@ function buildRecommendations(jsonlds, jsonldIssues, geoIssues, scores, rules) {
   const types = jsonlds.map(getType);
   const rulesLookup = rules || SCHEMA_RULES;
 
-  // Type-specific tips (remote rules 우선, 폴백으로 내장 규칙)
-  types.forEach(type => {
-    const r = rulesLookup[type];
-    if (r?.tips) {
-      const shuffled = [...r.tips].sort(() => 0.5 - Math.random());
-      // remote rules tips는 새니타이징 (허용: strong, code, em, b, br만)
-      recs.push(sanitizeHtml(shuffled[0]));
-    }
-  });
+  // Type-specific tips — 한국어 tips는 한국어 로케일에서만 표시
+  if (isKoLocale()) {
+    types.forEach(type => {
+      const r = rulesLookup[type];
+      if (r?.tips) {
+        const shuffled = [...r.tips].sort(() => 0.5 - Math.random());
+        recs.push(sanitizeHtml(shuffled[0]));
+      }
+    });
+  }
 
   const cs = scores.catScores || {};
   if ((cs.jsonld || 0) < 50 && jsonlds.length > 0) {

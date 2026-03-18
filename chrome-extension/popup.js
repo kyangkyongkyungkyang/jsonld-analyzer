@@ -202,15 +202,18 @@ function renderJsonldTab(issues, typeResults, jsonlds, rules) {
   // 2개 이상이거나 폴백 분석된 타입이 있으면 타입 태그 표시
   const showTypes = jsonlds.length > 1 || typeResults.some(t => t.isFallback);
 
-  // 타입별 tips 수집 (폴백 타입도 상위 타입의 tips 표시)
-  const rulesLookup = rules || SCHEMA_RULES;
-  const fallback = getTypeFallback(remoteRules);
-  const tips = [];
-  jsonlds.map(getType).forEach(type => {
-    const r = rulesLookup[type] || rulesLookup[fallback?.[type]];
-    if (r?.tips) tips.push(...r.tips.slice(0, 2));
-  });
-  const uniqueTips = [...new Set(tips)].slice(0, 4);
+  // 타입별 tips — 한국어 tips는 한국어 로케일에서만
+  const uniqueTips = [];
+  if (isKoLocale()) {
+    const rulesLookup = rules || SCHEMA_RULES;
+    const fallback = getTypeFallback(remoteRules);
+    const tips = [];
+    jsonlds.map(getType).forEach(type => {
+      const r = rulesLookup[type] || rulesLookup[fallback?.[type]];
+      if (r?.tips) tips.push(...r.tips.slice(0, 2));
+    });
+    uniqueTips.push(...[...new Set(tips)].slice(0, 4));
+  }
 
   // 에러/경고 없으면 축하 메시지
   const allGoodHtml = (errors.length === 0 && warns.length === 0 && passes.length > 0)
