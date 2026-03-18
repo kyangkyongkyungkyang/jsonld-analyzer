@@ -47,26 +47,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       activeTabId = tab.id;
       document.getElementById('pageUrl').textContent = tab.url;
 
-      // chrome://, edge://, about: 등 브라우저 내부 페이지는 스크립트 주입 불가
+      // 브라우저 내부 페이지는 스크립트 주입 불가
       if (!tab.url || !tab.url.match(/^https?:\/\//)) {
         resolve(null);
         return;
       }
 
-      chrome.tabs.sendMessage(tab.id, { action: 'extractAll' }, response => {
-        if (chrome.runtime.lastError || !response || response.error) {
-          chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ['content.js']
-          }, () => {
-            if (chrome.runtime.lastError) { resolve(null); return; }
-            chrome.tabs.sendMessage(tab.id, { action: 'extractAll' }, resp2 => {
-              resolve((!chrome.runtime.lastError && resp2 && !resp2.error) ? resp2 : null);
-            });
-          });
-          return;
-        }
-        resolve(response);
+      // content_scripts 없으므로 항상 동적 주입
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content.js']
+      }, () => {
+        if (chrome.runtime.lastError) { resolve(null); return; }
+        chrome.tabs.sendMessage(tab.id, { action: 'extractAll' }, resp => {
+          resolve((!chrome.runtime.lastError && resp && !resp.error) ? resp : null);
+        });
       });
     });
   });
