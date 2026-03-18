@@ -196,11 +196,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
   try {
-    if (request.action === 'extractJsonLd') {
-      const jsonlds = extractJsonLds();
-      sendResponse({ jsonlds, url: window.location.href, title: document.title });
-
-    } else if (request.action === 'extractAll') {
+    if (request.action === 'extractAll') {
       const jsonlds = extractJsonLds();
       sendResponse({
         url: window.location.href,

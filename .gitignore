@@ -19,3 +19,11 @@ claudedocs/
 *.crx
 *.pem
 *.zip
+
+# Store assets (local only)
+store-assets/
+webstore/
+
+# Node
+package.json
+package-lock.json
