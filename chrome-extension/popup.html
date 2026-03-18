@@ -35,9 +35,7 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 }
 .logo{
   width:34px;height:34px;border-radius:var(--radius-sm);
-  background:var(--primary);display:flex;align-items:center;justify-content:center;
-  color:#fff;font-weight:700;font-size:1rem;flex-shrink:0;
-  box-shadow:var(--shadow);
+  flex-shrink:0;object-fit:contain;
 }
 .header-info{flex:1;min-width:0}
 .header-info h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}
@@ -237,7 +235,7 @@ body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
 <!-- ═══ HEADER ═══ -->
 <div class="header">
-  <div class="logo">{}</div>
+  <img class="logo" src="icons/icon48.png" alt="GEO Analyzer">
   <div class="header-info">
     <h1>GEO Analyzer</h1>
     <span class="url" id="pageUrl" data-i18n="waiting"></span>
