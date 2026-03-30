@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "lastUpdated": "2026-03-17",
+  "version": "1.0.1",
+  "lastUpdated": "2026-03-30",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2118,6 +2118,18 @@
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
           "importance": "high"
+        },
+        {
+          "name": "Aranet-SearchBot",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "Google-Agent",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
         }
       ],
       "tips": [
