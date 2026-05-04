@@ -1,6 +1,6 @@
 {
-  "version": "1.0.1",
-  "lastUpdated": "2026-03-30",
+  "version": "1.0.2",
+  "lastUpdated": "2026-05-04",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2129,6 +2129,19 @@
           "name": "Google-Agent",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "NagetBot",
+          "org": "Naget Inc (founded by Chris Samarinas, headquarter in Amherst, Massachusetts)",
+          "desc": "'Naget revolutionizes content discovery through an AI-powered ecosystem that transforms how we gener",
+          "importance": "medium",
+          "label": "NagetBot (Naget Inc (founded by Chris Samarinas, headquarter in Amherst, Massachusetts))"
+        },
+        {
+          "name": "newsai",
+          "org": "",
+          "desc": "User-agent string doen't contain an URL and there multiple sites using the newsai brand.",
           "importance": "medium"
         }
       ],
