@@ -1,6 +1,6 @@
 {
-  "version": "1.0.2",
-  "lastUpdated": "2026-05-04",
+  "version": "1.0.3",
+  "lastUpdated": "2026-05-18",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2142,6 +2142,54 @@
           "name": "newsai",
           "org": "",
           "desc": "User-agent string doen't contain an URL and there multiple sites using the newsai brand.",
+          "importance": "medium"
+        },
+        {
+          "name": "Brightbot",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "Claude-Code",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "Code",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "Google-Gemini-CLI",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "HenkBot",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "opencode",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "Terra Cotta",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "Trae",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
           "importance": "medium"
         }
       ],
