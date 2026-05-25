@@ -1,6 +1,6 @@
 {
-  "version": "1.0.3",
-  "lastUpdated": "2026-05-18",
+  "version": "1.0.4",
+  "lastUpdated": "2026-05-25",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2191,6 +2191,12 @@
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
           "importance": "medium"
+        },
+        {
+          "name": "Shap-User",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "high"
         }
       ],
       "tips": [
