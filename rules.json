@@ -1,6 +1,6 @@
 {
-  "version": "1.0.5",
-  "lastUpdated": "2026-06-08",
+  "version": "1.0.6",
+  "lastUpdated": "2026-06-22",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2204,6 +2204,48 @@
           "desc": "Scrapes data for AI news aggregation and republishing.",
           "importance": "medium",
           "label": "AgentTimes (The Agent Times)"
+        },
+        {
+          "name": "CragCrawler",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "GeistHaus-PageFetcher",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "high"
+        },
+        {
+          "name": "GoogleAgent-URLContext",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "high"
+        },
+        {
+          "name": "Kimi-User",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "high"
+        },
+        {
+          "name": "Querit-SearchBot",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "QueritBot",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "medium"
+        },
+        {
+          "name": "UseAI",
+          "org": "",
+          "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
+          "importance": "high"
         }
       ],
       "tips": [
