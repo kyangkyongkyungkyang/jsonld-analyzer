@@ -1,6 +1,6 @@
 {
-  "version": "1.0.6",
-  "lastUpdated": "2026-06-22",
+  "version": "1.0.7",
+  "lastUpdated": "2026-06-29",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -1358,7 +1358,8 @@
           "name": "AI2Bot-DeepResearchEval",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high"
+          "importance": "high",
+          "label": "AI2Bot-DeepResearchEval (Ai2, a non-profit AI research institute)"
         },
         {
           "name": "Ai2Bot-Dolma",
@@ -1398,7 +1399,8 @@
           "name": "Amzn-User",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high"
+          "importance": "high",
+          "label": "Amzn-User (Amazon, used for fetching web content to answer user queries through Alexa and other Amazon AI services)"
         },
         {
           "name": "Andibot",
@@ -1746,7 +1748,8 @@
           "name": "kagi-fetcher",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high"
+          "importance": "high",
+          "label": "kagi-fetcher (Kagi that fetches web content to answer user queries through Kagi AI, their suite of AI-powered tools including Assistant, Res…)"
         },
         {
           "name": "Kangaroo Bot",
@@ -1809,7 +1812,8 @@
           "name": "Manus-User",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium"
+          "importance": "medium",
+          "label": "Manus-User (Butterfly Effect, a company based in China)"
         },
         {
           "name": "meta-externalagent",
@@ -1942,7 +1946,8 @@
           "name": "Poggio-Citations",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high"
+          "importance": "high",
+          "label": "Poggio-Citations (Poggio, a company that provides AI sales enablement tools for creating tailored narratives, business cases, and account plan…)"
         },
         {
           "name": "Poseidon Research Crawler",
@@ -2051,7 +2056,8 @@
           "name": "TwinAgent",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium"
+          "importance": "medium",
+          "label": "TwinAgent (Twin, a platform that creates automated workers to perform tasks by integrating with APIs and controlling web applications through browser automa…)"
         },
         {
           "name": "VelenPublicWebCrawler",
@@ -2209,43 +2215,55 @@
           "name": "CragCrawler",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium"
+          "importance": "medium",
+          "label": "CragCrawler (CragSoftware, a Brazil-based software company specializing in data engineering and AI web scraping services)"
         },
         {
           "name": "GeistHaus-PageFetcher",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high"
+          "importance": "high",
+          "label": "GeistHaus-PageFetcher (GeistHaus, a company developing AI systems for therapy and psychological assessment)"
         },
         {
           "name": "GoogleAgent-URLContext",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high"
+          "importance": "high",
+          "label": "GoogleAgent-URLContext (Google that retrieves web content on behalf of Gemini API users)"
         },
         {
           "name": "Kimi-User",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "high"
+          "importance": "high",
+          "label": "Kimi-User (Moonshot AI that fetches web content on behalf of users interacting with Kimi)"
         },
         {
           "name": "Querit-SearchBot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium"
+          "importance": "medium",
+          "label": "Querit-SearchBot (Querit that indexes web content for their search API service, which is designed to provide real-time search results for larg…)"
         },
         {
           "name": "QueritBot",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
-          "importance": "medium"
+          "importance": "medium",
+          "label": "QueritBot (Querit, a company providing a search API for large language model integration)"
         },
         {
           "name": "UseAI",
           "org": "",
           "desc": "Description unavailable from darkvisitors.com More info can be found at https://darkvisitors.com/age",
           "importance": "high"
+        },
+        {
+          "name": "Cursor",
+          "org": "",
+          "desc": "Cursor is an AI coding agent that helps write, edit, and understand code. More info can be found at ",
+          "importance": "medium"
         }
       ],
       "tips": [
