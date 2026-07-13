@@ -1,6 +1,6 @@
 {
-  "version": "1.0.7",
-  "lastUpdated": "2026-06-29",
+  "version": "1.0.8",
+  "lastUpdated": "2026-07-13",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2264,6 +2264,40 @@
           "org": "",
           "desc": "Cursor is an AI coding agent that helps write, edit, and understand code. More info can be found at ",
           "importance": "medium"
+        },
+        {
+          "name": "AIWebIndex",
+          "org": "Lyrenth that builds an AI-readable index of web content for AI systems",
+          "desc": "AIWebIndex is a web crawler operated by Lyrenth that builds an AI-readable index of web content for ",
+          "importance": "medium",
+          "label": "AIWebIndex (Lyrenth that builds an AI-readable index of web content for AI systems)"
+        },
+        {
+          "name": "amazon-QBusiness",
+          "org": "",
+          "desc": "amazon-QBusiness is an Amazon Q Business web crawler that fetches and indexes web content for Amazon",
+          "importance": "high"
+        },
+        {
+          "name": "Mozilla-Tabstack",
+          "org": "Mozilla",
+          "desc": "Tabstack is a web intelligence API for AI agents. It extracts structured data from web pages and mak",
+          "importance": "medium",
+          "label": "Mozilla-Tabstack (Mozilla)"
+        },
+        {
+          "name": "TongyiBot",
+          "org": "Alibaba that fetches web content for the Tongyi Qianwen assistant and related Qwen-generated answers",
+          "desc": "TongyiBot is a web crawler operated by Alibaba that fetches web content for the Tongyi Qianwen assis",
+          "importance": "high",
+          "label": "TongyiBot (Alibaba that fetches web content for the Tongyi Qianwen assistant and related Qwen-generated answers)"
+        },
+        {
+          "name": "YiyanBot",
+          "org": "Baidu that fetches web content for the yiyan",
+          "desc": "YiyanBot is a web crawler operated by Baidu that fetches web content for the yiyan.baidu.com assista",
+          "importance": "high",
+          "label": "YiyanBot (Baidu that fetches web content for the yiyan)"
         }
       ],
       "tips": [
