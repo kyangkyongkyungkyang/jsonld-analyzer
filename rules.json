@@ -1,6 +1,6 @@
 {
-  "version": "1.0.8",
-  "lastUpdated": "2026-07-13",
+  "version": "1.0.9",
+  "lastUpdated": "2026-08-24",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2298,6 +2298,27 @@
           "desc": "YiyanBot is a web crawler operated by Baidu that fetches web content for the yiyan.baidu.com assista",
           "importance": "high",
           "label": "YiyanBot (Baidu that fetches web content for the yiyan)"
+        },
+        {
+          "name": "ExaSearchBot",
+          "org": "Exa",
+          "desc": "ExaSearchBot is a web crawler operated by Exa that discovers and indexes public web pages so their c",
+          "importance": "high",
+          "label": "ExaSearchBot (Exa)"
+        },
+        {
+          "name": "Lightpanda",
+          "org": "Anyone who downloads the Lightpanda client. Possibly being used by a Grok-adjacent organization's botnet.",
+          "desc": "Lightpanda is a custom-built headless browser designed for AI and automation.",
+          "importance": "medium",
+          "label": "Lightpanda (Anyone who downloads the Lightpanda client. Possibly being used by a Grok-adjacent organization's botnet.)"
+        },
+        {
+          "name": "Reflectionbot",
+          "org": "Reflection",
+          "desc": "An undocumented crawler whose user agent links to Reflection, a company that builds AI models.",
+          "importance": "medium",
+          "label": "Reflectionbot (Reflection)"
         }
       ],
       "tips": [
