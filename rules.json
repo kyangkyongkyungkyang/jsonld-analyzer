@@ -1,6 +1,6 @@
 {
-  "version": "1.0.9",
-  "lastUpdated": "2026-08-24",
+  "version": "1.0.10",
+  "lastUpdated": "2026-09-07",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2319,6 +2319,41 @@
           "desc": "An undocumented crawler whose user agent links to Reflection, a company that builds AI models.",
           "importance": "medium",
           "label": "Reflectionbot (Reflection)"
+        },
+        {
+          "name": "Diffbot-User",
+          "org": "Diffbot",
+          "desc": "Diffbot-User is used by requests originating on behalf of a human user browsing a URL using Diffbot ",
+          "importance": "high",
+          "label": "Diffbot-User (Diffbot)"
+        },
+        {
+          "name": "Kimi-SearchBot",
+          "org": "Moonshot AI",
+          "desc": "Kimi-SearchBot powers Kimi's search features: it analyzes pages for relevance and builds the search ",
+          "importance": "high",
+          "label": "Kimi-SearchBot (Moonshot AI)"
+        },
+        {
+          "name": "KimiBot",
+          "org": "Moonshot AI",
+          "desc": "KimiBot crawls content potentially used to train Kimi's foundation models. Documented by Moonshot AI",
+          "importance": "medium",
+          "label": "KimiBot (Moonshot AI)"
+        },
+        {
+          "name": "MistralAI-Training",
+          "org": "Mistral AI",
+          "desc": "MistralAI-Training crawls web content to build training datasets. Documented by Mistral at https://d",
+          "importance": "medium",
+          "label": "MistralAI-Training (Mistral AI)"
+        },
+        {
+          "name": "OAI-AdsBot",
+          "org": "OpenAI",
+          "desc": "OAI-AdsBot visits the landing page of a page submitted as an ad on ChatGPT, to check it against Open",
+          "importance": "medium",
+          "label": "OAI-AdsBot (OpenAI)"
         }
       ],
       "tips": [
