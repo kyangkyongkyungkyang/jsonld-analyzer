@@ -1,6 +1,6 @@
 {
-  "version": "1.0.10",
-  "lastUpdated": "2026-09-07",
+  "version": "1.0.11",
+  "lastUpdated": "2026-09-14",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2354,6 +2354,34 @@
           "desc": "OAI-AdsBot visits the landing page of a page submitted as an ad on ChatGPT, to check it against Open",
           "importance": "medium",
           "label": "OAI-AdsBot (OpenAI)"
+        },
+        {
+          "name": "DoubaoBot",
+          "org": "ByteDance",
+          "desc": "DoubaoBot is a crawler operated by ByteDance to collect web content for its Doubao AI assistant. Dis",
+          "importance": "high",
+          "label": "DoubaoBot (ByteDance)"
+        },
+        {
+          "name": "ERNIEBot",
+          "org": "Baidu",
+          "desc": "ERNIEBot is a crawler operated by Baidu to collect public web content used for its ERNIE (Wenxin) la",
+          "importance": "medium",
+          "label": "ERNIEBot (Baidu)"
+        },
+        {
+          "name": "MistralAI-Index",
+          "org": "Mistral AI",
+          "desc": "MistralAI-Index is Mistral AI's indexing crawler. It collects web content for Mistral's search index",
+          "importance": "high",
+          "label": "MistralAI-Index (Mistral AI)"
+        },
+        {
+          "name": "QwenBot",
+          "org": "Alibaba",
+          "desc": "QwenBot is a crawler operated by Alibaba to collect public web content for its Qwen (Tongyi Qianwen)",
+          "importance": "medium",
+          "label": "QwenBot (Alibaba)"
         }
       ],
       "tips": [
