@@ -1,6 +1,6 @@
 {
-  "version": "1.0.11",
-  "lastUpdated": "2026-09-14",
+  "version": "1.0.12",
+  "lastUpdated": "2026-09-21",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2696,6 +2696,7 @@
     "AskPublicNewsArticle": "Article",
     "Attorney": "LocalBusiness",
     "Audiobook": "Book",
+    "Audiology": "LocalBusiness",
     "AutoBodyShop": "LocalBusiness",
     "AutoDealer": "LocalBusiness",
     "AutoPartsStore": "LocalBusiness",
@@ -2848,6 +2849,7 @@
     "OnlineMarketplace": "Organization",
     "OnlineStore": "Organization",
     "OperatingSystem": "SoftwareApplication",
+    "Ophthalmology": "LocalBusiness",
     "OpinionNewsArticle": "Article",
     "Optician": "LocalBusiness",
     "Optometric": "LocalBusiness",
