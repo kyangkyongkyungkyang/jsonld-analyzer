@@ -1,6 +1,6 @@
 {
-  "version": "1.0.12",
-  "lastUpdated": "2026-09-21",
+  "version": "1.0.13",
+  "lastUpdated": "2026-09-28",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2382,6 +2382,39 @@
           "desc": "QwenBot is a crawler operated by Alibaba to collect public web content for its Qwen (Tongyi Qianwen)",
           "importance": "medium",
           "label": "QwenBot (Alibaba)"
+        },
+        {
+          "name": "AgentDataBot",
+          "org": "",
+          "desc": "AgentDataBot visits public web pages to identify technology stacks, company details, and team member",
+          "importance": "medium"
+        },
+        {
+          "name": "BixelBot",
+          "org": "",
+          "desc": "BixelBot collects public company and market signals for Bixel's structured company-data platform, wh",
+          "importance": "medium"
+        },
+        {
+          "name": "CloudflareBrowserRenderingCrawler",
+          "org": "Cloudflare that returns rendered website content for research, monitoring, and AI data workflows",
+          "desc": "CloudflareBrowserRenderingCrawler is a web crawler operated by Cloudflare that returns rendered webs",
+          "importance": "medium",
+          "label": "CloudflareBrowserRenderingCrawler (Cloudflare that returns rendered website content for research, monitoring, and AI data workflows)"
+        },
+        {
+          "name": "Kimi-Agent",
+          "org": "Moonshot AI that browses websites while carrying out user-directed research and other tasks",
+          "desc": "Kimi-Agent is a browser-enabled AI agent operated by Moonshot AI that browses websites while carryin",
+          "importance": "medium",
+          "label": "Kimi-Agent (Moonshot AI that browses websites while carrying out user-directed research and other tasks)"
+        },
+        {
+          "name": "qodercli",
+          "org": "Qoder that helps developers build, debug, and modify software from the terminal",
+          "desc": "qodercli is a command-line AI coding agent operated by Qoder that helps developers build, debug, and",
+          "importance": "medium",
+          "label": "qodercli (Qoder that helps developers build, debug, and modify software from the terminal)"
         }
       ],
       "tips": [
