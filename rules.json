@@ -1,6 +1,6 @@
 {
-  "version": "1.0.13",
-  "lastUpdated": "2026-09-28",
+  "version": "1.0.14",
+  "lastUpdated": "2026-10-05",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2415,6 +2415,13 @@
           "desc": "qodercli is a command-line AI coding agent operated by Qoder that helps developers build, debug, and",
           "importance": "medium",
           "label": "qodercli (Qoder that helps developers build, debug, and modify software from the terminal)"
+        },
+        {
+          "name": "KeenableBot",
+          "org": "Keenable",
+          "desc": "KeenableBot is a web crawler operated by Keenable for indexing web content for AI search.",
+          "importance": "high",
+          "label": "KeenableBot (Keenable)"
         }
       ],
       "tips": [
