@@ -1,6 +1,6 @@
 {
-  "version": "1.0.14",
-  "lastUpdated": "2026-10-05",
+  "version": "1.0.15",
+  "lastUpdated": "2026-10-19",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2422,6 +2422,55 @@
           "desc": "KeenableBot is a web crawler operated by Keenable for indexing web content for AI search.",
           "importance": "high",
           "label": "KeenableBot (Keenable)"
+        },
+        {
+          "name": "GrokAppAndroid",
+          "org": "xAI",
+          "desc": "Grok AI is an advanced AI assistant built by xAI that leverages real-time web and X data to produce ",
+          "importance": "high",
+          "label": "GrokAppAndroid (xAI)"
+        },
+        {
+          "name": "GrokBot",
+          "org": "xAI",
+          "desc": "Used to collect publicly available web content to support the training of Grok AI models.",
+          "importance": "high",
+          "label": "GrokBot (xAI)"
+        },
+        {
+          "name": "Hunyuan",
+          "org": "Tencent",
+          "desc": "Hunyuan is a training crawler operated by Tencent. Its job is to read public web pages and feed that",
+          "importance": "medium",
+          "label": "Hunyuan (Tencent)"
+        },
+        {
+          "name": "MoonshotBot",
+          "org": "Kimi",
+          "desc": "MoonshotBot is a training crawler operated by Kimi. Its job is to read public web pages and feed tha",
+          "importance": "medium",
+          "label": "MoonshotBot (Kimi)"
+        },
+        {
+          "name": "nbot",
+          "org": "NBot",
+          "desc": "NBot uses advanced AI to scan news outlets, industry blogs, newsletters, and social media.",
+          "importance": "high",
+          "label": "nbot (NBot)"
+        },
+        {
+          "name": "xAI-Grok",
+          "org": "xAI",
+          "desc": "xAI-Grok is an xAI crawler token associated with Grok content collection. It is classified as traini",
+          "importance": "medium",
+          "label": "xAI-Grok (xAI)"
+        },
+        {
+          "name": "YiBot",
+          "org": "01.ai, an AI company founded by Kai-Fu Lee.",
+          "desc": "YiBot/1.0 is an advanced artificial intelligence platform designed to enhance interaction and engage",
+          "importance": "medium",
+          "label": "YiBot (01.ai, an AI company founded by Kai-Fu Lee.)"
         }
       ],
       "tips": [
