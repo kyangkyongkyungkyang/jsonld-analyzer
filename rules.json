@@ -1,6 +1,6 @@
 {
-  "version": "1.0.15",
-  "lastUpdated": "2026-10-19",
+  "version": "1.0.16",
+  "lastUpdated": "2026-10-26",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2471,6 +2471,82 @@
           "desc": "YiBot/1.0 is an advanced artificial intelligence platform designed to enhance interaction and engage",
           "importance": "medium",
           "label": "YiBot (01.ai, an AI company founded by Kai-Fu Lee.)"
+        },
+        {
+          "name": "AGI Agent",
+          "org": "AGI, Inc",
+          "desc": "AGI Agent is an AI assistant operated by AGI, Inc. that navigates websites to complete user-directed",
+          "importance": "medium",
+          "label": "AGI Agent (AGI, Inc)"
+        },
+        {
+          "name": "CartAI Agentic Commerce",
+          "org": "CartAI that accesses online stores to support user-directed shopping and checkout workflows",
+          "desc": "CartAI Agentic Commerce is a signed browser agent operated by CartAI that accesses online stores to ",
+          "importance": "medium",
+          "label": "CartAI Agentic Commerce (CartAI that accesses online stores to support user-directed shopping and checkout workflows)"
+        },
+        {
+          "name": "CledaraBot",
+          "org": "Cledara that visits SaaS providers to complete customer-approved administrative tasks, including invoice collection and user managem…",
+          "desc": "CledaraBot is an AI agent operated by Cledara that visits SaaS providers to complete customer-approv",
+          "importance": "medium",
+          "label": "CledaraBot (Cledara that visits SaaS providers to complete customer-approved administrative tasks, including invoice collection and user managem…)"
+        },
+        {
+          "name": "Codex",
+          "org": "",
+          "desc": "Codex is an AI coding agent by OpenAI that helps developers write, review, debug, and ship code. Mor",
+          "importance": "medium"
+        },
+        {
+          "name": "Dot",
+          "org": "",
+          "desc": "Dot is an OpenAI AI agent that uses a cloud browser to research websites and carry out ongoing tasks",
+          "importance": "medium"
+        },
+        {
+          "name": "ElevenlabsBot",
+          "org": "",
+          "desc": "ElevenlabsBot fetches pages that customers add to or refresh in ElevenLabs agents' knowledge bases, ",
+          "importance": "high"
+        },
+        {
+          "name": "ExaUser",
+          "org": "",
+          "desc": "ExaUser is Exa's on-demand fetcher that retrieves live website content when a user or an application",
+          "importance": "high"
+        },
+        {
+          "name": "Grok Bot",
+          "org": "",
+          "desc": "Grok Bot is a personal AI agent created by xAI that runs on a persistent cloud computer with a brows",
+          "importance": "medium"
+        },
+        {
+          "name": "HarkBot",
+          "org": "",
+          "desc": "HarkBot visits web pages on behalf of signed-in Hark users as Hark carries out research, form-fillin",
+          "importance": "medium"
+        },
+        {
+          "name": "Instinct",
+          "org": "",
+          "desc": "Instinct is a personal AI agent that uses a phone and computer to complete everyday tasks such as or",
+          "importance": "medium"
+        },
+        {
+          "name": "Muse",
+          "org": "",
+          "desc": "Muse is a personal AI agent created by Meta that uses a web browser and connected apps to complete m",
+          "importance": "medium"
+        },
+        {
+          "name": "Payhawk Invoice Fetching Agent",
+          "org": "Payhawk that retrieves invoices from supplier websites for users and attaches them to expense records",
+          "desc": "Payhawk Invoice Fetching Agent is a browser agent operated by Payhawk that retrieves invoices from s",
+          "importance": "medium",
+          "label": "Payhawk Invoice Fetching Agent (Payhawk that retrieves invoices from supplier websites for users and attaches them to expense records)"
         }
       ],
       "tips": [
