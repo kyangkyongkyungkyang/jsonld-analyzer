@@ -1,6 +1,6 @@
 {
-  "version": "1.0.16",
-  "lastUpdated": "2026-10-26",
+  "version": "1.0.17",
+  "lastUpdated": "2026-11-02",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2509,7 +2509,8 @@
           "name": "ElevenlabsBot",
           "org": "",
           "desc": "ElevenlabsBot fetches pages that customers add to or refresh in ElevenLabs agents' knowledge bases, ",
-          "importance": "high"
+          "importance": "high",
+          "label": "ElevenlabsBot (ElevenLabs)"
         },
         {
           "name": "ExaUser",
@@ -2547,6 +2548,20 @@
           "desc": "Payhawk Invoice Fetching Agent is a browser agent operated by Payhawk that retrieves invoices from s",
           "importance": "medium",
           "label": "Payhawk Invoice Fetching Agent (Payhawk that retrieves invoices from supplier websites for users and attaches them to expense records)"
+        },
+        {
+          "name": "ElevenlabsCrawler",
+          "org": "ElevenLabs",
+          "desc": "ElevenlabsCrawler is ElevenLabs' web crawler that collects public content that may be used to train ",
+          "importance": "medium",
+          "label": "ElevenlabsCrawler (ElevenLabs)"
+        },
+        {
+          "name": "ScryBot",
+          "org": "Scry",
+          "desc": "An AI agent companion that allows you to enhance answers by scraping data",
+          "importance": "medium",
+          "label": "ScryBot (Scry)"
         }
       ],
       "tips": [
