@@ -1,6 +1,6 @@
 {
-  "version": "1.0.17",
-  "lastUpdated": "2026-11-02",
+  "version": "1.0.18",
+  "lastUpdated": "2026-11-09",
   "schemaRules": {
     "Product": {
       "label": "제품",
@@ -2562,6 +2562,19 @@
           "desc": "An AI agent companion that allows you to enhance answers by scraping data",
           "importance": "medium",
           "label": "ScryBot (Scry)"
+        },
+        {
+          "name": "__usage_ai-training",
+          "org": "Not applicable.",
+          "desc": "`__usage_ai-training` is a policy token defined in an [Internet Draft](https://datatracker.ietf.org/",
+          "importance": "medium",
+          "label": "__usage_ai-training (Not applicable.)"
+        },
+        {
+          "name": "Claude-Agent",
+          "org": "",
+          "desc": "Claude-Agent is Anthropic's cloud browser agent for Claude Duet. It navigates websites and completes",
+          "importance": "medium"
         }
       ],
       "tips": [
